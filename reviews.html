@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMOKE HUB | Відгуки</title>
+<style>
+:root {
+    --accent-pink: #e91e63;
+    --bg-dark: #0f051d;
+    --card-bg: rgba(26, 11, 46, 0.85);
+}
+
+body {
+    background: radial-gradient(circle at top right, #1a0b2e, #0d0216);
+    margin: 0;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    white-space: nowrap;   /* забороняє перенос на новий рядок */
+}
+
+
+.logo-icon{
+  font-size:22px;
+  filter:drop-shadow(0 0 6px rgba(255,255,255,.6));
+}
+
+.logo-text {
+    font-weight: 900; 
+    font-size: 22px;
+    background: linear-gradient(90deg, #ff0055, #00f2ff, #ff0055);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-move 3s linear infinite;
+}
+@keyframes gradient-move { to { background-position: 200% center; } }
+
+header {
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Кнопка назад у стилі скляної карти */
+.back-btn {
+    padding: 0.5em 1em;           /* вертикальний і горизонтальний відступ у відсотках */
+    font-size: clamp(12px, 1.2vw, 16px); /* мін 12px, макс 16px, адаптивно по ширині екрана */
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.3);
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--accent-pink);
+    transition: 0.3s;
+}
+.back-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 25px var(--accent-pink);
+    border-color: var(--accent-pink);
+}
+
+.container { max-width: 800px; margin: 0 auto; padding: 20px; }
+
+h1 {
+    font-size: 32px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin: 30px 0;
+}
+
+/* Скляна форма відгуків */
+.review-form {
+    background: var(--card-bg);
+    padding: 25px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.review-form input, .review-form textarea {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 12px;
+    margin-bottom: 15px;
+    color: white;
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+.review-form button {
+    width: 100%;
+    background: var(--accent-pink);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 15px var(--accent-pink);
+    transition: 0.3s;
+    text-transform: uppercase;
+}
+.review-form button:hover { transform: scale(1.02); box-shadow: 0 0 25px var(--accent-pink); }
+
+/* Картки відгуків */
+.review-card {
+    background: rgba(26, 11, 46, 0.85);
+    border: 1px solid rgba(233,30,99,0.3);
+    border-radius: 25px;
+    padding: 20px 25px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 25px rgba(233,30,99,0.3);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s forwards;
+}
+.review-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(120deg, #ff0055, #00f2ff, #ff0055, #00f2ff);
+    opacity: 0.2;
+    transform: rotate(25deg);
+    pointer-events: none;
+}
+.review-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 0 40px rgba(233,30,99,0.6);
+    border-color: var(--accent-pink);
+}
+.review-card .name {
+    font-size: 18px;
+    font-weight: 800;
+    color: #ff0055;
+    text-shadow: 0 0 5px #ff0055;
+    margin-bottom: 5px;
+}
+.review-card .date {
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+.review-card .text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #ddd;
+    background: rgba(0,0,0,0.1);
+    padding: 10px 15px;
+    border-radius: 15px;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.05);
+    transition: background 0.3s ease;
+}
+.review-card .text:hover { background: rgba(0,0,0,0.2); }
+
+@keyframes fadeInUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Адмін-панель */
+.admin-panel {
+    display: none;
+    background: rgba(233,30,99,0.1);
+    border: 1px solid var(--accent-pink);
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    text-align: center;
+}
+.delete-btn {
+    background: #ff3333;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    transition: 0.3s;
+}
+.delete-btn:hover { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
+
+/* Dev панель */
+.dev-panel {
+    position: fixed; top: 20px; left: -350px; width: 280px; background: #111;
+    border: 1px solid var(--accent-pink); border-radius: 15px; padding: 25px;
+    z-index: 10000; transition: 0.4s ease; backdrop-filter: blur(20px);
+}
+.dev-panel.active { left: 20px; }
+.dev-panel input { width: 100%; background: #222; border: 1px solid #444; padding: 12px; margin-bottom: 10px; color: white; border-radius: 8px; box-sizing: border-box; }
+.dev-panel button { width: 100%; background: var(--accent-pink); color: white; border: none; padding: 12px; cursor: pointer; border-radius: 8px; font-weight: bold; }
+.dev-trigger { position: fixed; bottom: 0; left: 0; width: 40px; height: 40px; background: transparent; z-index: 10001; }
+
+footer { text-align: center; font-size: 11px; color: #555; padding: 40px 0; }
+
+/* ❄️ Сніг */
+.snowflake{
+    position:fixed;
+    top:-10px;
+    opacity:.7;
+    pointer-events:none;
+    animation:fall linear infinite;
+}
+@keyframes fall{ to{transform:translateY(110vh);} }
+
+@media (max-width: 480px) {
+    .logo-text {
+        font-size: 18px;  /* трохи менше на мобільних */
+    }
+    .logo-icon {
+        font-size: 18px;
+    }
+}
+
+</style>
+</head>
+<body>
+
+<div id="dev-login" class="dev-panel">
+    <h3 style="margin-top:0">Admin Access</h3>
+    <input type="text" id="dev-user" placeholder="Логін">
+    <input type="password" id="dev-pass" placeholder="Пароль">
+    <button onclick="checkAuth()">УВІЙТИ</button>
+    <button onclick="closePanels()" style="background:#333; margin-top:5px;">ЗАКРИТИ</button>
+</div>
+<div class="dev-trigger" onclick="toggleLogin()"></div>
+
+<header>
+    <button class="back-btn" onclick="location.href='index.html'">← КАТАЛОГ</button>
+
+    <div class="logo">
+        <span class="logo-icon">🎅</span>
+        <span class="logo-text">SMOKE HUB</span>
+    </div>
+
+    <div style="width:70px"></div>
+</header>
+
+<div class="container">
+    <h1>ВІДГУКИ</h1>
+
+    <div id="admin-bar" class="admin-panel">
+        <span style="color:var(--accent-pink); font-weight:bold; margin-right:15px;">РЕЖИМ АДМІНІСТРАТОРА</span>
+        <button onclick="logoutAdmin()" style="background:#333; color:white; border:1px solid #555; padding:5px 15px; border-radius:5px; cursor:pointer;">ВИЙТИ</button>
+    </div>
+
+    <div class="review-form">
+        <input type="text" id="rev-name" placeholder="Твоє ім'я" maxlength="25">
+        <textarea id="rev-text" placeholder="Напиши свій відгук тут..." rows="4" maxlength="400"></textarea>
+        <button onclick="sendReview()">ОПУБЛІКУВАТИ</button>
+    </div>
+
+    <div id="reviews-container"></div>
+</div>
+
+<footer>
+    <p>© SMOKE HUB</p>
+</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = { databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/" };
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const reviewsRef = ref(db, 'reviews');
+
+// Авторизація
+window.checkAuth = () => {
+    if(document.getElementById('dev-user').value==="admin" && document.getElementById('dev-pass').value==="admin"){
+        sessionStorage.setItem('isHubAdmin','true');
+        location.reload();
+    } else alert("Помилка");
+}
+window.logoutAdmin = () => { sessionStorage.removeItem('isHubAdmin'); location.reload(); }
+window.toggleLogin = () => document.getElementById('dev-login').classList.toggle('active');
+window.closePanels = () => document.getElementById('dev-login').classList.remove('active');
+
+// Відправка відгуків
+window.sendReview = () => {
+    const n = document.getElementById('rev-name').value.trim();
+    const t = document.getElementById('rev-text').value.trim();
+    if(!n || !t) return alert("Будь ласка, заповни всі поля!");
+    
+    const newRef = push(reviewsRef);
+    set(newRef, { name: n, text: t, date: new Date().toLocaleDateString('uk-UA') }).then(() => {
+        document.getElementById('rev-name').value = "";
+        document.getElementById('rev-text').value = "";
+    });
+}
+
+// Відображення відгуків
+onValue(reviewsRef, (snap) => {
+    const container = document.getElementById('reviews-container');
+    container.innerHTML = "";
+    const data = snap.val();
+    const isAdmin = sessionStorage.getItem('isHubAdmin')==='true';
+    if(isAdmin) document.getElementById('admin-bar').style.display='block';
+
+    if(data){
+        Object.keys(data).reverse().forEach(key=>{
+            const r = data[key];
+            const card = document.createElement('div');
+            card.className = 'review-card';
+            card.innerHTML = `
+                <div class="name">${r.name}</div>
+                <div class="date">${r.date}</div>
+                <div class="text">${r.text}</div>
+                ${isAdmin?`<button class="delete-btn" onclick="deleteReview('${key}')">ВИДАЛИТИ</button>`:''}
+            `;
+            container.appendChild(card);
+        });
+    }
+});
+
+window.deleteReview = key => confirm("Видалити відгук?") && remove(ref(db,'reviews/'+key));
+
+document.addEventListener('keydown', e => { if(e.shiftKey && e.code==='KeyD') window.toggleLogin(); });
+
+// ❄️ Snow
+for(let i=0;i<20;i++){
+  let s=document.createElement("div");
+  s.className="snowflake";
+  s.innerHTML="❄️";
+  s.style.left=Math.random()*100+"vw";
+  s.style.animationDuration=6+Math.random()*10+"s";
+  s.style.fontSize=10+Math.random()*16+"px";
+  document.body.appendChild(s);
+}
+</script>
+</body>
+</html>
