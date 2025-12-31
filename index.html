@@ -604,44 +604,35 @@
 @keyframes slideUp { from { transform: translateY(150%); } to { transform: translateY(0); } }
 </style>
 
+<div id="pwa-toast" style="display: none; position: fixed; bottom: 100px; left: 20px; right: 20px; background: linear-gradient(135deg, #1a0b2e 0%, #0d0216 100%); border: 1px solid #00c6ff; border-radius: 20px; padding: 15px; z-index: 10001; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <img src="images/logo.png" style="width: 50px; height: 50px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+        <div style="flex: 1;">
+            <div style="font-weight: 800; font-size: 14px; color: #fff; margin-bottom: 4px;">SMOKE HUB App</div>
+            <div id="pwa-text" style="font-size: 12px; color: #bbb;">Натисни <img src="https://img.icons8.com/ios/50/ffffff/upload--v1.png" style="width:16px; vertical-align:middle;"> та <b>"Додати на початковий екран"</b></div>
+        </div>
+        <button onclick="document.getElementById('pwa-toast').style.display='none'" style="background: #00c6ff; border: none; color: #000; padding: 8px 15px; border-radius: 12px; font-weight: 700; font-size: 12px;">ОК</button>
+    </div>
+</div>
+
 <script>
-const pwaToast = document.getElementById('pwa-toast');
-const pwaBtn = document.getElementById('pwa-btn');
-const pwaText = document.getElementById('pwa-text');
+    window.addEventListener('load', () => {
+        // Перевіряємо чи це iPhone
+        const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+        // Перевіряємо чи сайт вже відкритий як додаток
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
-// Перевірка пристрою
-const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent);
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-
-let deferredPrompt;
-
-// Для Android (Chrome)
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    if (!isStandalone) {
-        setTimeout(() => { pwaToast.style.display = 'block'; }, 4000);
-    }
-});
-
-pwaBtn.addEventListener('click', () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        pwaToast.style.display = 'none';
-    } else if (isIos) {
-        pwaToast.style.display = 'none';
-    }
-});
-
-// Для iPhone (Safari) - міняємо текст під інструкцію
-if (isIos && !isStandalone) {
-    pwaText.innerHTML = 'Натисни <img src="https://img.icons8.com/ios/50/ffffff/upload--v1.png" style="width:16px; vertical-align:middle;"> та <b>"Додати на початковий екран"</b>';
-    pwaBtn.innerText = 'Зрозумів';
-    setTimeout(() => { pwaToast.style.display = 'block'; }, 4000);
-}
+        // Якщо це iPhone і ще НЕ додаток — показуємо через 3 секунди
+        if (isIos && !isStandalone) {
+            setTimeout(() => {
+                document.getElementById('pwa-toast').style.display = 'block';
+            }, 3000);
+        }
+    });
 </script>
 
 </body>
 </html>
+
 
 
