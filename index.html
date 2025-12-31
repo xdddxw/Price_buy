@@ -605,37 +605,46 @@
 </style>
 
 <div id="pwa-toast" 
-     onclick="this.style.display='none'; if(typeof triggerHaptic === 'function') triggerHaptic();"
-     style="display: none; position: fixed; bottom: 100px; left: 20px; right: 20px; background: linear-gradient(135deg, #1a0b2e 0%, #0d0216 100%); border: 1px solid #00c6ff; border-radius: 20px; padding: 15px; z-index: 10001; box-shadow: 0 10px 30px rgba(0,0,0,0.8); cursor: pointer; -webkit-tap-highlight-color: transparent;">
+     onclick="this.style.setProperty('display', 'none', 'important');"
+     style="display: none !important; position: fixed; bottom: 110px; left: 20px; right: 20px; background: #1a0b2e; border: 2px solid #00c6ff; border-radius: 20px; padding: 15px; z-index: 999999; box-shadow: 0 10px 40px rgba(0,0,0,0.9); cursor: pointer; touch-action: manipulation;">
     
     <div style="display: flex; align-items: center; gap: 15px; pointer-events: none;">
-        <img src="images/logo.png" style="width: 50px; height: 50px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+        <img src="images/logo.png" style="width: 45px; height: 45px; border-radius: 10px;">
         <div style="flex: 1;">
-            <div style="font-weight: 800; font-size: 14px; color: #fff; margin-bottom: 4px;">SMOKE HUB App</div>
-            <div style="font-size: 12px; color: #bbb;">Натисніть <img src="https://img.icons8.com/ios/50/ffffff/upload--v1.png" style="width:16px; vertical-align:middle;"> та <b>"Додати на екран"</b></div>
+            <div style="font-weight: 800; font-size: 14px; color: #fff;">SMOKE HUB App</div>
+            <div style="font-size: 11px; color: #bbb;">Натисни <img src="https://img.icons8.com/ios/50/ffffff/upload--v1.png" style="width:14px; vertical-align:middle;"> та <b>"Додати на екран"</b></div>
         </div>
-        <div style="background: #00c6ff; color: #000; padding: 8px 15px; border-radius: 12px; font-weight: 700; font-size: 12px;">ОК</div>
+        <div style="background: #00c6ff; color: #000; padding: 6px 12px; border-radius: 10px; font-weight: 700; font-size: 12px; min-width: 40px; text-align: center;">ОК</div>
     </div>
 </div>
 
 <script>
-    window.addEventListener('load', () => {
-        const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    // Виносимо логіку в окрему функцію для надійності
+    function showPwaPrompt() {
+        const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent);
+        const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
 
         if (isIos && !isStandalone) {
             setTimeout(() => {
                 const toast = document.getElementById('pwa-toast');
                 if (toast) {
-                    toast.style.display = 'block';
+                    toast.style.setProperty('display', 'block', 'important');
                 }
             }, 3000);
         }
-    });
+    }
+
+    // Запускаємо перевірку
+    if (document.readyState === 'complete') {
+        showPwaPrompt();
+    } else {
+        window.addEventListener('load', showPwaPrompt);
+    }
 </script>
 
 </body>
 </html>
+
 
 
 
