@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMOKE HUB | Рандомайзер</title>
+
+<style>
+/* ===== BODY ===== */
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: radial-gradient(circle at top, #1b0b2e, #0b0416);
+  color: #fff;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* ===== СНІГ ===== */
+.snowflake {
+  position: fixed;
+  color: white;
+  font-size: 1em;
+  opacity: 0.8;
+  pointer-events: none;
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes fall { to { transform: translateY(110vh); } }
+
+/* ===== ЛОГО ===== */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  margin: 25px 0 10px;
+}
+.logo-icon { font-size: 28px; }
+.logo-text {
+  font-weight: 900;
+  font-size: 26px;
+  background: linear-gradient(90deg, #ff0055, #00f2ff, #ff0055);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-move 3s linear infinite;
+}
+@keyframes gradient-move { to { background-position: 200% center; } }
+
+/* ===== КАРТКИ ===== */
+.card {
+  width: 90%;
+  max-width: 420px;
+  margin: 15px auto;
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.07);
+  box-shadow: 0 0 35px rgba(255,0,150,0.2);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  word-wrap: break-word;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+.buttons button, .main-btn, .back-btn {
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+}
+.buttons button { background: rgba(255,255,255,0.1); color: #fff; }
+.buttons button:hover { background: linear-gradient(90deg,#ff2f92,#ff005d); box-shadow:0 0 15px rgba(255,0,150,0.6); }
+
+.main-btn { margin-top: 20px; background: linear-gradient(90deg,#ff2f92,#ff005d); color: #fff; box-shadow:0 0 20px rgba(255,0,150,0.6); }
+
+.back-btn { display:block; margin-bottom:15px; padding:12px 16px; border-radius:12px; background: rgba(255,255,255,0.1); color:#fff; box-shadow:0 0 10px rgba(255,0,150,0.3); }
+.back-btn:hover { background: linear-gradient(90deg,#ff2f92,#ff005d); box-shadow:0 0 15px rgba(255,0,150,0.6); }
+
+.result-card {
+  margin-top: 12px;
+  padding: 15px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.1);
+  box-shadow: 0 0 15px rgba(255,255,255,0.1);
+  width: 100%;
+  text-align: center;
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Сніг -->
+<script>
+for(let i=0;i<25;i++){
+  let s = document.createElement("div");
+  s.className="snowflake";
+  s.innerHTML = "❄️";
+  s.style.left = Math.random()*100 + "vw";
+  s.style.top = Math.random()*100 + "vh";  // випадкове початкове положення
+  s.style.animationDuration = 5 + Math.random()*10 + "s";
+  s.style.fontSize = 10 + Math.random()*20 + "px";
+  document.body.appendChild(s);
+}
+</script>
+
+<!-- Лого -->
+<div class="logo">
+  <span class="logo-icon">🎅</span>
+  <span class="logo-text">SMOKE HUB</span>
+</div>
+
+<!-- Вибір смаку -->
+<div class="card" id="quiz">
+  <button class="back-btn" onclick="location.href='index.html'">← Назад</button>
+  <h2 id="question">Який смак сьогодні?</h2>
+  <div class="buttons" id="answers">
+    <button onclick="pick('fruit')">🍓 Фрукти</button>
+    <button onclick="pick('mint')">❄️ Холод / Мʼята</button>
+    <button onclick="pick('drink')">🥤 Напої</button>
+    <button onclick="pick('sweet')">🍰 Десерт</button>
+    <button onclick="randomPick()">🎲 Рандомний смак</button>
+  </div>
+</div>
+
+<!-- Результат -->
+<div class="card" id="result" style="display:none;">
+  <h2>🎁 Твій смак:</h2>
+  <div id="list"></div>
+  <button class="main-btn" onclick="restart()">Підібрати ще</button>
+</div>
+
+<script>
+const juices = [
+  {name:"Berry Mint", tags:["fruit","mint"], desc:"Ягоди з мʼякою мʼятою"},
+  {name:"Spearmint", tags:["mint"], desc:"Чиста освіжаюча мʼята"},
+  {name:"Double Grape", tags:["fruit","sweet"], desc:"Насичений солодкий виноград"},
+  {name:"Apple Mixed", tags:["fruit"], desc:"Мікс зеленого та червоного яблука"},
+  {name:"Double Raspberry", tags:["fruit","sweet"], desc:"Подвійна солодка малина"},
+  {name:"Cranberry Mors", tags:["fruit"], desc:"Кисло-солодкий журавлинний морс"},
+  {name:"Watermelon Melon", tags:["fruit","sweet"], desc:"Кавун з динею"},
+  {name:"Cola Lemon", tags:["drink","sweet"], desc:"Кола з лимоном"},
+  {name:"RedBull Blue Raspberry", tags:["drink","sweet"], desc:"Енергетик з синьою малиною"},
+  {name:"Pineapple Lemonade", tags:["drink","sweet"], desc:"Ананасовий лимонад"},
+  {name:"Multifruit", tags:["fruit","sweet"], desc:"Солодкий фруктовий коктейль"},
+  {name:"Bali Triple Shot", tags:["fruit","sweet"], desc:"Тропічний мікс"}
+];
+
+function pick(tag){
+  const filtered = juices.filter(j => j.tags.includes(tag));
+  showResult(filtered);
+}
+
+function randomPick(){
+  const j = juices[Math.floor(Math.random()*juices.length)];
+  showResult([j]);
+}
+
+function showResult(array){
+  document.getElementById("quiz").style.display="none";
+  document.getElementById("result").style.display="block";
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+  array.forEach(j => {
+    const div = document.createElement("div");
+    div.className="result-card";
+    div.innerHTML = `<strong>${j.name}</strong><br>${j.desc}`;
+    list.appendChild(div);
+  });
+}
+
+function restart(){
+  document.getElementById("quiz").style.display="block";
+  document.getElementById("result").style.display="none";
+}
+</script>
+
+</body>
+</html>

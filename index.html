@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMOKE HUB | Каталог</title>
+    <!--<link rel="stylesheet" href="style.css">-->
+    <!-- PWA META -->
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SMOKE HUB">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="shortcut icon" href="logo.png">
+<link rel="manifest" href="manifest.json">
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/service-worker.js');
+  });
+}
+</script>
+
+
+    <style>
+        /* Стилі для накладання стікерів на фото */
+        .product-img {
+            position: relative; /* База для позиціонування */
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        .badge {
+            position: absolute; /* Накладання поверх */
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            pointer-events: none;
+            display: none; /* Ховаємо за замовчуванням */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .badge-hit {
+            display: block;
+            background: #ff0055;
+            color: white;
+        }
+
+        .badge-promo {
+            display: block;
+            background: #ffd900;
+            color: black;
+        }
+
+        /* Видаляємо старі відступи, які могли бути */
+        .product-card .badge:empty {
+            display: none;
+        }
+
+        /* 1. ГЛОБАЛЬНІ НАЛАШТУВАННЯ */
+:root {
+    --bg-dark: #0d0216;
+    --sidebar-bg: #1a0b2e;
+    --accent-pink: #e91e63;
+    --accent-yellow: #ffcc00;
+    --accent-blue: #00c6ff;
+    --card-bg: rgba(255, 255, 255, 0.05);
+}
+
+body {
+    background: radial-gradient(circle at top right, #1a0b2e, #0d0216);
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+    overflow-x: hidden;
+    transition: filter 2s ease-in-out; /* Для плавного димового ефекту */
+}
+
+/* 2. ШАПКА ТА НОВОРІЧНЕ ЛОГО */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+    position: relative;
+    display: inline-block;
+    font-weight: 900;
+    font-size: 22px;
+    background: linear-gradient(90deg, #ff0055, #00f2ff, #ff0055);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-move 3s linear infinite;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* ШАПКА САНТИ (ЕМОДЗІ) */
+.santa-hat-emoji {
+    position: absolute;
+    font-size: 26px;
+    top: -20px;
+    left: -12px;
+    transform: rotate(-15deg);
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    z-index: 5;
+    pointer-events: none;
+    animation: hat-float 3s ease-in-out infinite;
+    -webkit-text-fill-color: initial; /* Щоб емодзі не був прозорим через градієнт лого */
+}
+
+@keyframes hat-float {
+    0%, 100% { transform: rotate(-15deg) translateY(0); }
+    50% { transform: rotate(-10deg) translateY(-3px); }
+}
+
+@keyframes gradient-move { to { background-position: 200% center; } }
+
+/* Гірлянда для головного заголовка */
+h1 {
+    font-size: 32px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin: 30px 0;
+    animation: garland 2s infinite alternate !important;
+}
+
+@keyframes garland {
+    0% { color: #ff0000; text-shadow: 0 0 15px rgba(255, 0, 0, 0.8); }
+    50% { color: #ffffff; text-shadow: 0 0 20px rgba(255, 255, 255, 0.9); }
+    100% { color: #00ff44; text-shadow: 0 0 15px rgba(0, 255, 68, 0.8); }
+}
+
+/* 3. ФІЛЬТРИ (ЗИМОВІ) */
+.filters {
+    display: flex; justify-content: center; gap: 10px; margin-bottom: 25px;
+    width: 100%; overflow-x: auto; padding: 10px 0;
+}
+.filters button {
+    flex: 0 0 auto; background: #222; color: white; border: 1px solid transparent;
+    padding: 10px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s;
+}
+.filters button.active {
+    background: linear-gradient(135deg, #00c6ff, #0072ff) !important;
+    box-shadow: 0 0 15px rgba(0, 198, 255, 0.5) !important;
+    border: 1px solid #fff !important;
+}
+
+/* 4. КАТАЛОГ ТА КАРТКИ */
+.product-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 10px;
+}
+@media (min-width: 768px) {
+    .product-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; }
+}
+
+.product-card {
+    background: var(--card-bg); backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px;
+    padding: 15px; text-align: center; position: relative; transition: 0.3s;
+    overflow: hidden;
+}
+.product-card:hover {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2) !important;
+    border-color: #ffffff !important;
+}
+.product-card::after {
+    content: "❄️"; position: absolute; top: 5px; right: 5px; font-size: 14px; opacity: 0.3;
+}
+
+.product-img img { width: 100%; border-radius: 12px; aspect-ratio: 1/1; object-fit: cover; }
+.price { font-weight: 800; font-size: 15px; color: white; margin-top: 10px; display: block; }
+
+/* Наявність */
+.product-card.out-of-stock { opacity: 0.4; filter: grayscale(1); }
+.product-card.out-of-stock::after {
+    content: "РОЗКУПИЛИ"; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    background: rgba(233, 30, 99, 0.9); color: white;
+    padding: 5px 12px; font-weight: bold; border-radius: 5px; z-index: 10; opacity: 1;
+}
+
+/* 5. АДМІН-ПАНЕЛЬ (GLASSMORPHISM) */
+.dev-panel {
+    position: fixed; z-index: 10000;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+    opacity: 0; pointer-events: none;
+}
+.admin-glass {
+    background: rgba(13, 2, 22, 0.95) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--accent-pink) !important;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 1) !important;
+    width: 90%; max-width: 320px; border-radius: 24px; padding: 20px;
+}
+
+@media (min-width: 481px) {
+    .dev-panel { top: 20px; right: 20px; transform: translateX(120%); }
+    .dev-panel.active { transform: translateX(0); opacity: 1; pointer-events: auto; }
+}
+@media (max-width: 480px) {
+    .dev-panel { bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150%); }
+    .dev-panel.active { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+}
+
+/* Редагування */
+.editing-active {
+    outline: 2px dashed var(--accent-pink) !important;
+    background: rgba(233, 30, 99, 0.15) !important;
+    box-shadow: 0 0 15px rgba(233, 30, 99, 0.4);
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+/* 6. ІНШЕ */
+#snow-canvas {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 9999;
+}
+
+#scrollTopBtn {
+    display: none; position: fixed; bottom: 30px; left: 30px; z-index: 999;
+    width: 45px; height: 45px; background: var(--accent-pink); color: white;
+    border: none; border-radius: 50%; font-size: 20px; cursor: pointer;
+    box-shadow: 0 0 15px var(--accent-pink); opacity: 0.8;
+}
+
+.mobile-nav {
+    position: fixed; top: 0; right: -100%; width: 280px; height: 100vh;
+    background: var(--bg-dark); z-index: 2000; padding: 40px 20px; transition: 0.4s;
+    border-left: 1px solid var(--accent-pink);
+}
+.mobile-nav.active { right: 0; }
+
+#smoke-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle, rgba(0,255,127,0.1) 0%, rgba(13,2,22,0.8) 100%);
+    backdrop-filter: blur(0px); opacity: 0; pointer-events: none; z-index: 9998;
+    transition: opacity 2s, backdrop-filter 2s;
+}
+#smoke-overlay.smoke-active { opacity: 1; backdrop-filter: blur(8px); }
+
+/* --- ПОВЕРНЕННЯ МЕНЮ-БУРГЕРА --- */
+.menu-toggle {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 2001; /* Щоб бути вище всього */
+}
+
+.menu-toggle span {
+    width: 25px;
+    height: 3px;
+    background: white;
+    border-radius: 2px;
+    transition: 0.3s;
+    box-shadow: 0 0 5px var(--accent-pink);
+}
+
+/* --- МОБІЛЬНЕ МЕНЮ (ЗИМОВИЙ СТИЛЬ) --- */
+.mobile-nav {
+    position: fixed;
+    top: 0;
+    right: -100%; /* Ховаємо за екран */
+    width: 280px;
+    height: 100vh;
+    background: rgba(13, 2, 22, 0.98);
+    backdrop-filter: blur(15px);
+    z-index: 2000;
+    padding: 40px 20px;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 2px solid var(--accent-blue); /* Блакитний неон */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-nav.active {
+    right: 0; /* Виїжджає при активації */
+}
+
+.close-menu {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 35px;
+    cursor: pointer;
+    color: var(--accent-blue);
+    line-height: 1;
+}
+
+/* КНОПКИ В МЕНЮ */
+.menu-btn-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 50px;
+}
+
+.menu-item-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 15px;
+    border-radius: 15px;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 14px;
+    transition: 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Кольори для кнопок меню */
+.btn-payment { border-color: #4CAF50; color: #4CAF50; }
+.btn-reviews { border-color: var(--accent-blue); color: var(--accent-blue); }
+.btn-random { border-color: #af4c4c; color: #af4c4c; }
+.btn-tg { 
+    background: linear-gradient(90deg, #24a1de, #00c6ff) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.menu-item-btn:hover {
+    transform: scale(1.02);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Приховуємо всі категорії за замовчуванням */
+#cat-zalivka, #cat-prodazh, #cat-aktsii {
+    display: none;
+}
+
+/* Показуємо категорію, якщо в неї НЕМАЄ класу .hidden */
+#cat-zalivka:not(.hidden), 
+#cat-prodazh:not(.hidden), 
+#cat-aktsii:not(.hidden) {
+    display: block;
+}
+
+/* Додатковий примусовий клас для приховування */
+.hidden {
+    display: none !important;
+}
+
+/* --- ЦЕНТРУВАННЯ ФУТЕРА ТА ТЕКСТУ ВНИЗУ --- */
+footer {
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Центрує по горизонталі */
+    align-items: center;
+    padding: 40px 0;
+    margin-top: 50px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.disclaimer {
+    width: 100%;
+    max-width: 600px; /* Обмежуємо ширину для кращого вигляду */
+    text-align: center !important; /* Примусово по центру */
+    font-size: 12px;
+    color: #666;
+    margin: 0 auto; /* Центрує сам блок */
+    line-height: 1.6;
+    padding: 0 20px;
+}
+
+/* Якщо текст "РОЗКУПИЛИ" на картках теж збоку */
+.product-card.out-of-stock::after {
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) rotate(-15deg) !important;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* ===== ADMIN SIDE PANEL ===== */
+.dev-trigger {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 55px;
+    height: 55px;
+    cursor: pointer;
+    z-index: 10000;
+}
+
+/* ПАНЕЛЬ */
+.dev-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 320px;
+    z-index: 10001;
+    pointer-events: none;
+    transform: translateX(120%);
+    transition: 0.35s ease;
+}
+
+/* АКТИВНА */
+.dev-panel.active {
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* КОНТЕНТ */
+.admin-box {
+    background: rgba(13, 2, 22, 0.97);
+    backdrop-filter: blur(16px);
+    border-radius: 22px;
+    padding: 20px;
+    border: 1px solid var(--accent-pink);
+    box-shadow: 0 0 40px rgba(0,0,0,0.9);
+    color: white;
+}
+
+/* ===== UI ===== */
+.admin-title {
+    text-align: center;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+.admin-section {
+    margin-bottom: 18px;
+}
+
+.admin-section span {
+    font-size: 12px;
+    color: #aaa;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.admin-section small {
+    display: block;
+    font-size: 11px;
+    color: #777;
+    text-align: center;
+    margin-top: 6px;
+}
+
+/* INPUTS */
+.admin-box input,
+.admin-box select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 14px;
+    background: #0f021a;
+    border: 1px solid #333;
+    color: white;
+    outline: none;
+}
+
+/* GRID */
+.admin-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.admin-grid button {
+    padding: 12px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: white;
+    cursor: pointer;
+}
+
+.admin-grid button.active {
+    background: var(--accent-pink);
+    border-color: white;
+}
+
+/* ACTIONS */
+.admin-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-main,
+.btn-save {
+    flex: 1;
+    padding: 12px;
+    border-radius: 16px;
+    border: none;
+    font-weight: bold;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    color: white;
+}
+
+.btn-alt,
+.btn-exit {
+    flex: 1;
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid #555;
+    background: transparent;
+    color: #aaa;
+}
+
+/* ПРИМУСОВО ВИМИКАЄМО БЛОКУВАННЯ ВІД ЕФЕКТІВ */
+#snow-canvas, #smoke-overlay, .snowflakes, #smoke-canvas {
+    pointer-events: none !important;
+}
+
+/* КОНТЕЙНЕР ПАНЕЛІ */
+.dev-panel {
+    position: fixed;
+    z-index: 999999 !important; /* Максимально можливий пріоритет */
+    left: 50%;
+    width: 95%;
+    max-width: 400px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none; /* За замовчуванням вимкнено */
+}
+
+/* ВІДКРИТА ПАНЕЛЬ */
+.dev-panel.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto !important; /* ВМИКАЄМО КЛІКИ ПРИ АКТИВАЦІЇ */
+}
+
+/* АДАПТИВ: ТЕЛЕФОН (ЗНИЗУ) */
+@media (max-width: 480px) {
+    .dev-panel {
+        bottom: env(safe-area-inset-bottom, 20px); /* Враховує полоску на iPhone */
+        transform: translate(-50%, 120%);
+    }
+    .dev-panel.active {
+        transform: translate(-50%, 0);
+    }
+}
+
+/* АДАПТИВ: ПК (СПРАВА) */
+@media (min-width: 481px) {
+    .dev-panel {
+        top: 20px;
+        right: 20px;
+        left: auto;
+        transform: translateX(120%);
+    }
+    .dev-panel.active {
+        transform: translateX(0);
+    }
+}
+
+/* САМА КОРОБКА */
+.admin-box {
+    background: #1a0b2e !important; /* Повністю непрозорий для надійності */
+    border: 2px solid #e91e63;
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 1);
+    max-height: 85vh;
+    overflow-y: auto !important;
+    position: relative;
+    /* Усуваємо будь-які конфлікти з дотиками */
+    touch-action: pan-y; 
+}
+
+/* КНОПКИ ТА ЕЛЕМЕНТИ ФОРМИ */
+.admin-box button, 
+.admin-box input, 
+.admin-box select {
+    pointer-events: auto !important; 
+    cursor: pointer !important;
+    position: relative;
+    z-index: 10;
+}
+
+/* Кнопка тригера (шестерня або що у тебе) */
+.dev-trigger {
+    z-index: 999998 !important;
+    pointer-events: auto !important;
+}
+
+/* =========================
+   📱 MOBILE ADAPT (NO REDESIGN)
+   ========================= */
+
+@media (max-width: 480px) {
+
+    body {
+        overflow-x: hidden;
+    }
+
+    header {
+        padding: 12px 14px;
+    }
+
+    .logo {
+        font-size: 18px;
+        letter-spacing: 1px;
+    }
+
+    h1 {
+        font-size: 22px;
+        margin: 10px 0;
+    }
+
+    /* ФІЛЬТРИ */
+    .filters {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        gap: 8px;
+        padding-bottom: 6px;
+    }
+
+    .filters button {
+        font-size: 13px;
+        padding: 10px 16px;
+        white-space: nowrap;
+        min-height: 44px;
+    }
+
+    /* КАТАЛОГ */
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .product-card {
+        padding: 10px;
+        border-radius: 16px;
+    }
+
+    .product-img {
+        border-radius: 12px;
+    }
+
+    .product-desc {
+        font-size: 13px;
+        line-height: 1.2;
+        margin-top: 6px;
+    }
+
+    .price {
+        font-size: 13px;
+        margin-top: 4px;
+    }
+
+    /* СТІКЕРИ */
+    .badge {
+        font-size: 10px;
+        padding: 3px 8px;
+        top: 8px;
+        left: 8px;
+    }
+
+    /* МОБІЛЬНЕ МЕНЮ */
+    .mobile-nav {
+        width: 85%;
+    }
+
+    .menu-item-btn {
+        font-size: 13px;
+        padding: 14px;
+        min-height: 44px;
+    }
+
+    /* АДМІНКА */
+    .dev-panel {
+        width: 95%;
+        left: 50%;
+        bottom: env(safe-area-inset-bottom, 16px);
+        transform: translate(-50%, 120%);
+    }
+
+    .dev-panel.active {
+        transform: translate(-50%, 0);
+    }
+
+    .admin-box {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    /* SCROLL TOP */
+    #scrollTopBtn {
+        width: 42px;
+        height: 42px;
+        bottom: 20px;
+        right: 15px;
+    }
+}
+
+/* Мобільна адмін-панель */
+.mobile-admin-panel {
+    position: fixed;
+    bottom: -100%;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: #1a1a1a;
+    color: #fff;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.5);
+    transition: bottom 0.3s ease;
+    z-index: 9999;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.mobile-admin-panel.active {
+    bottom: 0;
+}
+
+.mobile-admin-panel .admin-title {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.mobile-admin-panel .tab-btn {
+    width: 48%;
+    margin: 0 1%;
+    padding: 10px 0;
+    font-size: 14px;
+    border-radius: 8px;
+    border: none;
+    background: #333;
+    color: #fff;
+}
+
+.mobile-admin-panel .tab-btn.active {
+    background: #ff0055;
+}
+
+.mobile-admin-panel .tab-content {
+    display: none;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mobile-admin-panel .tab-content.active {
+    display: flex;
+}
+
+.mobile-admin-panel button {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #444;
+    color: #fff;
+    cursor: pointer;
+}
+
+.mobile-admin-panel button:hover {
+    background: #ff0055;
+}
+
+.mobile-admin-panel .admin-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+/* ❄️ Сніг */
+.snowflake {
+  position: fixed;
+  top: -10px;
+  color: white;
+  font-size: 1em;
+  opacity: 0.8;
+  animation: fall linear infinite;
+  pointer-events: none;
+}
+
+@keyframes fall {
+  to { transform: translateY(110vh); }
+}
+    </style>
+</head>
+<body>
+<canvas id="snow-canvas"></canvas>
+
+<div class="dev-trigger" onclick="openDevAuth()" title="Admin"></div>
+<div id="dev-login" class="dev-panel">
+    <div class="admin-box">
+        <div class="admin-title">🔐 ADMIN LOGIN</div>
+        <input id="dev-user" type="text" placeholder="Логін">
+        <input id="dev-pass" type="password" placeholder="Пароль">
+        <button class="btn-main" onclick="checkDevAuth()">УВІЙТИ</button>
+        <button class="btn-alt" onclick="closeAllPanels()">СКАСУВАТИ</button>
+    </div>
+</div>
+
+<div id="dev-menu" class="dev-panel mobile-admin-panel">
+    <div class="admin-box">
+        <div class="admin-title">⚙️ Адмін-панель</div>
+        <div class="admin-tabs">
+            <button class="tab-btn active" onclick="openTab('edit')">Редагування</button>
+            <button class="tab-btn" onclick="openTab('stickers')">Стікери</button>
+        </div>
+
+        <div id="tab-edit" class="tab-content active">
+            <button onclick="toggleEdit('price')">💰 Ціни</button>
+            <button onclick="toggleEdit('desc')">📝 Назви</button>
+            <button onclick="toggleStockMode()">📦 Склад</button>
+            <button onclick="toggleImgMode()">🖼 Фото</button>
+        </div>
+
+        <div id="tab-stickers" class="tab-content">
+            <label>Виберіть стікер:</label>
+            <select id="badge-selector">
+                <option value="">🚫 Без стікера</option>
+                <option value="hit">🔥 Хіт</option>
+                <option value="promo">🏷 Акція</option>
+            </select>
+            <small>Натисніть на товар для застосування</small>
+        </div>
+
+        <div class="admin-actions">
+            <button class="btn-save" onclick="adminSave()">💾 Зберегти</button>
+            <button class="btn-exit" onclick="devLogout()">🚪 Вийти</button>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<header>
+    <div class="logo"><span class="santa-hat-emoji">🎅</span> SMOKE HUB</div>
+    <div class="menu-toggle" id="openMenu"><span></span><span></span><span></span></div>
+</header>
+
+<nav class="mobile-nav" id="mobileMenu">
+    <div class="close-menu" id="closeMenu">&times;</div>
+    <h2 style="text-align:center; color:var(--accent-pink); letter-spacing:3px;">SMOKE HUB</h2>
+    <div class="menu-btn-container">
+        <a href="payment.html" class="menu-item-btn btn-payment"><span>💳</span> Оплата</a>
+        <a href="reviews.html" class="menu-item-btn btn-reviews"><span>⭐</span> Відгуки</a>
+        <a href="kwiz.html" class="menu-item-btn btn-random"><span>🍷</span>Опис смаків</a>
+        <a href="https://t.me/liquid_br" target="_blank" class="menu-item-btn btn-tg"><span>✈️</span> Telegram</a>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>Каталог</h1>
+    <div class="filters">
+        <button id="btn-zalivka" class="active" onclick="toggleCategory('zalivka')">Заливка</button>
+        <button id="btn-prodazh" onclick="toggleCategory('prodazh')">Продаж</button>
+        <button id="btn-aktsii" onclick="toggleCategory('aktsii')">Інше</button>
+    </div>
+
+    <div id="cat-zalivka">
+        <div class="product-grid">
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/spermint.jpg"></div><h3 class="product-desc">Spermint 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/Double-grape.jpg"></div><h3 class="product-desc">Double-grape 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/apple-mixed.jpg"></div><h3 class="product-desc">Apple-mixed 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blackcurrant-grape.jpg"></div><h3 class="product-desc">Blackcurrant-grape 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blueberry-currant.jpg"></div><h3 class="product-desc">Blueberry-currant 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermalon-melon.jpg"></div><h3 class="product-desc">Watermelon-melon 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cranberry-mors.jpg"></div><h3 class="product-desc">Cranberry-mors 2ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/double-raspberry.jpg"></div><h3 class="product-desc">Double-raspberry 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cola-lemon.jpg"></div><h3 class="product-desc">Cola-lemon 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/RedBull-blueraspberry.jpg"></div><h3 class="product-desc">RedBull-blueraspberry 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/pineapple-lemonade.jpg"></div><h3 class="product-desc">Pineapple-lemonade 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/multifruit.jpg"></div><h3 class="product-desc">Multifruit 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/bali-triple-shot.jpg"></div><h3 class="product-desc">Balitriple-shot 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+        </div>
+    </div>
+
+    <div id="cat-prodazh" class="hidden">
+        <div class="product-grid">
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/spermint.jpg"></div><h3 class="product-desc">Spermint 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/Double-grape.jpg"></div><h3 class="product-desc">Double-grape 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/apple-mixed.jpg"></div><h3 class="product-desc">Apple-mixed 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blackcurrant-grape.jpg"></div><h3 class="product-desc">Blackcurrant-grape 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blueberry-currant.jpg"></div><h3 class="product-desc">Blueberry-currant 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermalon-melon.jpg"></div><h3 class="product-desc">Watermelon-melon 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cranberry-mors.jpg"></div><h3 class="product-desc">Cranberry-mors 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/double-raspberry.jpg"></div><h3 class="product-desc">Double-raspberry 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cola-lemon.jpg"></div><h3 class="product-desc">Cola-lemon 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/RedBull-blueraspberry.jpg"></div><h3 class="product-desc">RedBull-blueraspberry 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/pineapple-lemonade.jpg"></div><h3 class="product-desc">Pineapple-lemonade 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/multifruit.jpg"></div><h3 class="product-desc">Multifruit 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/bali-triple-shot.jpg"></div><h3 class="product-desc">Balitriple-shot 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+        </div>
+    </div>
+
+    <div id="cat-aktsii" class="hidden">
+        <div class="product-grid">
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/ice-shot.jpg"></div><h3 class="product-desc">Ice-shot</h3><div class="price">10 zł/110 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/xros-catridge-2ml.jpg"></div><h3 class="product-desc">Катридж xros 2 мл/0.8Q</h3><div class="price">30 zł/350 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/xros-catridge-3ml.jpg"></div><h3 class="product-desc">Катридж xros 3 мл/0.4-0.8Q</h3><div class="price">30 zł/350 грн</div></div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p class="disclaimer">🔞 SMOKE HUB: 10+. Нікотин викликає залежність.</p>
+</footer>
+
+<button id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = { databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/" };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const catalogRef = ref(db, 'catalog');
+
+    let firstLoadDone = false;
+
+    onValue(catalogRef, (snapshot) => {
+        if (sessionStorage.getItem('isHubAdmin') === 'true' && firstLoadDone) return;
+        const data = snapshot.val();
+        if (data) {
+            const cards = document.querySelectorAll('.product-card');
+            cards.forEach((card, i) => {
+                if(data.prices && data.prices[i]) card.querySelector('.price').innerText = data.prices[i];
+                if(data.descs && data.descs[i]) card.querySelector('.product-desc').innerText = data.descs[i];
+               // if(data.images && data.images[i]) card.querySelector('img').src = data.images[i];
+                if(data.stock && data.stock[i] === false) card.classList.add('out-of-stock');
+                else card.classList.remove('out-of-stock');
+
+                const b = card.querySelector('.badge');
+                if (b) {
+                    b.className = 'badge';
+                    if(data.badges && data.badges[i]) {
+                        card.setAttribute('data-badge', data.badges[i]);
+                        if(data.badges[i] === 'hit') { b.innerText = '🔥 ХІТ'; b.classList.add('badge-hit'); }
+                        else if(data.badges[i] === 'promo') { b.innerText = '🏷️ АКЦІЯ'; b.classList.add('badge-promo'); }
+                    } else {
+                        card.setAttribute('data-badge', "");
+                        b.innerText = "";
+                    }
+                }
+            });
+            firstLoadDone = true;
+        }
+    });
+
+    window.saveToFirebase = function() {
+        const cards = document.querySelectorAll('.product-card');
+        const data = {
+            prices: Array.from(cards).map(c => c.querySelector('.price').innerText),
+            descs: Array.from(cards).map(c => c.querySelector('.product-desc').innerText),
+            images: Array.from(cards).map(c => c.querySelector('img').src),
+            stock: Array.from(cards).map(c => !c.classList.contains('out-of-stock')),
+            badges: Array.from(cards).map(c => c.getAttribute('data-badge') || "")
+        };
+        return set(catalogRef, data);
+    }
+
+    window.adminSave = function () {
+        if (sessionStorage.getItem('isHubAdmin') !== 'true') return;
+        firstLoadDone = true;
+        saveToFirebase()
+            .then(() => alert("✅ Зміни збережено"))
+            .catch(err => { alert("❌ Помилка збереження"); console.error(err); });
+    };
+</script>
+
+<script>
+const ADMIN_U = "YWRtaW4="; 
+const ADMIN_P = "YWRtaW4xMjM="; 
+let adminModes = { stock: false, img: false };
+
+window.checkDevAuth = () => {
+    const u = document.getElementById('dev-user').value;
+    const p = document.getElementById('dev-pass').value;
+    if (u === atob(ADMIN_U) && p === atob(ADMIN_P)) {
+        sessionStorage.setItem('isHubAdmin', 'true');
+        location.reload(); 
+    } else { alert("Невірно!"); }
+};
+
+window.openDevAuth = () => {
+    // Перевіряємо чи авторизований адмін
+    const isAuth = sessionStorage.getItem('isHubAdmin') === 'true';
+    const panelId = isAuth ? 'dev-menu' : 'dev-login';
+    
+    const panel = document.getElementById(panelId);
+    const overlay = document.getElementById('admin-overlay');
+    
+    if (panel) panel.classList.add('active');
+    if (overlay) overlay.classList.add('active');
+};
+
+window.closeAllPanels = () => { 
+    // Закриваємо всі панелі та фон
+    document.querySelectorAll('.dev-panel').forEach(p => p.classList.remove('active')); 
+    const overlay = document.getElementById('admin-overlay');
+    if (overlay) overlay.classList.remove('active');
+};
+
+// Оновлюємо функцію логауту, щоб вона чистила все
+window.devLogout = () => {
+    sessionStorage.removeItem('isHubAdmin');
+    location.reload();
+};
+
+function resetModesExcept(mode) {
+    const modes = ['stock', 'img'];
+    modes.forEach(m => { if(m !== mode) adminModes[m] = false; });
+    document.getElementById('edit-stock-btn').style.background = adminModes.stock ? "#4CAF50" : "";
+    document.getElementById('edit-img-btn').style.background = adminModes.img ? "#4CAF50" : "";
+}
+
+window.toggleStockMode = () => { adminModes.stock = !adminModes.stock; resetModesExcept('stock'); };
+window.toggleImgMode = () => { adminModes.img = !adminModes.img; resetModesExcept('img'); };
+
+window.toggleEdit = (type) => {
+    const els = document.querySelectorAll(type === 'price' ? '.price' : '.product-desc');
+    const b = document.getElementById(type === 'price' ? 'edit-prices-btn' : 'edit-desc-btn');
+    if(!els.length) return;
+    const isEditing = els[0].contentEditable === "true";
+    els.forEach(e => {
+        e.contentEditable = !isEditing;
+        e.classList.toggle('editing-active', !isEditing);
+    });
+    if(b) b.style.background = !isEditing ? "#ff0055" : "";
+};
+
+document.addEventListener('click', (e) => {
+    const card = e.target.closest('.product-card');
+    if (!card) return;
+
+    if (adminModes.stock) {
+        card.classList.toggle('out-of-stock');
+        return;
+    }
+
+    if (adminModes.img) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = () => {
+            const file = input.files[0];
+            if (file) {
+                const r = new FileReader();
+                r.onload = () => card.querySelector('img').src = r.result;
+                r.readAsDataURL(file);
+            }
+        };
+        input.click();
+        return;
+    }
+
+    if (sessionStorage.getItem('isHubAdmin') === 'true') {
+        const badgeValue = document.getElementById('badge-selector').value;
+        const b = card.querySelector('.badge');
+        if (!b) return;
+
+        b.className = 'badge';
+        card.setAttribute('data-badge', badgeValue);
+
+        if (badgeValue) {
+            b.classList.add('badge-' + badgeValue);
+            b.innerText = badgeValue === 'hit' ? '🔥 ХІТ' : '🏷 АКЦІЯ';
+        } else {
+            b.innerText = "";
+        }
+    }
+});
+
+window.toggleCategory = (cat) => {
+    ['zalivka', 'prodazh', 'aktsii'].forEach(t => {
+        const s = document.getElementById('cat-' + t), b = document.getElementById('btn-' + t);
+        if(s) s.classList.toggle('hidden', t !== cat);
+        if(b) b.classList.toggle('active', t === cat);
+    });
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const o = document.getElementById('openMenu'), c = document.getElementById('closeMenu'), m = document.getElementById('mobileMenu');
+    if(o) o.onclick = () => m.classList.add('active');
+    if(c) c.onclick = () => m.classList.remove('active');
+    
+    document.onkeydown = function(e) {
+        if (e.shiftKey && e.code === 'KeyD') openDevAuth();
+    };
+});
+
+window.onscroll = () => {
+    const btn = document.getElementById("scrollTopBtn");
+    if(btn) btn.style.display = (window.scrollY > 300) ? "block" : "none";
+};
+window.scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+// Сніг
+for(let i=0;i<25;i++){
+  let s=document.createElement("div");
+  s.className="snowflake";
+  s.innerHTML="❄️";
+  s.style.left=Math.random()*100+"vw";
+  s.style.animationDuration=5+Math.random()*10+"s";
+  s.style.fontSize=10+Math.random()*20+"px";
+  document.body.appendChild(s);
+}
+
+
+
+// Перемикання вкладок
+function openTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tabName).classList.add('active');
+    document.querySelector(`.tab-btn[onclick="openTab('${tabName}')"]`).classList.add('active');
+}
+
+// Відкриття панелі через кнопку або по Shift+D
+document.querySelector('.dev-trigger').onclick = toggleAdminPanel;
+document.onkeydown = function(e) {
+    if (e.shiftKey && e.code === 'KeyD') toggleAdminPanel();
+};
+
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW registered', reg))
+      .catch(err => console.log('SW failed', err));
+  });
+}
+</script>
+
+</body>
+</html>

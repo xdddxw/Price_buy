@@ -1,0 +1,20 @@
+{
+  "name": "SMOKE HUB",
+  "short_name": "SMOKE HUB",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0d0216",
+  "theme_color": "#e91e63",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
