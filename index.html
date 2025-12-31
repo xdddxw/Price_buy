@@ -588,10 +588,27 @@
         }, 5000);
     });
 </script>
+<script>
+// Перевірка, чи це iPhone/iPad і чи сайт ще НЕ встановлений як додаток
+const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
 
-<div id="image-modal" onclick="this.style.display='none'">
-    <img id="zoomed-img" src="" alt="">
-</div>
+if (isIos && !isStandalone) {
+    const iosPrompt = document.createElement('div');
+    iosPrompt.style.cssText = 'position:fixed; bottom:100px; left:10px; right:10px; background:rgba(26,11,46,0.95); border:1px solid #e91e63; border-radius:15px; padding:15px; z-index:10001; font-size:13px; text-align:center; color:white; backdrop-filter:blur(10px); box-shadow:0 0 20px rgba(0,0,0,0.5);';
+    iosPrompt.innerHTML = '📲 <b>Встанови як додаток:</b> натисни <img src="https://img.icons8.com/ios/50/ffffff/upload--v1.png" style="width:18px; vertical-align:middle; margin:0 3px;"> потім <b>"Додати на початковий екран"</b>';
+    
+    // Додаємо кнопку закрити
+    const closeBtn = document.createElement('div');
+    closeBtn.innerText = '×';
+    closeBtn.style.cssText = 'position:absolute; top:5px; right:10px; font-size:20px; color:#777; cursor:pointer;';
+    closeBtn.onclick = () => iosPrompt.remove();
+    
+    iosPrompt.appendChild(closeBtn);
+    document.body.appendChild(iosPrompt);
+}
+</script>
 
 </body>
 </html>
+
