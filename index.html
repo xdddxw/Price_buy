@@ -604,49 +604,64 @@
 @keyframes slideUp { from { transform: translateY(150%); } to { transform: translateY(0); } }
 </style>
 
-<div id="pwa-toast" style="display: none !important; position: fixed; bottom: 110px; left: 20px; right: 20px; background: #1a0b2e; border: 2px solid #00c6ff; border-radius: 20px; padding: 15px; z-index: 999999; box-shadow: 0 10px 40px rgba(0,0,0,0.9); transition: 0.3s;">
+<div id="pwa-toast" style="display: none !important; position: fixed; bottom: 110px; left: 20px; right: 20px; background: #1a0b2e; border: 2px solid #00c6ff; border-radius: 20px; padding: 15px; z-index: 999999; box-shadow: 0 10px 40px rgba(0,0,0,0.9);">
     
     <div onclick="document.getElementById('pwa-toast').style.setProperty('display', 'none', 'important');" 
-         style="position: absolute; top: 10px; right: 15px; color: #777; font-size: 22px; cursor: pointer; padding: 5px;">&times;</div>
+         style="position: absolute; top: 5px; right: 10px; color: #777; font-size: 26px; cursor: pointer; padding: 10px; z-index: 10;">&times;</div>
 
-    <div style="display: flex; align-items: center; gap: 12px; margin-right: 20px;">
+    <div style="display: flex; align-items: center; gap: 12px; padding-right: 30px;">
         <img src="images/logo.png" style="width: 45px; height: 45px; border-radius: 10px;">
         <div style="flex: 1;">
             <div style="font-weight: 800; font-size: 14px; color: #fff;">SMOKE HUB App</div>
             <div style="font-size: 11px; color: #bbb;">Натисни <img src="https://img.icons8.com/ios/50/ffffff/upload--v1.png" style="width:14px; vertical-align:middle;"> та <b>"Додати на екран"</b></div>
         </div>
         
-        <button onclick="document.getElementById('pwa-toast').style.setProperty('display', 'none', 'important'); if(typeof triggerHaptic === 'function') triggerHaptic();" 
-                style="background: #00c6ff; border: none; color: #000; padding: 10px 20px; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer; -webkit-appearance: none; touch-action: manipulation;">
+        <div id="pwa-ok-area" style="background: #00c6ff; color: #000; padding: 10px 20px; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer; position: relative;">
             ОК
-        </button>
+        </div>
     </div>
 </div>
 
 <script>
-    function showPwaPrompt() {
+    function setupPwa() {
+        const toast = document.getElementById('pwa-toast');
+        const okBtn = document.getElementById('pwa-ok-area');
+        
+        // Функція закриття
+        const closePwa = (e) => {
+            if (e) e.preventDefault();
+            toast.style.setProperty('display', 'none', 'important');
+            if (typeof triggerHaptic === 'function') triggerHaptic();
+        };
+
+        // Навішуємо події на кнопку ОК двома способами
+        if (okBtn) {
+            okBtn.onclick = closePwa;
+            okBtn.ontouchstart = closePwa;
+        }
+
+        // Перевірка iPhone
         const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent);
         const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
 
         if (isIos && !isStandalone) {
             setTimeout(() => {
-                const toast = document.getElementById('pwa-toast');
-                if (toast) {
-                    toast.style.setProperty('display', 'block', 'important');
-                }
+                toast.style.setProperty('display', 'block', 'important');
             }, 3000);
         }
     }
 
+    // Запуск
     if (document.readyState === 'complete') {
-        showPwaPrompt();
+        setupPwa();
     } else {
-        window.addEventListener('load', showPwaPrompt);
+        window.addEventListener('load', setupPwa);
     }
 </script>
 
 </body>
 </html>
+
 
 
 
