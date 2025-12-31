@@ -149,37 +149,16 @@ h1 {
 </header>
 
 <div class="app-container">
-  <h1>Додати SMOKE HUB</h1>
-
-  <button class="install-btn" id="installBtn">Додати на головний екран</button>
+  <h1>Додаток SMOKE HUB</h1>
 
   <div class="instructions">
-    <strong>Для Android:</strong> натисніть кнопку "Додати на головний екран".<br><br>
     <strong>Для iOS:</strong> відкрийте сайт у Safari → натисніть Share → "Додати на головний екран".
   </div>
 
-  <a href="index.html" class="back-btn">← Назад до сайту</a>
+  <a href="index.html" class="back-btn">← Каталог</a>
 </div>
 
 <script>
-let deferredPrompt;
-const installBtn = document.getElementById('installBtn');
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-});
-
-installBtn.addEventListener('click', async () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    deferredPrompt = null;
-  } else {
-    alert("Для iOS: натисніть Поділитися → Додати на головний екран");
-  }
-});
-
 // ===== Сніг =====
 for(let i=0;i<25;i++){
   let s = document.createElement("div");
@@ -194,3 +173,4 @@ for(let i=0;i<25;i++){
 
 </body>
 </html>
+
