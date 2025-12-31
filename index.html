@@ -561,23 +561,37 @@
         if(badgeVal) { b.classList.add('badge-' + badgeVal); b.innerText = badgeVal === 'hit' ? 'ХІТ' : 'АКЦІЯ'; }
     });
 
-// Збільшення картинки
-function zoomImg(el, e) {
-    e.stopPropagation(); // щоб не спрацьовували інші кліки
-    const src = el.querySelector('img').src;
-    document.getElementById('zoomed-img').src = src;
-    document.getElementById('image-modal').style.display = 'flex';
-    triggerHaptic();
-}
+    // Збільшення картинки
+    function zoomImg(el, e) {
+        e.stopPropagation(); // щоб не спрацьовували інші кліки
+        const src = el.querySelector('img').src;
+        document.getElementById('zoomed-img').src = src;
+        document.getElementById('image-modal').style.display = 'flex';
+        triggerHaptic();
+    }
+
+    function triggerHaptic() {
+        if (window.navigator && window.navigator.vibrate) {
+            window.navigator.vibrate(15);
+        }
+    }
+
+    // --- ЛОГІКА PWA ---
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        setTimeout(() => {
+            if (confirm("Встановити SMOKE HUB як додаток для швидкого доступу?")) {
+                deferredPrompt.prompt();
+            }
+        }, 5000);
+    });
 </script>
 
-</body>
-    <div id="image-modal" onclick="this.style.display='none'">
+<div id="image-modal" onclick="this.style.display='none'">
     <img id="zoomed-img" src="" alt="">
 </div>
+
+</body>
 </html>
-
-
-
-
-
