@@ -12,6 +12,13 @@
 <meta name="apple-mobile-web-app-title" content="SMOKE HUB">
 <link rel="apple-touch-icon" href="logo.png">
 <link rel="shortcut icon" href="logo.png">
+    <link rel="manifest" href="/manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
+
 
     <style>
         /* Стилі для накладання стікерів на фото */
@@ -1147,3 +1154,4 @@ if ('serviceWorker' in navigator) {
 </body>
 
 </html>
+
