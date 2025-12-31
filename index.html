@@ -111,6 +111,18 @@
         .editing-active { outline: 1px dashed var(--accent-pink) !important; background: rgba(233, 30, 99, 0.1) !important; }
         .hidden { display: none !important; }
         .dev-trigger { position: fixed; top: 0; right: 0; width: 60px; height: 60px; z-index: 1000; opacity: 0; }
+
+        /* Вікно для збільшення фото */
+        #image-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 10000;
+            display: none; align-items: center; justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+        #image-modal img { 
+            max-width: 90%; max-height: 80%; 
+            border-radius: 15px; box-shadow: 0 0 30px rgba(0,198,255,0.3); 
+        }
     </style>
 </head>
 <body>
@@ -131,54 +143,298 @@
 
     <div id="cat-zalivka">
         <div class="product-grid">
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/spermint.jpg"></div><h3 class="product-desc">Spermint 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/Double-grape.jpg"></div><h3 class="product-desc">Double-grape 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/apple-mixed.jpg"></div><h3 class="product-desc">Apple-mixed 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blackcurrant-grape.jpg"></div><h3 class="product-desc">Blackcurrant-grape 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blueberry-currant.jpg"></div><h3 class="product-desc">Blueberry-currant 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermalon-melon.jpg"></div><h3 class="product-desc">Watermelon-melon 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cranberry-mors.jpg"></div><h3 class="product-desc">Cranberry-mors 2ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/double-raspberry.jpg"></div><h3 class="product-desc">Double-raspberry 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cola-lemon.jpg"></div><h3 class="product-desc">Cola-lemon 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/RedBull-blueraspberry.jpg"></div><h3 class="product-desc">RedBull-blueraspberry 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/pineapple-lemonade.jpg"></div><h3 class="product-desc">Pineapple-lemonade 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/multifruit.jpg"></div><h3 class="product-desc">Multifruit 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/bali-triple-shot.jpg"></div><h3 class="product-desc">Balitriple-shot 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/spermint.jpg">
+    </div>
+    <h3 class="product-desc">Spermint 2 ml</h3>
+    <div class="price">6 zł/70 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/Double-grape.jpg">
+    </div>
+    <h3 class="product-desc">Double-grape 2 ml</h3>
+    <div class="price">6 zł/70 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/apple-mixed.jpg">
+    </div>
+    <h3 class="product-desc">Apple-mixed 2 ml</h3>
+    <div class="price">6 zł/70 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/blackcurrant-grape.jpg">
+    </div>
+    <h3 class="product-desc">Blackcurrant-grape 2 ml</h3>
+    <div class="price">6 zł/70 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/blueberry-currant.jpg">
+    </div>
+    <h3 class="product-desc">Blueberry-currant 2 ml</h3>
+    <div class="price">6 zł/70 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/watermalon-melon.jpg">
+    </div>
+    <h3 class="product-desc">Watermelon-melon 2 ml</h3>
+    <div class="price">6 zł/70 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/cranberry-mors.jpg">
+    </div>
+    <h3 class="product-desc">Cranberry-mors 2ml</h3>
+    <div class="price">6 zł/70 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/double-raspberry.jpg">
+    </div>
+    <h3 class="product-desc">Double-raspberry 2 ml</h3>
+    <div class="price">6 zł/70 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/cola-lemon.jpg">
+    </div>
+    <h3 class="product-desc">Cola-lemon 2 ml</h3>
+    <div class="price">6 zł/70 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/RedBull-blueraspberry.jpg">
+    </div>
+    <h3 class="product-desc">RedBull-blueraspberry 2 ml</h3>
+    <div class="price">6 zł/70 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/pineapple-lemonade.jpg">
+    </div>
+    <h3 class="product-desc">Pineapple-lemonade 2 ml</h3>
+    <div class="price">6 zł/70 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/multifruit.jpg">
+    </div>
+    <h3 class="product-desc">Multifruit 2 ml</h3>
+    <div class="price">6 zł/70 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/bali-triple-shot.jpg">
+    </div>
+    <h3 class="product-desc">Balitriple-shot 2 ml</h3>
+    <div class="price">6 zł/70 грн</div>
+</div>
         </div>
     </div>
 
     <div id="cat-prodazh" class="hidden">
         <div class="product-grid">
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/spermint.jpg"></div><h3 class="product-desc">Spermint 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/Double-grape.jpg"></div><h3 class="product-desc">Double-grape 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/apple-mixed.jpg"></div><h3 class="product-desc">Apple-mixed 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blackcurrant-grape.jpg"></div><h3 class="product-desc">Blackcurrant-grape 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blueberry-currant.jpg"></div><h3 class="product-desc">Blueberry-currant 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermalon-melon.jpg"></div><h3 class="product-desc">Watermelon-melon 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cranberry-mors.jpg"></div><h3 class="product-desc">Cranberry-mors 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/double-raspberry.jpg"></div><h3 class="product-desc">Double-raspberry 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cola-lemon.jpg"></div><h3 class="product-desc">Cola-lemon 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/RedBull-blueraspberry.jpg"></div><h3 class="product-desc">RedBull-blueraspberry 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/pineapple-lemonade.jpg"></div><h3 class="product-desc">Pineapple-lemonade 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/multifruit.jpg"></div><h3 class="product-desc">Multifruit 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/bali-triple-shot.jpg"></div><h3 class="product-desc">Balitriple-shot 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/spermint.jpg">
+    </div>
+    <h3 class="product-desc">Spermint 30 ml 5%</h3>
+    <div class="price">60 zł/700 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/Double-grape.jpg">
+    </div>
+    <h3 class="product-desc">Double-grape 30 ml 5%</h3>
+    <div class="price">60 zł/700 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/apple-mixed.jpg">
+    </div>
+    <h3 class="product-desc">Apple-mixed 30 ml 5%</h3>
+    <div class="price">60 zł/700 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/blackcurrant-grape.jpg">
+    </div>
+    <h3 class="product-desc">Blackcurrant-grape 30 ml 5%</h3>
+    <div class="price">60 zł/700 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/blueberry-currant.jpg">
+    </div>
+    <h3 class="product-desc">Blueberry-currant 30 ml 5%</h3>
+    <div class="price">60 zł/700 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/watermalon-melon.jpg">
+    </div>
+    <h3 class="product-desc">Watermelon-melon 30 ml 5%</h3>
+    <div class="price">60 zł/700 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/cranberry-mors.jpg">
+    </div>
+    <h3 class="product-desc">Cranberry-mors 30 ml 5%</h3>
+    <div class="price">60 zł/700 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/double-raspberry.jpg">
+    </div>
+    <h3 class="product-desc">Double-raspberry 30 ml 5%</h3>
+    <div class="price">60 zł/700 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/cola-lemon.jpg">
+    </div>
+    <h3 class="product-desc">Cola-lemon 30 ml 5%</h3>
+    <div class="price">60 zł/700 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/RedBull-blueraspberry.jpg">
+    </div>
+    <h3 class="product-desc">RedBull-blueraspberry 30 ml 5%</h3>
+    <div class="price">60 zł/700 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/pineapple-lemonade.jpg">
+    </div>
+    <h3 class="product-desc">Pineapple-lemonade 30 ml 5%</h3>
+    <div class="price">60 zł/700 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/multifruit.jpg">
+    </div>
+    <h3 class="product-desc">Multifruit 30 ml 5%</h3>
+    <div class="price">60 zł/700 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/bali-triple-shot.jpg">
+    </div>
+    <h3 class="product-desc">Balitriple-shot 30 ml 5%</h3>
+    <div class="price">60 zł/700 грн</div>
+</div>
         </div>
     </div>
 
     <div id="cat-aktsii" class="hidden">
         <div class="product-grid">
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/ice-shot.jpg"></div><h3 class="product-desc">Ice-shot</h3><div class="price">10 zł/110 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/xros-catridge-2ml.jpg"></div><h3 class="product-desc">Катридж xros 2 мл</h3><div class="price">30 zł/350 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/xros-catridge-3ml.jpg"></div><h3 class="product-desc">Катридж xros 3 мл</h3><div class="price">30 zł/350 грн</div></div>
+            <div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/ice-shot.jpg">
+    </div>
+    <h3 class="product-desc">Ice-shot</h3>
+    <div class="price">10 zł/110 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/xros-catridge-2ml.jpg">
+    </div>
+    <h3 class="product-desc">Катридж xros 2 мл</h3>
+    <div class="price">30 zł/350 грн</div>
+</div>
+
+<div class="product-card" onclick="triggerHaptic()">
+    <div class="product-img" onclick="zoomImg(this, event)">
+        <div class="badge"></div>
+        <img src="images/xros-catridge-3ml.jpg">
+    </div>
+    <h3 class="product-desc">Катридж xros 3 мл</h3>
+    <div class="price">30 zł/350 грн</div>
+</div>
         </div>
     </div>
 
     <div id="cat-info" class="hidden">
         <div class="info-grid">
-            <a href="payment.html" class="info-card"><div class="info-icon">💳</div><span>Оплата</span></a>
-            <a href="reviews.html" class="info-card"><div class="info-icon">⭐</div><span>Відгуки</span></a>
-            <a href="kwiz.html" class="info-card"><div class="info-icon">🍷</div><span>Смаки</span></a>
-            <div class="info-card" onclick="toggleAdminPanel()"><div class="info-icon">🔐</div><span>Адмін</span></div>
+            <a href="payment.html" class="info-card" onclick="triggerHaptic()">
+    <div class="info-icon">💳</div>
+    <span>Оплата</span>
+</a>
+
+<a href="reviews.html" class="info-card" onclick="triggerHaptic()">
+    <div class="info-icon">⭐</div>
+    <span>Відгуки</span>
+</a>
+
+<a href="kwiz.html" class="info-card" onclick="triggerHaptic()">
+    <div class="info-icon">🍷</div>
+    <span>Смаки</span>
+</a>
+
+<div class="info-card" onclick="toggleAdminPanel(); triggerHaptic()">
+    <div class="info-icon">🔐</div>
+    <span>Адмін</span>
+</div>
 
             <div class="section-label">Соціальні мережі</div>
             
@@ -303,8 +559,28 @@
         const b = card.querySelector('.badge'); b.className = 'badge';
         if(badgeVal) { b.classList.add('badge-' + badgeVal); b.innerText = badgeVal === 'hit' ? 'ХІТ' : 'АКЦІЯ'; }
     });
+
+    // Вібрація
+function triggerHaptic() {
+    if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(15); // коротка вібрація 15 мс
+    }
+}
+
+// Збільшення картинки
+function zoomImg(el, e) {
+    e.stopPropagation(); // щоб не спрацьовували інші кліки
+    const src = el.querySelector('img').src;
+    document.getElementById('zoomed-img').src = src;
+    document.getElementById('image-modal').style.display = 'flex';
+    triggerHaptic();
+}
 </script>
 
 </body>
+    <div id="image-modal" onclick="this.style.display='none'">
+    <img id="zoomed-img" src="" alt="">
+</div>
 </html>
+
 
