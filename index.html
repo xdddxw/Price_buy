@@ -604,22 +604,26 @@
 @keyframes slideUp { from { transform: translateY(150%); } to { transform: translateY(0); } }
 </style>
 
-<div id="pwa-toast" 
-     onclick="this.style.setProperty('display', 'none', 'important');"
-     style="display: none !important; position: fixed; bottom: 110px; left: 20px; right: 20px; background: #1a0b2e; border: 2px solid #00c6ff; border-radius: 20px; padding: 15px; z-index: 999999; box-shadow: 0 10px 40px rgba(0,0,0,0.9); cursor: pointer; touch-action: manipulation;">
+<div id="pwa-toast" style="display: none !important; position: fixed; bottom: 110px; left: 20px; right: 20px; background: #1a0b2e; border: 2px solid #00c6ff; border-radius: 20px; padding: 15px; z-index: 999999; box-shadow: 0 10px 40px rgba(0,0,0,0.9); transition: 0.3s;">
     
-    <div style="display: flex; align-items: center; gap: 15px; pointer-events: none;">
+    <div onclick="document.getElementById('pwa-toast').style.setProperty('display', 'none', 'important');" 
+         style="position: absolute; top: 10px; right: 15px; color: #777; font-size: 22px; cursor: pointer; padding: 5px;">&times;</div>
+
+    <div style="display: flex; align-items: center; gap: 12px; margin-right: 20px;">
         <img src="images/logo.png" style="width: 45px; height: 45px; border-radius: 10px;">
         <div style="flex: 1;">
             <div style="font-weight: 800; font-size: 14px; color: #fff;">SMOKE HUB App</div>
             <div style="font-size: 11px; color: #bbb;">Натисни <img src="https://img.icons8.com/ios/50/ffffff/upload--v1.png" style="width:14px; vertical-align:middle;"> та <b>"Додати на екран"</b></div>
         </div>
-        <div style="background: #00c6ff; color: #000; padding: 6px 12px; border-radius: 10px; font-weight: 700; font-size: 12px; min-width: 40px; text-align: center;">ОК</div>
+        
+        <button onclick="document.getElementById('pwa-toast').style.setProperty('display', 'none', 'important'); if(typeof triggerHaptic === 'function') triggerHaptic();" 
+                style="background: #00c6ff; border: none; color: #000; padding: 10px 20px; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer; -webkit-appearance: none; touch-action: manipulation;">
+            ОК
+        </button>
     </div>
 </div>
 
 <script>
-    // Виносимо логіку в окрему функцію для надійності
     function showPwaPrompt() {
         const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent);
         const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
@@ -634,7 +638,6 @@
         }
     }
 
-    // Запускаємо перевірку
     if (document.readyState === 'complete') {
         showPwaPrompt();
     } else {
@@ -644,6 +647,7 @@
 
 </body>
 </html>
+
 
 
 
