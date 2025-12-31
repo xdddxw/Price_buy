@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SMOKE HUB | Pro</title>
+    
+    <style>
+        :root {
+            --bg: #0d0216;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --accent-pink: #e91e63;
+            --accent-blue: #00c6ff;
+        }
+
+        body {
+            background: radial-gradient(circle at top right, #1a0b2e, #0d0216);
+            margin: 0; padding-bottom: 90px;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: white; overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- НОВОРІЧНИЙ ДЕКОР --- */
+        .snowflake { position: fixed; top: -10px; color: white; font-size: 1em; opacity: 0.8; pointer-events: none; z-index: 9999; animation: fall linear infinite; }
+        @keyframes fall { to { transform: translateY(110vh); } }
+
+        header {
+            display: flex; justify-content: center; align-items: center;
+            padding: 15px; background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo { 
+            position: relative; font-weight: 900; font-size: 20px; text-transform: uppercase; 
+            background: linear-gradient(90deg, #ff0055, #00f2ff, #ff0055); 
+            background-size: 200% auto; -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; animation: gradient-move 3s linear infinite; 
+        }
+        .logo::before { content: "🎅"; position: absolute; top: -15px; left: -15px; font-size: 24px; transform: rotate(-15deg); -webkit-text-fill-color: initial; }
+
+        @keyframes gradient-move { to { background-position: 200% center; } }
+
+        .container { padding: 10px; }
+        h1 { font-size: 20px; text-align: center; margin: 15px 0; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* СІТКА ТОВАРІВ */
+        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .product-card { background: var(--card-bg); border-radius: 15px; padding: 8px; text-align: center; position: relative; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; transition: 0.3s; }
+        .product-img { width: 100%; aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; margin-bottom: 6px; }
+        .product-img img { width: 100%; height: 100%; object-fit: cover; }
+        .product-desc { font-size: 11px; font-weight: 600; line-height: 1.2; height: 26px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin: 2px 0; }
+        .price { font-weight: 800; font-size: 11px; color: var(--accent-blue); margin-top: auto; }
+        
+        .badge { position: absolute; top: 5px; left: 5px; padding: 2px 6px; border-radius: 4px; font-size: 8px; font-weight: 900; z-index: 5; display: none; }
+        .badge-hit { display: block !important; background: #ff0055; color: white; }
+        .badge-promo { display: block !important; background: #ffd900; color: black; }
+        .out-of-stock { opacity: 0.4; filter: grayscale(1); }
+        .out-of-stock::after { content: "SOLD OUT"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); background: var(--accent-pink); padding: 4px 8px; border-radius: 5px; font-size: 10px; font-weight: bold; z-index: 10; }
+
+        /* --- НОВИЙ СТИЛЬ РОЗДІЛУ ІНФО --- */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-card:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); }
+
+        .info-card .info-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 10px rgba(0, 198, 255, 0.5));
+        }
+
+        .info-card span {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-card.full-width {
+            grid-column: span 2;
+            background: linear-gradient(135deg, rgba(36, 161, 222, 0.2), rgba(0, 198, 255, 0.05));
+            border-color: #24a1de;
+            flex-direction: row;
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .section-label {
+            grid-column: span 2;
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-top: 15px;
+            margin-left: 5px;
+            font-weight: 800;
+        }
+
+        /* --- BOTTOM NAV --- */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(20, 5, 35, 0.98); backdrop-filter: blur(15px); display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
+        .nav-item { background: none; border: none; color: #888; display: flex; flex-direction: column; align-items: center; font-size: 9px; gap: 4px; text-transform: uppercase; flex: 1; }
+        .nav-item.active { color: white; }
+        .nav-item .icon { font-size: 18px; }
+
+        /* АДМІНКА */
+        .dev-panel { position: fixed; bottom: -100%; left: 0; right: 0; background: #1a0b2e; border-radius: 20px 20px 0 0; padding: 20px; transition: 0.4s; z-index: 2000; border-top: 2px solid var(--accent-pink); max-height: 80vh; overflow-y: auto; }
+        .dev-panel.active { bottom: 0; }
+        .admin-box input, .admin-box select { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #333; background: #0f021a; color: white; box-sizing: border-box; }
+        .admin-btn { width: 100%; padding: 12px; border-radius: 10px; background: var(--accent-blue); color: white; border: none; font-weight: bold; margin-bottom: 8px; font-size: 13px; }
+        .editing-active { outline: 1px dashed var(--accent-pink) !important; background: rgba(233, 30, 99, 0.1) !important; }
+
+        .hidden { display: none !important; }
+        .dev-trigger { position: fixed; top: 0; right: 0; width: 60px; height: 60px; z-index: 1000; opacity: 0; }
+    </style>
+</head>
+<body>
+
+<div class="dev-trigger" onclick="toggleAdminPanel()"></div>
+
+<header><div class="logo">SMOKE HUB</div></header>
+
+<div class="container">
+    <h1 id="page-title">Заливка</h1>
+
+    <div id="cat-zalivka">
+        <div class="product-grid">
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/spermint.jpg"></div><h3 class="product-desc">Spermint 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/Double-grape.jpg"></div><h3 class="product-desc">Double-grape 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/apple-mixed.jpg"></div><h3 class="product-desc">Apple-mixed 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blackcurrant-grape.jpg"></div><h3 class="product-desc">Blackcurrant-grape 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blueberry-currant.jpg"></div><h3 class="product-desc">Blueberry-currant 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermalon-melon.jpg"></div><h3 class="product-desc">Watermelon-melon 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cranberry-mors.jpg"></div><h3 class="product-desc">Cranberry-mors 2ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/double-raspberry.jpg"></div><h3 class="product-desc">Double-raspberry 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cola-lemon.jpg"></div><h3 class="product-desc">Cola-lemon 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/RedBull-blueraspberry.jpg"></div><h3 class="product-desc">RedBull-blueraspberry 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/pineapple-lemonade.jpg"></div><h3 class="product-desc">Pineapple-lemonade 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/multifruit.jpg"></div><h3 class="product-desc">Multifruit 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/bali-triple-shot.jpg"></div><h3 class="product-desc">Balitriple-shot 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+        </div>
+    </div>
+
+    <div id="cat-prodazh" class="hidden">
+        <div class="product-grid">
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/spermint.jpg"></div><h3 class="product-desc">Spermint 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/Double-grape.jpg"></div><h3 class="product-desc">Double-grape 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/apple-mixed.jpg"></div><h3 class="product-desc">Apple-mixed 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blackcurrant-grape.jpg"></div><h3 class="product-desc">Blackcurrant-grape 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blueberry-currant.jpg"></div><h3 class="product-desc">Blueberry-currant 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermalon-melon.jpg"></div><h3 class="product-desc">Watermelon-melon 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cranberry-mors.jpg"></div><h3 class="product-desc">Cranberry-mors 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/double-raspberry.jpg"></div><h3 class="product-desc">Double-raspberry 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cola-lemon.jpg"></div><h3 class="product-desc">Cola-lemon 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/RedBull-blueraspberry.jpg"></div><h3 class="product-desc">RedBull-blueraspberry 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/pineapple-lemonade.jpg"></div><h3 class="product-desc">Pineapple-lemonade 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/multifruit.jpg"></div><h3 class="product-desc">Multifruit 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/bali-triple-shot.jpg"></div><h3 class="product-desc">Balitriple-shot 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+        </div>
+    </div>
+
+    <div id="cat-aktsii" class="hidden">
+        <div class="product-grid">
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/ice-shot.jpg"></div><h3 class="product-desc">Ice-shot</h3><div class="price">10 zł/110 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/xros-catridge-2ml.jpg"></div><h3 class="product-desc">Катридж xros 2 мл</h3><div class="price">30 zł/350 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/xros-catridge-3ml.jpg"></div><h3 class="product-desc">Катридж xros 3 мл</h3><div class="price">30 zł/350 грн</div></div>
+        </div>
+    </div>
+
+    <div id="cat-info" class="hidden">
+        <div class="info-grid">
+            <div class="section-label">Допомога та сервіс</div>
+            
+            <a href="payment.html" class="info-card">
+                <div class="info-icon">💳</div>
+                <span>Оплата</span>
+            </a>
+            
+            <a href="reviews.html" class="info-card">
+                <div class="info-icon">⭐</div>
+                <span>Відгуки</span>
+            </a>
+            
+            <a href="kwiz.html" class="info-card">
+                <div class="info-icon">🍷</div>
+                <span>Смаки</span>
+            </a>
+            
+            <div class="info-card" onclick="toggleAdminPanel()">
+                <div class="info-icon">🔐</div>
+                <span>Адмін</span>
+            </div>
+
+            <div class="section-label">Соціальні мережі</div>
+            
+            <a href="https://t.me/liquid_br" target="_blank" class="info-card full-width">
+                <div class="info-icon" style="font-size: 24px;">✈️</div>
+                <span>Наш Telegram канал</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('zalivka', 'Заливка', this)"><span class="icon">💧</span><span>Заливка</span></button>
+    <button class="nav-item" onclick="switchTab('prodazh', 'Продаж', this)"><span class="icon">📦</span><span>Продаж</span></button>
+    <button class="nav-item" onclick="switchTab('aktsii', 'Інше', this)"><span class="icon">⚡</span><span>Інше</span></button>
+    <button class="nav-item" onclick="switchTab('info', 'Інфо', this)"><span class="icon">ℹ️</span><span>Інфо</span></button>
+</nav>
+
+<div id="dev-login" class="dev-panel">
+    <div class="admin-box">
+        <h3 style="text-align:center;">🔐 LOGIN</h3>
+        <input id="dev-user" type="text" placeholder="Логін">
+        <input id="dev-pass" type="password" placeholder="Пароль">
+        <button class="admin-btn" onclick="checkDevAuth()">УВІЙТИ</button>
+        <button class="admin-btn" style="background:none; color:#777;" onclick="closePanels()">ЗАКРИТИ</button>
+    </div>
+</div>
+
+<div id="dev-menu" class="dev-panel">
+    <div class="admin-box">
+        <h3 style="text-align:center;">⚙️ КЕРУВАННЯ</h3>
+        <button class="admin-btn" onclick="toggleEdit('price')">💰 РЕД. ЦІНИ</button>
+        <button class="admin-btn" onclick="toggleEdit('desc')">📝 РЕД. НАЗВИ</button>
+        <button class="admin-btn" id="btn-edit-stock" onclick="toggleStockMode()">📦 СКЛАД</button>
+        <select id="badge-selector">
+            <option value="">Без стікера</option>
+            <option value="hit">🔥 ХІТ</option>
+            <option value="promo">🏷 АКЦІЯ</option>
+        </select>
+        <button class="admin-btn" style="background:var(--accent-pink);" onclick="adminSave()">💾 ЗБЕРЕГТИ ВСЕ</button>
+        <button class="admin-btn" style="background:none; color:#777;" onclick="devLogout()">🚪 ВИЙТИ</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = { databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/" };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    onValue(ref(db, 'catalog'), (snap) => {
+        const data = snap.val(); if(!data) return;
+        const cards = document.querySelectorAll('.product-card');
+        cards.forEach((card, i) => {
+            if(data.prices?.[i]) card.querySelector('.price').innerText = data.prices[i];
+            if(data.descs?.[i]) card.querySelector('.product-desc').innerText = data.descs[i];
+            if(data.stock?.[i] === false) card.classList.add('out-of-stock'); else card.classList.remove('out-of-stock');
+            const b = card.querySelector('.badge'); b.className = 'badge';
+            if(data.badges?.[i]) { b.classList.add('badge-' + data.badges[i]); b.innerText = data.badges[i] === 'hit' ? 'ХІТ' : 'АКЦІЯ'; }
+        });
+    });
+
+    window.adminSave = function() {
+        const prices = [], descs = [], stock = [], badges = [];
+        document.querySelectorAll('.product-card').forEach(card => {
+            prices.push(card.querySelector('.price').innerText);
+            descs.push(card.querySelector('.product-desc').innerText);
+            stock.push(!card.classList.contains('out-of-stock'));
+            const b = card.querySelector('.badge');
+            badges.push(b.classList.contains('badge-hit') ? 'hit' : b.classList.contains('badge-promo') ? 'promo' : '');
+        });
+        set(ref(db, 'catalog'), { prices, descs, stock, badges }).then(() => { alert("Оновлено!"); location.reload(); });
+    };
+</script>
+
+<script>
+    // СНІГ
+    function createSnow() {
+        for (let i = 0; i < 20; i++) {
+            let s = document.createElement('div'); s.className = 'snowflake'; s.innerHTML = '❄️';
+            s.style.left = Math.random() * 100 + 'vw'; s.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            s.style.opacity = Math.random(); document.body.appendChild(s);
+        }
+    }
+    createSnow();
+
+    function switchTab(id, title, btn) {
+        document.querySelectorAll('[id^="cat-"]').forEach(el => el.classList.add('hidden'));
+        document.getElementById('cat-' + id).classList.remove('hidden');
+        document.getElementById('page-title').innerText = title;
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function toggleAdminPanel() {
+        const auth = sessionStorage.getItem('isHubAdmin') === 'true';
+        document.getElementById(auth ? 'dev-menu' : 'dev-login').classList.add('active');
+    }
+
+    function checkDevAuth() {
+        if (document.getElementById('dev-user').value === "admin" && document.getElementById('dev-pass').value === "admin123") {
+            sessionStorage.setItem('isHubAdmin', 'true'); location.reload();
+        }
+    }
+    
+    function devLogout() { sessionStorage.removeItem('isHubAdmin'); location.reload(); }
+    function closePanels() { document.querySelectorAll('.dev-panel').forEach(p => p.classList.remove('active')); }
+
+    let adminModes = { stock: false };
+    function toggleEdit(type) {
+        const els = document.querySelectorAll(type === 'price' ? '.price' : '.product-desc');
+        const state = els[0].contentEditable !== "true";
+        els.forEach(e => { e.contentEditable = state; e.classList.toggle('editing-active', state); });
+    }
+
+    function toggleStockMode() {
+        adminModes.stock = !adminModes.stock;
+        document.getElementById('btn-edit-stock').style.background = adminModes.stock ? "#4CAF50" : "";
+    }
+
+    document.addEventListener('click', (e) => {
+        const card = e.target.closest('.product-card');
+        if (!card || sessionStorage.getItem('isHubAdmin') !== 'true') return;
+        if (adminModes.stock) { card.classList.toggle('out-of-stock'); return; }
+        const badgeVal = document.getElementById('badge-selector').value;
+        const b = card.querySelector('.badge');
+        b.className = 'badge';
+        if(badgeVal) { b.classList.add('badge-' + badgeVal); b.innerText = badgeVal === 'hit' ? 'ХІТ' : 'АКЦІЯ'; }
+    });
+</script>
+
+</body>
+</html>
