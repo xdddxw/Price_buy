@@ -129,33 +129,26 @@
 <body>
     <div id="pwa-toast" 
      onclick="this.style.setProperty('display', 'none', 'important');"
-     style="display: none !important; position: fixed; top: 20%; left: 20px; right: 20px; background: #1a0b2e; border: 2px solid #00c6ff; border-radius: 20px; padding: 20px; z-index: 1000000; box-shadow: 0 10px 50px rgba(0,0,0,1); pointer-events: auto !important; cursor: pointer;">
+     style="display: none !important; position: fixed; bottom: 150px; left: 20px; right: 20px; background: linear-gradient(135deg, #1a0b2e 0%, #0d0216 100%); border: 2px solid #00c6ff; border-radius: 20px; padding: 20px; z-index: 1000000; box-shadow: 0 10px 50px rgba(0,0,0,1); pointer-events: auto !important; cursor: pointer; animation: pwaFadeIn 0.5s ease-out;">
     
     <div style="text-align: right; margin-top: -10px; margin-right: -10px; font-size: 24px; color: #777;">&times;</div>
 
     <div style="display: flex; align-items: center; gap: 15px; pointer-events: none;">
-        <img src="images/logo.png" style="width: 50px; height: 50px; border-radius: 12px;">
+        <img src="images/logo.png" style="width: 50px; height: 50px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
         <div style="flex: 1;">
-            <div style="font-weight: 800; font-size: 16px; color: #fff;">SMOKE HUB App</div>
-            <div style="font-size: 13px; color: #bbb;">Натисни <img src="https://img.icons8.com/ios/50/ffffff/upload--v1.png" style="width:18px; vertical-align:middle;"> та <b>"Додати на екран"</b></div>
+            <div style="font-weight: 800; font-size: 16px; color: #fff; margin-bottom: 2px;">SMOKE HUB App</div>
+            <div style="font-size: 12px; color: #bbb;">Натисни <img src="https://img.icons8.com/ios/50/ffffff/upload--v1.png" style="width:16px; vertical-align:middle;"> та <b>"Додати на екран"</b></div>
         </div>
-        <div style="background: #00c6ff; color: #000; padding: 10px 20px; border-radius: 12px; font-weight: 900; font-size: 14px;">ОК</div>
+        <div style="background: #00c6ff; color: #000; padding: 10px 18px; border-radius: 12px; font-weight: 900; font-size: 13px; box-shadow: 0 0 15px rgba(0,198,255,0.3);">ОК</div>
     </div>
 </div>
 
-<script>
-    // Цей скрипт тільки показує банер, а закриває його сам HTML (onclick)
-    window.addEventListener('load', function() {
-        var isIos = /iPhone|iPad|iPod/.test(navigator.userAgent);
-        var isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-
-        if (isIos && !isStandalone) {
-            setTimeout(function() {
-                document.getElementById('pwa-toast').style.setProperty('display', 'block', 'important');
-            }, 3000);
-        }
-    });
-</script>
+<style>
+@keyframes pwaFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
 
 <div class="dev-trigger" onclick="toggleAdminPanel()"></div>
 
@@ -635,6 +628,7 @@
 
 </body>
 </html>
+
 
 
 
