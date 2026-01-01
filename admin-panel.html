@@ -160,7 +160,7 @@
     const db = firebase.firestore();
 
     const allFlavors = [
-        "spermint", "double grape", "apple mixed", "berry mint", 
+        "БЕЗ СМАКУ", "spermint", "double grape", "apple mixed", "berry mint", 
         "blackurant grape", "blueberry curant", "watermelon melon", 
         "cranberry mors", "double raspberry", "Cola Lemon", 
         "RedBull blue raspberry", "pineaple lemonade", "multifruit", "bali triple shot"
@@ -176,20 +176,36 @@
     };
 
     function updateFlavorList() {
-        const catalog = document.getElementById('catalog').value;
-        const flavorSelect = document.getElementById('flavor');
-        const volBox = document.getElementById('volBox');
-        flavorSelect.innerHTML = '<option value="none" selected disabled>Вибери смак...</option>';
-        if (catalog === "заливка") {
-            allFlavors.forEach(f => { flavorSelect.innerHTML += `<option value="${f}">${f}</option>`; });
-            volBox.style.display = "block";
-        } else {
-            flavorSelect.innerHTML += `<option value="ICE SHOT">ICE SHOT 🧊</option>`;
-            allFlavors.forEach(f => { flavorSelect.innerHTML += `<option value="${f}">${f} (30ml)</option>`; });
-            volBox.style.display = "none";
-        }
-        calc();
+    const catalog = document.getElementById('catalog').value;
+    const flavorSelect = document.getElementById('flavor');
+    const volBox = document.getElementById('volBox');
+    
+    // Очищуємо список і ставимо дефолтний варіант
+    flavorSelect.innerHTML = '<option value="none" selected disabled>Вибери смак...</option>';
+    
+    if (catalog === "заливка") {
+        // Додаємо пункт БЕЗ СМАКУ першим для заливки
+        flavorSelect.innerHTML += `<option value="БЕЗ СМАКУ">БЕЗ СМАКУ</option>`;
+        
+        // Додаємо всі інші смаки
+        allFlavors.forEach(f => { 
+            flavorSelect.innerHTML += `<option value="${f}">${f}</option>`; 
+        });
+        
+        volBox.style.display = "block"; // Показуємо вибір мл
+    } else {
+        // Для продажу БЕЗ СМАКУ не додаємо, починаємо з ICE SHOT
+        flavorSelect.innerHTML += `<option value="ICE SHOT">ICE SHOT 🧊</option>`;
+        
+        allFlavors.forEach(f => { 
+            flavorSelect.innerHTML += `<option value="${f}">${f} (30ml)</option>`; 
+        });
+        
+        volBox.style.display = "none"; // Ховаємо вибір мл
     }
+    
+    calc(); // Перераховуємо ціну (для "БЕЗ СМАКУ" ціна підтягнеться автоматично як за звичайну заливку)
+}
 
     function handleFlavorChange() {
         const f = document.getElementById('flavor').value;
@@ -241,40 +257,69 @@
 
     // Головна функція синхронізації
     function syncData() {
-        db.collection("orders").orderBy("date", "desc").onSnapshot(snap => {
-            const logs = document.getElementById('logs');
-            const debtList = document.getElementById('debtList');
-            let pln = 0, uah = 0;
-            logs.innerHTML = ""; debtList.innerHTML = "";
+    db.collection("orders").orderBy("date", "desc").onSnapshot(snap => {
+        const logs = document.getElementById('logs');
+        const debtList = document.getElementById('debtList');
+        const topBlock = document.getElementById('topFlavors'); // Блок для ТОП-3
+        
+        let pln = 0, uah = 0;
+        let stats = {}; // Для збору статистики
+        
+        logs.innerHTML = ""; 
+        debtList.innerHTML = "";
+        
+        snap.forEach(doc => {
+            const item = doc.data(); 
+            const id = doc.id;
             
-            snap.forEach(doc => {
-                const item = doc.data(); const id = doc.id;
-                if (item.status === 'paid') {
-                    if(item.currency === "PLN") pln += item.priceVal; else uah += item.priceVal;
-                    logs.innerHTML += `
-                    <div class="order-row">
-                        <div class="order-info"><b>${item.flavor}</b><span>${item.size} • ${item.pay}</span></div>
-                        <div class="order-right">
-                            <div class="order-price">${item.fullPrice}</div>
-                            <button class="action-btn" onclick="db.collection('orders').doc('${id}').delete()">🗑️</button>
-                        </div>
-                    </div>`;
-                } else {
-                    debtList.innerHTML += `
-                    <div class="order-row debt">
-                        <div class="order-info"><b>${item.debtor}</b><span>${item.flavor}</span></div>
-                        <div class="order-right">
-                            <div class="order-price">${item.fullPrice}</div>
-                            <button class="pay-debt-btn" onclick="db.collection('orders').doc('${id}').update({status:'paid'})">ОПЛАТИВ</button>
-                            <button class="action-btn" onclick="db.collection('orders').doc('${id}').delete()">🗑️</button>
-                        </div>
-                    </div>`;
+            if (item.status === 'paid') {
+                // Рахуємо гроші
+                if(item.currency === "PLN") pln += item.priceVal; else uah += item.priceVal;
+                
+                // Збираємо статистику (ігноруємо "БЕЗ СМАКУ")
+                if(item.flavor !== "БЕЗ СМАКУ") {
+                    stats[item.flavor] = (stats[item.flavor] || 0) + 1;
                 }
-            });
-            document.getElementById('totalPLN').innerText = pln;
-            document.getElementById('totalUAH').innerText = uah;
+
+                logs.innerHTML += `
+                <div class="order-row">
+                    <div class="order-info"><b>${item.flavor}</b><span>${item.size} • ${item.pay}</span></div>
+                    <div class="order-right">
+                        <div class="order-price">${item.fullPrice}</div>
+                        <button class="action-btn" onclick="if(confirm('Видалити цей запис?')) db.collection('orders').doc('${id}').delete()">🗑️</button>
+                    </div>
+                </div>`;
+            } else {
+                debtList.innerHTML += `
+                <div class="order-row debt">
+                    <div class="order-info"><b>${item.debtor}</b><span>${item.flavor}</span></div>
+                    <div class="order-right">
+                        <div class="order-price">${item.fullPrice}</div>
+                        <button class="pay-debt-btn" onclick="db.collection('orders').doc('${id}').update({status:'paid'})">ОПЛАТИВ</button>
+                        <button class="action-btn" onclick="if(confirm('Видалити борг?')) db.collection('orders').doc('${id}').delete()">🗑️</button>
+                    </div>
+                </div>`;
+            }
         });
-    }
+
+        // Оновлюємо цифри каси
+        document.getElementById('totalPLN').innerText = pln;
+        document.getElementById('totalUAH').innerText = uah;
+
+        // Оновлюємо ТОП-3 популярних смаків
+        if (topBlock) {
+            const sorted = Object.entries(stats).sort((a, b) => b[1] - a[1]).slice(0, 3);
+            topBlock.innerHTML = sorted.length ? "" : "<div style='font-size:10px; color:#666; text-align:center;'>Статистика збирається...</div>";
+            sorted.forEach((item, index) => {
+                topBlock.innerHTML += `
+                <div class="top-item" style="display:flex; justify-content:space-between; font-size:13px; margin:5px 0; color:#ffd700;">
+                    <span>${index + 1}. ${item[0]}</span>
+                    <b>${item[1]} шт.</b>
+                </div>`;
+            });
+        }
+    });
+}
 
     // Запуск
     syncData();
