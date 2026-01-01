@@ -129,11 +129,11 @@
 
         /* Сповіщення */
         #toast {
-            position: fixed; 
-            bottom: 40px; 
-            left: 50%; 
-            transform: translateX(-50%) translateY(100px);
-            background: rgba(30, 10, 50, 0.9); 
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(150px); /* Сховано глибше */
+            background: rgba(30, 10, 50, 0.95);
             color: #fff;
             padding: 14px 28px;
             border-radius: 16px;
@@ -143,10 +143,16 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(0, 242, 255, 0.3);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+            opacity: 0; /* Додано прозорість */
+            pointer-events: none;
             font-family: sans-serif;
         }
-        #toast.show { transform: translateX(-50%) translateY(0); }
+        
+        #toast.show { 
+            transform: translateX(-50%) translateY(0); 
+            opacity: 1; /* Стає видимим */
+        }
 
         .snowflake {
             position: fixed; top: -10px; color: #fff; opacity: 0.4; pointer-events: none; z-index: 1;
@@ -219,14 +225,23 @@
     updateClock();
 
     function copyNum(text, label) {
-        navigator.clipboard.writeText(text).then(() => {
-            const t = document.getElementById('toast');
-            t.innerHTML = `<span style="color:var(--accent)">✓</span> ${label} скопійовано`;
-            t.classList.add('show');
-            if (navigator.vibrate) navigator.vibrate(25);
-            setTimeout(() => t.classList.remove('show'), 2000);
-        });
-    }
+    navigator.clipboard.writeText(text).then(() => {
+        const toast = document.getElementById('toast');
+        toast.innerHTML = `<span style="color:var(--accent)">✓</span> ${label} скопійовано`;
+        
+        // Спочатку додаємо клас
+        toast.classList.add('show');
+        
+        if (navigator.vibrate) navigator.vibrate(25);
+
+        // Таймер на зникнення (через 2 секунди)
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2000);
+    }).catch(() => {
+        alert("Помилка копіювання");
+    });
+}
 
     // Сніг
     for(let i=0; i<12; i++){
@@ -242,3 +257,4 @@
 
 </body>
 </html>
+
