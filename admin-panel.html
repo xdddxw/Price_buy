@@ -234,11 +234,9 @@
         let currency = (p === "Монобанк") ? "грн" : "зл";
         let finalPrice = 0;
 
-        // Якщо введено ручну ціну - використовуємо її
         if (manual && manual > 0) {
             finalPrice = manual;
         } else {
-            // Стандартний розрахунок
             if (cat === "продаж") {
                 finalPrice = (f === "ICE SHOT") ? (p === "Монобанк" ? 110 : 10) : (p === "Монобанк" ? 650 : 60);
             } else {
@@ -271,8 +269,7 @@
                 date: new Date().getTime()
             });
             document.getElementById('debtorName').value = "";
-            document.getElementById('manualPrice').value = ""; // Очищуємо ціну
-            calc(); // Скидаємо відображення ціни
+            document.getElementById('manualPrice').value = "";
             alert("Збережено! ✅");
         } catch (e) {
             alert("Помилка: " + e.message);
@@ -295,6 +292,9 @@
                 const item = doc.data(); 
                 const id = doc.id;
                 
+                const d = new Date(item.date);
+                const dateStr = d.getDate().toString().padStart(2, '0') + '.' + (d.getMonth() + 1).toString().padStart(2, '0');
+                
                 if (item.status === 'paid') {
                     if(item.currency === "PLN") pln += item.priceVal; else uah += item.priceVal;
                     
@@ -304,7 +304,7 @@
 
                     logs.innerHTML += `
                     <div class="order-row">
-                        <div class="order-info"><b>${item.flavor}</b><span>${item.size} • ${item.pay}</span></div>
+                        <div class="order-info"><b>${item.flavor}</b><span>${item.size} • ${item.pay} • <i style="color:#00f2ff">${dateStr}</i></span></div>
                         <div class="order-right">
                             <div class="order-price">${item.fullPrice}</div>
                             <button class="action-btn" onclick="if(confirm('Видалити цей запис?')) db.collection('orders').doc('${id}').delete()">🗑️</button>
@@ -313,7 +313,7 @@
                 } else {
                     debtList.innerHTML += `
                     <div class="order-row debt">
-                        <div class="order-info"><b>${item.debtor}</b><span>${item.flavor}</span></div>
+                        <div class="order-info"><b>${item.debtor}</b><span>${item.flavor} • <i style="color:#ff9800">${dateStr}</i></span></div>
                         <div class="order-right">
                             <div class="order-price">${item.fullPrice}</div>
                             <button class="pay-debt-btn" onclick="db.collection('orders').doc('${id}').update({status:'paid'})">ОПЛАТИВ</button>
