@@ -2,198 +2,212 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>SMOKE HUB | Рандомайзер</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
 <style>
-/* ===== BODY ===== */
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Arial, sans-serif;
   background: radial-gradient(circle at top, #1b0b2e, #0b0416);
   color: #fff;
-  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
-/* ===== СНІГ ===== */
+/* СНІГ */
 .snowflake {
-  position: fixed;
-  color: white;
-  font-size: 1em;
-  opacity: 0.8;
-  pointer-events: none;
-  animation-name: fall;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
+  position: fixed; color: white; font-size: 1em; opacity: 0.8;
+  pointer-events: none; z-index: 9999; animation: fall linear infinite;
 }
 @keyframes fall { to { transform: translateY(110vh); } }
 
-/* ===== ЛОГО ===== */
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  margin: 25px 0 10px;
-}
-.logo-icon { font-size: 28px; }
+/* ЛОГО */
+.logo { display: flex; align-items: center; gap: 10px; margin: 15px 0 5px; flex-shrink: 0; }
+.logo-icon { font-size: 24px; }
 .logo-text {
-  font-weight: 900;
-  font-size: 26px;
+  font-weight: 900; font-size: 24px;
   background: linear-gradient(90deg, #ff0055, #00f2ff, #ff0055);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradient-move 3s linear infinite;
+  background-size: 200% auto; -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; animation: gradient-move 3s linear infinite;
 }
 @keyframes gradient-move { to { background-position: 200% center; } }
 
-/* ===== КАРТКИ ===== */
+/* КАРТКА */
 .card {
-  width: 90%;
-  max-width: 420px;
-  margin: 15px auto;
-  padding: 20px;
-  border-radius: 18px;
+  width: 92%; 
+  max-width: 400px; 
+  max-height: 85vh; 
   background: rgba(255,255,255,0.07);
-  box-shadow: 0 0 35px rgba(255,0,150,0.2);
-  backdrop-filter: blur(4px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-sizing: border-box;
-  word-wrap: break-word;
-}
-
-.buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-}
-.buttons button, .main-btn, .back-btn {
-  padding: 14px;
-  border-radius: 12px;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.2s;
-  width: 100%;
-  text-align: center;
-  font-weight: bold;
-}
-.buttons button { background: rgba(255,255,255,0.1); color: #fff; }
-.buttons button:hover { background: linear-gradient(90deg,#ff2f92,#ff005d); box-shadow:0 0 15px rgba(255,0,150,0.6); }
-
-.main-btn { margin-top: 20px; background: linear-gradient(90deg,#ff2f92,#ff005d); color: #fff; box-shadow:0 0 20px rgba(255,0,150,0.6); }
-
-.back-btn { display:block; margin-bottom:15px; padding:12px 16px; border-radius:12px; background: rgba(255,255,255,0.1); color:#fff; box-shadow:0 0 10px rgba(255,0,150,0.3); }
-.back-btn:hover { background: linear-gradient(90deg,#ff2f92,#ff005d); box-shadow:0 0 15px rgba(255,0,150,0.6); }
-
-.result-card {
-  margin-top: 12px;
   padding: 15px;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.1);
-  box-shadow: 0 0 15px rgba(255,255,255,0.1);
-  width: 100%;
-  text-align: center;
-  word-wrap: break-word;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
 }
+
+.card-static-top { flex-shrink: 0; width: 100%; }
+
+/* СКРОЛ СПИСКУ */
+.list-scrollable {
+  overflow-y: auto;
+  flex-grow: 1;
+  min-height: 0;
+  margin: 10px 0;
+  padding-right: 5px;
+  -webkit-overflow-scrolling: touch;
+}
+.list-scrollable::-webkit-scrollbar { width: 4px; }
+.list-scrollable::-webkit-scrollbar-thumb { background: #ff0055; border-radius: 10px; }
+
+/* КНОПКИ */
+.buttons button, .back-btn, .wheel-again-btn {
+  padding: 14px; border-radius: 12px; border: none; font-size: 16px;
+  cursor: pointer; width: 100%; font-weight: bold; text-align: center;
+  transition: 0.2s; box-sizing: border-box;
+}
+
+.buttons { display: flex; flex-direction: column; gap: 10px; }
+.buttons button { background: rgba(255,255,255,0.1); color: #fff; }
+.back-btn { background: rgba(255,255,255,0.15); color: #fff; text-decoration: none; margin-bottom: 10px; display: block; }
+.wheel-again-btn { background: linear-gradient(90deg,#ff2f92,#ff005d); color: #fff; margin-top: 10px; flex-shrink: 0; display: none; }
+
+/* РОЗМИТИЙ ФОН ПРИ КРУТІННІ (ВИПРАВЛЕНО) */
+#wheel-overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(11, 4, 22, 0.4); /* Напівпрозорий темний фон */
+    backdrop-filter: blur(15px); /* ТУТ САМЕ РОЗМИТТЯ */
+    -webkit-backdrop-filter: blur(15px); /* Для iPhone */
+    z-index: 10000; display: none; 
+    align-items: center; justify-content: center; 
+}
+
+.wheel-container { position: relative; width: 280px; height: 280px; border: 5px solid #fff; border-radius: 50%; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+.pointer { position: absolute; right: -25px; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-top: 15px solid transparent; border-bottom: 15px solid transparent; border-right: 35px solid #fff; z-index: 100; }
+#main-wheel { width: 100%; height: 100%; border-radius: 50%; position: relative; overflow: hidden; transition: transform 7s cubic-bezier(0.1, 0, 0, 1); }
+.wheel-label { position: absolute; width: 50%; height: 20px; top: calc(50% - 10px); left: 50%; transform-origin: left center; display: flex; align-items: center; justify-content: center; padding-left: 20px; font-size: 8px; font-weight: 900; text-transform: uppercase; white-space: nowrap; text-shadow: 1px 1px 2px #000; }
+
+.result-card { margin-bottom: 10px; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.1); border-left: 4px solid #00f2ff; text-align: left; }
 </style>
 </head>
 
 <body>
 
-<!-- Сніг -->
 <script>
-for(let i=0;i<25;i++){
-  let s = document.createElement("div");
-  s.className="snowflake";
-  s.innerHTML = "❄️";
-  s.style.left = Math.random()*100 + "vw";
-  s.style.top = Math.random()*100 + "vh";  // випадкове початкове положення
-  s.style.animationDuration = 5 + Math.random()*10 + "s";
-  s.style.fontSize = 10 + Math.random()*20 + "px";
+for(let i=0;i<15;i++){
+  let s = document.createElement("div"); s.className="snowflake"; s.innerHTML = "❄️";
+  s.style.left = Math.random()*100 + "vw"; s.style.animationDuration = 5 + Math.random()*10 + "s";
   document.body.appendChild(s);
 }
 </script>
 
-<!-- Лого -->
-<div class="logo">
-  <span class="logo-icon">🎅</span>
-  <span class="logo-text">SMOKE HUB</span>
+<div id="wheel-overlay">
+    <div class="pointer"></div>
+    <div class="wheel-container"><div id="main-wheel"></div></div>
 </div>
 
-<!-- Вибір смаку -->
-<div class="card" id="quiz">
-  <button class="back-btn" onclick="location.href='index.html'">← Назад</button>
-  <h2 id="question">Який смак сьогодні?</h2>
-  <div class="buttons" id="answers">
+<div class="logo"><span class="logo-icon">🎅</span><span class="logo-text">SMOKE HUB</span></div>
+
+<div id="quiz" class="card">
+  <div class="card-static-top">
+    <a href="index.html" class="back-btn">← Назад</a>
+    <h2 style="margin: 0 0 15px; text-align: center; font-size: 20px;">Який смак сьогодні?</h2>
+  </div>
+  <div class="buttons">
     <button onclick="pick('fruit')">🍓 Фрукти</button>
     <button onclick="pick('mint')">❄️ Холод / Мʼята</button>
     <button onclick="pick('drink')">🥤 Напої</button>
     <button onclick="pick('sweet')">🍰 Десерт</button>
-    <button onclick="randomPick()">🎲 Рандомний смак</button>
+    <button style="background: #fff; color: #000;" onclick="startWheel()">🎡 Колесо Фортуни</button>
   </div>
 </div>
 
-<!-- Результат -->
-<div class="card" id="result" style="display:none;">
-  <h2>🎁 Твій смак:</h2>
-  <div id="list"></div>
-  <button class="main-btn" onclick="restart()">Підібрати ще</button>
+<div id="result" class="card" style="display:none;">
+  <div class="card-static-top">
+    <button class="back-btn" onclick="restart()">← Назад</button>
+    <h2 style="text-align: center; margin: 0; font-size: 20px;">🎁 Твій вибір:</h2>
+  </div>
+  <div class="list-scrollable" id="list"></div>
+  <button id="wheel-btn" class="wheel-again-btn" onclick="startWheel()">Крутити ще 🎡</button>
 </div>
 
 <script>
 const juices = [
-  {name:"Berry Mint", tags:["fruit","mint"], desc:"Ягоди з мʼякою мʼятою"},
-  {name:"Spearmint", tags:["mint"], desc:"Чиста освіжаюча мʼята"},
-  {name:"Double Grape", tags:["fruit","sweet"], desc:"Насичений солодкий виноград"},
-  {name:"Apple Mixed", tags:["fruit"], desc:"Мікс зеленого та червоного яблука"},
-  {name:"Double Raspberry", tags:["fruit","sweet"], desc:"Подвійна солодка малина"},
-  {name:"Cranberry Mors", tags:["fruit"], desc:"Кисло-солодкий журавлинний морс"},
-  {name:"Watermelon Melon", tags:["fruit","sweet"], desc:"Кавун з динею"},
-  {name:"Cola Lemon", tags:["drink","sweet"], desc:"Кола з лимоном"},
-  {name:"RedBull Blue Raspberry", tags:["drink","sweet"], desc:"Енергетик з синьою малиною"},
-  {name:"Pineapple Lemonade", tags:["drink","sweet"], desc:"Ананасовий лимонад"},
-  {name:"Multifruit", tags:["fruit","sweet"], desc:"Солодкий фруктовий коктейль"},
-  {name:"Bali Triple Shot", tags:["fruit","sweet"], desc:"Тропічний мікс"}
+  {name: "BERRY MINT", color: "#ff0055", tags: ["fruit","mint"], desc: "Вибуховий мікс лісових ягід з холодком."},
+  {name: "SPEARMINT", color: "#00f2ff", tags: ["mint"], desc: "Класична садова м'ята: чистий смак."},
+  {name: "DOUBLE GRAPE", color: "#8e2de2", tags: ["fruit","sweet"], desc: "Дует темного та світлого винограду."},
+  {name: "APPLE MIX", color: "#4CAF50", tags: ["fruit"], desc: "Баланс між кислим та солодким яблуком."},
+  {name: "RASPBERRY", color: "#ff2f92", tags: ["fruit","sweet"], desc: "Подвійна порція стиглої малини."},
+  {name: "CRANBERRY", color: "#d50000", tags: ["fruit"], desc: "Журавлинний морс з благородною кислинкою."},
+  {name: "WATERMELON", color: "#e91e63", tags: ["fruit","sweet"], desc: "Кавун у поєднанні з медовою динею."},
+  {name: "COLA LEMON", color: "#3e2723", tags: ["drink","sweet"], desc: "Газировка з часточкою лимона."},
+  {name: "REDBULL BLUE", color: "#1a237e", tags: ["drink","sweet"], desc: "Енергетик з синьою малиною."},
+  {name: "PINEAPPLE", color: "#ff9800", tags: ["drink","sweet"], desc: "Ананасовий лимонад."},
+  {name: "MULTIFRUIT", color: "#795548", tags: ["fruit","sweet"], desc: "Яскравий тропічний пунш."},
+  {name: "BALI SHOT", color: "#009688", tags: ["fruit","sweet"], desc: "Мікс гуави, маракуйя та апельсина."}
 ];
 
-function pick(tag){
-  const filtered = juices.filter(j => j.tags.includes(tag));
-  showResult(filtered);
+const wheel = document.getElementById('main-wheel');
+const step = 360 / juices.length;
+
+function setupWheel() {
+    let gradient = juices.map((j, i) => `${j.color} ${i * step}deg ${(i + 1) * step}deg`).join(', ');
+    wheel.style.background = `conic-gradient(${gradient})`;
+    juices.forEach((j, i) => {
+        const div = document.createElement('div');
+        div.className = 'wheel-label';
+        div.style.transform = `rotate(${i * step + (step / 2)}deg)`;
+        div.innerText = j.name;
+        wheel.appendChild(div);
+    });
+}
+setupWheel();
+
+function startWheel() {
+    document.getElementById('wheel-btn').style.display = 'none';
+    const overlay = document.getElementById('wheel-overlay');
+    overlay.style.display = 'flex';
+    wheel.style.transition = 'none';
+    wheel.style.transform = 'rotate(0deg)';
+    setTimeout(() => {
+        const randomIndex = Math.floor(Math.random() * juices.length);
+        const totalRotation = (360 * 10) - (randomIndex * step + step / 2);
+        wheel.style.transition = 'transform 7s cubic-bezier(0.1, 0, 0, 1)';
+        wheel.style.transform = `rotate(${totalRotation}deg)`;
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            showResult([juices[randomIndex]], true);
+        }, 7200);
+    }, 50);
 }
 
-function randomPick(){
-  const j = juices[Math.floor(Math.random()*juices.length)];
-  showResult([j]);
-}
+function pick(tag){ showResult(juices.filter(j => j.tags.includes(tag)), false); }
 
-function showResult(array){
+function showResult(array, fromWheel){
   document.getElementById("quiz").style.display="none";
-  document.getElementById("result").style.display="block";
+  document.getElementById("result").style.display="flex";
+  document.getElementById("wheel-btn").style.display = fromWheel ? "block" : "none";
   const list = document.getElementById("list");
   list.innerHTML = "";
   array.forEach(j => {
     const div = document.createElement("div");
     div.className="result-card";
-    div.innerHTML = `<strong>${j.name}</strong><br>${j.desc}`;
+    div.innerHTML = `<strong style="color:#00f2ff; font-size:16px;">${j.name}</strong><br><small style="color:#eee;">${j.desc}</small>`;
     list.appendChild(div);
   });
 }
 
 function restart(){
-  document.getElementById("quiz").style.display="block";
+  document.getElementById("quiz").style.display="flex";
   document.getElementById("result").style.display="none";
 }
 </script>
-
 </body>
 </html>
