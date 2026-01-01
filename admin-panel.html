@@ -180,31 +180,24 @@
     const flavorSelect = document.getElementById('flavor');
     const volBox = document.getElementById('volBox');
     
-    // Очищуємо список і ставимо дефолтний варіант
     flavorSelect.innerHTML = '<option value="none" selected disabled>Вибери смак...</option>';
     
     if (catalog === "заливка") {
-        // Додаємо пункт БЕЗ СМАКУ першим для заливки
-        flavorSelect.innerHTML += `<option value="БЕЗ СМАКУ">БЕЗ СМАКУ</option>`;
-        
-        // Додаємо всі інші смаки
+        // Просто перебираємо масив. Якщо там є "БЕЗ СМАКУ", він додасться один раз.
         allFlavors.forEach(f => { 
             flavorSelect.innerHTML += `<option value="${f}">${f}</option>`; 
         });
-        
-        volBox.style.display = "block"; // Показуємо вибір мл
+        volBox.style.display = "block";
     } else {
-        // Для продажу БЕЗ СМАКУ не додаємо, починаємо з ICE SHOT
         flavorSelect.innerHTML += `<option value="ICE SHOT">ICE SHOT 🧊</option>`;
-        
         allFlavors.forEach(f => { 
+            // Для продажу пропускаємо "БЕЗ СМАКУ", якщо він є в масиві
+            if (f === "БЕЗ СМАКУ") return;
             flavorSelect.innerHTML += `<option value="${f}">${f} (30ml)</option>`; 
         });
-        
-        volBox.style.display = "none"; // Ховаємо вибір мл
+        volBox.style.display = "none";
     }
-    
-    calc(); // Перераховуємо ціну (для "БЕЗ СМАКУ" ціна підтягнеться автоматично як за звичайну заливку)
+    calc();
 }
 
     function handleFlavorChange() {
