@@ -50,6 +50,7 @@
             width: 100%; padding: 14px; border-radius: 12px; border: none; 
             background: rgba(255,255,255,0.1); color: #fff; font-size: 16px; outline: none; box-sizing: border-box;
         }
+        input::placeholder { color: rgba(255,255,255,0.3); }
 
         #location-info {
             margin-top: 10px; padding: 10px; border-radius: 12px;
@@ -57,7 +58,7 @@
             text-align: center; font-size: 13px; color: #fff; font-weight: bold; display: none;
         }
 
-        .price-display { font-size: 36px; text-align: center; margin: 15px 0; font-weight: 900; text-shadow: 0 0 15px #ff0055; }
+        .price-display { font-size: 36px; text-align: center; margin: 10px 0; font-weight: 900; text-shadow: 0 0 15px #ff0055; }
         .main-btn {
             width: 100%; padding: 18px; border-radius: 15px; border: none;
             background: linear-gradient(90deg, #ff2f92, #ff005d);
@@ -66,6 +67,12 @@
 
         .table-card { width: 92%; max-width: 400px; margin-top: 25px; }
         .section-title { font-size: 11px; color: #666; text-transform: uppercase; margin: 15px 0 8px 5px; letter-spacing: 1px; }
+
+        .top-badge { 
+            background: rgba(255, 215, 0, 0.1); border: 1px solid gold; 
+            padding: 10px; border-radius: 15px; margin-top: 10px; 
+            box-sizing: border-box; width: 100%;
+        }
 
         .order-row {
             background: rgba(255,255,255,0.04); padding: 14px; border-radius: 15px;
@@ -132,12 +139,18 @@
     
     <div id="location-info">📍 Місце: <span id="loc-text">-</span></div>
 
+    <label>Своя ціна (якщо треба змінити)</label>
+    <input type="number" id="manualPrice" placeholder="Введіть число" oninput="calc()">
+
     <div class="price-display" id="total">6 зл</div>
     
     <button class="main-btn" onclick="saveOrder()">ЗБЕРЕГТИ</button>
 </div>
 
 <div class="table-card">
+    <div class="section-title">Популярні смаки 🔥</div>
+    <div id="topFlavors" class="top-badge"></div>
+
     <div class="section-title">Боржники 🚩</div>
     <div id="debtList"></div>
 
@@ -146,7 +159,6 @@
 </div>
 
 <script>
-    // Твої підтверджені дані Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAOW2GEW1McWRAzs4RLVOGHvcoAnRhgRC4",
       authDomain: "smokehub-7a072.firebaseapp.com",
@@ -176,29 +188,27 @@
     };
 
     function updateFlavorList() {
-    const catalog = document.getElementById('catalog').value;
-    const flavorSelect = document.getElementById('flavor');
-    const volBox = document.getElementById('volBox');
-    
-    flavorSelect.innerHTML = '<option value="none" selected disabled>Вибери смак...</option>';
-    
-    if (catalog === "заливка") {
-        // Просто перебираємо масив. Якщо там є "БЕЗ СМАКУ", він додасться один раз.
-        allFlavors.forEach(f => { 
-            flavorSelect.innerHTML += `<option value="${f}">${f}</option>`; 
-        });
-        volBox.style.display = "block";
-    } else {
-        flavorSelect.innerHTML += `<option value="ICE SHOT">ICE SHOT 🧊</option>`;
-        allFlavors.forEach(f => { 
-            // Для продажу пропускаємо "БЕЗ СМАКУ", якщо він є в масиві
-            if (f === "БЕЗ СМАКУ") return;
-            flavorSelect.innerHTML += `<option value="${f}">${f} (30ml)</option>`; 
-        });
-        volBox.style.display = "none";
+        const catalog = document.getElementById('catalog').value;
+        const flavorSelect = document.getElementById('flavor');
+        const volBox = document.getElementById('volBox');
+        
+        flavorSelect.innerHTML = '<option value="none" selected disabled>Вибери смак...</option>';
+        
+        if (catalog === "заливка") {
+            allFlavors.forEach(f => { 
+                flavorSelect.innerHTML += `<option value="${f}">${f}</option>`; 
+            });
+            volBox.style.display = "block";
+        } else {
+            flavorSelect.innerHTML += `<option value="ICE SHOT">ICE SHOT 🧊</option>`;
+            allFlavors.forEach(f => { 
+                if (f === "БЕЗ СМАКУ") return;
+                flavorSelect.innerHTML += `<option value="${f} (30ml)">${f} (30ml)</option>`; 
+            });
+            volBox.style.display = "none";
+        }
+        calc();
     }
-    calc();
-}
 
     function handleFlavorChange() {
         const f = document.getElementById('flavor').value;
@@ -218,12 +228,25 @@
         const p = document.getElementById('pay').value;
         const s = document.getElementById('size').value;
         const f = document.getElementById('flavor').value;
+        const manual = document.getElementById('manualPrice').value;
         const out = document.getElementById('total');
-        if (cat === "продаж") {
-            out.innerText = (f === "ICE SHOT") ? (p === "Монобанк" ? "110 грн" : "10 зл") : (p === "Монобанк" ? "650 грн" : "60 зл");
+        
+        let currency = (p === "Монобанк") ? "грн" : "зл";
+        let finalPrice = 0;
+
+        // Якщо введено ручну ціну - використовуємо її
+        if (manual && manual > 0) {
+            finalPrice = manual;
         } else {
-            out.innerText = (p === "Монобанк") ? (s === "2" ? "70 грн" : "100 грн") : (s === "2" ? "6 зл" : "9 зл");
+            // Стандартний розрахунок
+            if (cat === "продаж") {
+                finalPrice = (f === "ICE SHOT") ? (p === "Монобанк" ? 110 : 10) : (p === "Монобанк" ? 650 : 60);
+            } else {
+                finalPrice = (p === "Монобанк") ? (s === "2" ? 70 : 100) : (s === "2" ? 6 : 9);
+            }
         }
+        
+        out.innerText = `${finalPrice} ${currency}`;
     }
 
     async function saveOrder() {
@@ -232,89 +255,91 @@
         const stat = document.getElementById('status').value;
         const dbtr = document.getElementById('debtorName').value;
         if(stat === 'debt' && !dbtr) return alert("Впиши ім'я боржника!");
-        const price = document.getElementById('total').innerText;
+        const priceText = document.getElementById('total').innerText;
         
         try {
             await db.collection("orders").add({
                 catalog: document.getElementById('catalog').value,
                 pay: document.getElementById('pay').value,
                 size: (document.getElementById('catalog').value === "продаж") ? (f === "ICE SHOT" ? "Shot" : "30ml") : document.getElementById('size').value + "ml",
-                flavor: f, priceVal: parseInt(price), currency: (price.includes("грн") ? "UAH" : "PLN"),
-                fullPrice: price, status: stat, debtor: dbtr || "", date: new Date().getTime()
+                flavor: f, 
+                priceVal: parseInt(priceText), 
+                currency: (priceText.includes("грн") ? "UAH" : "PLN"),
+                fullPrice: priceText, 
+                status: stat, 
+                debtor: dbtr || "", 
+                date: new Date().getTime()
             });
             document.getElementById('debtorName').value = "";
+            document.getElementById('manualPrice').value = ""; // Очищуємо ціну
+            calc(); // Скидаємо відображення ціни
+            alert("Збережено! ✅");
         } catch (e) {
             alert("Помилка: " + e.message);
         }
     }
 
-    // Головна функція синхронізації
     function syncData() {
-    db.collection("orders").orderBy("date", "desc").onSnapshot(snap => {
-        const logs = document.getElementById('logs');
-        const debtList = document.getElementById('debtList');
-        const topBlock = document.getElementById('topFlavors'); // Блок для ТОП-3
-        
-        let pln = 0, uah = 0;
-        let stats = {}; // Для збору статистики
-        
-        logs.innerHTML = ""; 
-        debtList.innerHTML = "";
-        
-        snap.forEach(doc => {
-            const item = doc.data(); 
-            const id = doc.id;
+        db.collection("orders").orderBy("date", "desc").onSnapshot(snap => {
+            const logs = document.getElementById('logs');
+            const debtList = document.getElementById('debtList');
+            const topBlock = document.getElementById('topFlavors');
             
-            if (item.status === 'paid') {
-                // Рахуємо гроші
-                if(item.currency === "PLN") pln += item.priceVal; else uah += item.priceVal;
+            let pln = 0, uah = 0;
+            let stats = {}; 
+            
+            logs.innerHTML = ""; 
+            debtList.innerHTML = "";
+            
+            snap.forEach(doc => {
+                const item = doc.data(); 
+                const id = doc.id;
                 
-                // Збираємо статистику (ігноруємо "БЕЗ СМАКУ")
-                if(item.flavor !== "БЕЗ СМАКУ") {
-                    stats[item.flavor] = (stats[item.flavor] || 0) + 1;
-                }
+                if (item.status === 'paid') {
+                    if(item.currency === "PLN") pln += item.priceVal; else uah += item.priceVal;
+                    
+                    if(item.flavor && item.flavor !== "БЕЗ СМАКУ") {
+                        stats[item.flavor] = (stats[item.flavor] || 0) + 1;
+                    }
 
-                logs.innerHTML += `
-                <div class="order-row">
-                    <div class="order-info"><b>${item.flavor}</b><span>${item.size} • ${item.pay}</span></div>
-                    <div class="order-right">
-                        <div class="order-price">${item.fullPrice}</div>
-                        <button class="action-btn" onclick="if(confirm('Видалити цей запис?')) db.collection('orders').doc('${id}').delete()">🗑️</button>
-                    </div>
-                </div>`;
-            } else {
-                debtList.innerHTML += `
-                <div class="order-row debt">
-                    <div class="order-info"><b>${item.debtor}</b><span>${item.flavor}</span></div>
-                    <div class="order-right">
-                        <div class="order-price">${item.fullPrice}</div>
-                        <button class="pay-debt-btn" onclick="db.collection('orders').doc('${id}').update({status:'paid'})">ОПЛАТИВ</button>
-                        <button class="action-btn" onclick="if(confirm('Видалити борг?')) db.collection('orders').doc('${id}').delete()">🗑️</button>
-                    </div>
-                </div>`;
+                    logs.innerHTML += `
+                    <div class="order-row">
+                        <div class="order-info"><b>${item.flavor}</b><span>${item.size} • ${item.pay}</span></div>
+                        <div class="order-right">
+                            <div class="order-price">${item.fullPrice}</div>
+                            <button class="action-btn" onclick="if(confirm('Видалити цей запис?')) db.collection('orders').doc('${id}').delete()">🗑️</button>
+                        </div>
+                    </div>`;
+                } else {
+                    debtList.innerHTML += `
+                    <div class="order-row debt">
+                        <div class="order-info"><b>${item.debtor}</b><span>${item.flavor}</span></div>
+                        <div class="order-right">
+                            <div class="order-price">${item.fullPrice}</div>
+                            <button class="pay-debt-btn" onclick="db.collection('orders').doc('${id}').update({status:'paid'})">ОПЛАТИВ</button>
+                            <button class="action-btn" onclick="if(confirm('Видалити борг?')) db.collection('orders').doc('${id}').delete()">🗑️</button>
+                        </div>
+                    </div>`;
+                }
+            });
+
+            document.getElementById('totalPLN').innerText = pln;
+            document.getElementById('totalUAH').innerText = uah;
+
+            if (topBlock) {
+                const sorted = Object.entries(stats).sort((a, b) => b[1] - a[1]).slice(0, 3);
+                topBlock.innerHTML = sorted.length ? "" : "<div style='font-size:10px; color:#666; text-align:center;'>Статистика збирається...</div>";
+                sorted.forEach((item, index) => {
+                    topBlock.innerHTML += `
+                    <div class="top-item" style="display:flex; justify-content:space-between; font-size:13px; margin:5px 0; color:#ffd700;">
+                        <span>${index + 1}. ${item[0]}</span>
+                        <b>${item[1]} шт.</b>
+                    </div>`;
+                });
             }
         });
+    }
 
-        // Оновлюємо цифри каси
-        document.getElementById('totalPLN').innerText = pln;
-        document.getElementById('totalUAH').innerText = uah;
-
-        // Оновлюємо ТОП-3 популярних смаків
-        if (topBlock) {
-            const sorted = Object.entries(stats).sort((a, b) => b[1] - a[1]).slice(0, 3);
-            topBlock.innerHTML = sorted.length ? "" : "<div style='font-size:10px; color:#666; text-align:center;'>Статистика збирається...</div>";
-            sorted.forEach((item, index) => {
-                topBlock.innerHTML += `
-                <div class="top-item" style="display:flex; justify-content:space-between; font-size:13px; margin:5px 0; color:#ffd700;">
-                    <span>${index + 1}. ${item[0]}</span>
-                    <b>${item[1]} шт.</b>
-                </div>`;
-            });
-        }
-    });
-}
-
-    // Запуск
     syncData();
     updateFlavorList();
 </script>
