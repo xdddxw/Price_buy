@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SMOKE HUB">
+    
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/8514/8514488.png">
+    
+    <title>SMOKE HUB | PRIVATE ADMIN</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        /* Додав відступ зверху для iPhone з "чубчиком" */
+        body {
+            margin: 0; font-family: 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at top, #1b0b2e, #0b0416);
+            color: #fff; display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; padding-bottom: 50px;
+            padding-top: env(safe-area-inset-top); 
+        }
+
+        .logo { display: flex; align-items: center; gap: 10px; margin: 15px 0; }
+        .logo-text {
+            font-weight: 900; font-size: 26px;
+            background: linear-gradient(90deg, #ff0055, #00f2ff, #ff0055);
+            background-size: 200% auto; -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; animation: gradient-move 3s linear infinite;
+        }
+        @keyframes gradient-move { to { background-position: 200% center; } }
+
+        .card {
+            width: 92%; max-width: 400px; padding: 20px; border-radius: 20px;
+            background: rgba(255,255,255,0.07); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1); box-sizing: border-box;
+        }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-box {
+            background: rgba(0, 242, 255, 0.05); padding: 10px; border-radius: 12px; text-align: center;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+        }
+        .stat-box span { display: block; font-size: 10px; color: #00f2ff; text-transform: uppercase; }
+        .stat-box b { font-size: 22px; color: #fff; }
+
+        label { display: block; margin: 15px 0 5px; font-size: 11px; color: #00f2ff; font-weight: bold; text-transform: uppercase; }
+        select, input[type="text"] {
+            width: 100%; padding: 15px; border-radius: 12px; border: none; 
+            background: rgba(255,255,255,0.1); color: #fff; font-size: 16px; outline: none; box-sizing: border-box;
+            -webkit-appearance: none; /* Прибираємо стандартний стиль iOS */
+        }
+
+        #location-info {
+            margin-top: 10px; padding: 10px; border-radius: 12px;
+            background: rgba(255, 47, 146, 0.1); border: 1px dashed #ff2f92;
+            text-align: center; font-size: 14px; color: #fff; font-weight: bold;
+        }
+
+        .price-display { font-size: 36px; text-align: center; margin: 15px 0; font-weight: 900; text-shadow: 0 0 15px #ff0055; }
+        
+        .main-btn {
+            width: 100%; padding: 18px; border-radius: 15px; border: none;
+            background: linear-gradient(90deg, #ff2f92, #ff005d);
+            color: #fff; font-weight: bold; font-size: 18px; cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .table-card { width: 92%; max-width: 400px; margin-top: 25px; }
+        .section-title { font-size: 12px; color: #666; text-transform: uppercase; margin: 15px 0 10px 5px; letter-spacing: 1px; }
+
+        .order-row {
+            background: rgba(255,255,255,0.04); padding: 14px; border-radius: 15px;
+            margin-bottom: 10px; border-left: 4px solid #00f2ff;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .order-row.debt { border-left-color: #ff9800; background: rgba(255, 152, 0, 0.1); }
+        .order-info b { color: #00f2ff; display: block; font-size: 14px; }
+        .order-right { display: flex; align-items: center; gap: 12px; }
+        .order-price { font-weight: bold; color: #ff2f92; font-size: 16px; }
+        
+        .action-btn { background: none; border: none; color: #444; cursor: pointer; font-size: 18px; }
+        .pay-debt-btn { background: #ff9800; color: #000; border: none; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="logo">
+    <span style="font-size: 30px;">🎅</span><span class="logo-text">SMOKE HUB</span>
+</div>
+
+<div class="card">
+    <div class="stats-grid">
+        <div class="stat-box"><span>Всього PLN</span><b id="totalPLN">0</b></div>
+        <div class="stat-box"><span>Всього UAH</span><b id="totalUAH">0</b></div>
+    </div>
+
+    <label>Каталог</label>
+    <select id="catalog" onchange="updateFlavorList()">
+        <option value="заливка">ЗАЛИВКА 🧪</option>
+        <option value="продаж">ПРОДАЖ 📦</option>
+    </select>
+
+    <label>Статус оплати</label>
+    <select id="status" onchange="toggleDebtInput()">
+        <option value="paid">ОПЛАЧЕНО ✅</option>
+        <option value="debt">БОРГ 🚩</option>
+    </select>
+
+    <div id="debtorBox" style="display: none; margin-top: 10px;">
+        <label>Хто винен?</label>
+        <input type="text" id="debtorName" placeholder="Введіть ім'я">
+    </div>
+
+    <label>Оплата</label>
+    <select id="pay" onchange="calc()">
+        <option value="Готівка">Готівка (PLN)</option>
+        <option value="Польська карта">Польська карта (PLN)</option>
+        <option value="Монобанк">Монобанк (UAH)</option>
+    </select>
+
+    <div id="volBox">
+        <label>Об'єм</label>
+        <select id="size" onchange="calc()">
+            <option value="2">2 ml</option>
+            <option value="3">3 ml</option>
+        </select>
+    </div>
+
+    <label>Смак</label>
+    <select id="flavor" onchange="handleFlavorChange()"></select>
+    
+    <div id="location-info" style="display: none;">📍 Місце: <span id="loc-text">-</span></div>
+    <div class="price-display" id="total">6 зл</div>
+    <button class="main-btn" onclick="saveOrder()">ЗБЕРЕГТИ</button>
+</div>
+
+<div class="table-card">
+    <div class="section-title">Боржники 🚩</div>
+    <div id="debtList"></div>
+    <div class="section-title">Останні продажі ✅</div>
+    <div id="logs"></div>
+</div>
+
+<script>
+    // Встав сюди свій скрипт Firebase та логіку з попередньої відповіді
+    // (Я скоротив код для зручності, але логіка та сама)
+    const firebaseConfig = { apiKey: "КЛЮЧ", projectId: "ПРОЕКТ", appId: "APP_ID" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const allFlavors = [
+        "spermint", "double grape", "apple mixed", "berry mint", 
+        "blackurant grape", "blueberry curant", "watermelon melon", 
+        "cranberry mors", "double raspberry", "Cola Lemon", 
+        "RedBull blue raspberry", "pineaple lemonade", "multifruit", "bali triple shot"
+    ];
+
+    const locations = {
+        "ICE SHOT": "Холодильник", "spermint": "Полиця 1", "double grape": "Полиця 1", "apple mixed": "Полиця 1",
+        "berry mint": "Полиця 2", "blackurant grape": "Поlyця 2", "blueberry curant": "Полиця 2",
+        "watermelon melon": "Коробка А", "cranberry mors": "Коробка А", "double raspberry": "Коробка А",
+        "Cola Lemon": "Коробка Б", "RedBull blue raspberry": "Коробка Б", 
+        "pineaple lemonade": "Стіл", "multifruit": "Стіл", "bali triple shot": "Вітрина"
+    };
+
+    function updateFlavorList() {
+        const catalog = document.getElementById('catalog').value;
+        const flavorSelect = document.getElementById('flavor');
+        const volBox = document.getElementById('volBox');
+        flavorSelect.innerHTML = '<option value="none" selected disabled>Оберіть смак...</option>';
+        if (catalog === "заливка") {
+            allFlavors.forEach(f => { flavorSelect.innerHTML += `<option value="${f}">${f}</option>`; });
+            volBox.style.display = "block";
+        } else {
+            flavorSelect.innerHTML += `<option value="ICE SHOT">ICE SHOT 🧊</option>`;
+            allFlavors.forEach(f => { flavorSelect.innerHTML += `<option value="${f}">${f} (30ml)</option>`; });
+            volBox.style.display = "none";
+        }
+        calc();
+    }
+
+    function handleFlavorChange() { showLocation(); calc(); }
+    function showLocation() {
+        const f = document.getElementById('flavor').value;
+        const box = document.getElementById('location-info');
+        const cleanName = f ? f.replace(" (30ml)", "") : "";
+        if(locations[cleanName]) { 
+            box.style.display="block"; 
+            document.getElementById('loc-text').innerText = locations[cleanName]; 
+        } else { box.style.display="none"; }
+    }
+    function toggleDebtInput() { document.getElementById('debtorBox').style.display = (document.getElementById('status').value === 'debt') ? 'block' : 'none'; }
+    function calc() {
+        const cat = document.getElementById('catalog').value;
+        const p = document.getElementById('pay').value;
+        const s = document.getElementById('size').value;
+        const f = document.getElementById('flavor').value;
+        const out = document.getElementById('total');
+        if (cat === "продаж") {
+            out.innerText = (f === "ICE SHOT") ? (p === "Монобанк" ? "110 грн" : "10 зл") : (p === "Монобанк" ? "700 грн" : "60 зл");
+        } else {
+            out.innerText = (p === "Монобанк") ? (s === "2" ? "70 грн" : "100 грн") : (s === "2" ? "6 зл" : "9 зл");
+        }
+    }
+
+    async function saveOrder() {
+        const f = document.getElementById('flavor').value;
+        const cat = document.getElementById('catalog').value;
+        const status = document.getElementById('status').value;
+        const debtor = document.getElementById('debtorName').value;
+        if(f === "none" || !f) return alert("Вибери смак!");
+        if(status === 'debt' && !debtor) return alert("Впиши ім'я боржника!");
+        const priceStr = document.getElementById('total').innerText;
+        await db.collection("orders").add({
+            catalog: cat, pay: document.getElementById('pay').value,
+            size: (cat === "продаж") ? (f === "ICE SHOT" ? "Shot" : "30ml") : document.getElementById('size').value + "ml",
+            flavor: f, priceVal: parseInt(priceStr), currency: (priceStr.includes("грн")) ? "UAH" : "PLN",
+            fullPrice: priceStr, status: status, debtor: debtor || "", date: new Date().getTime()
+        });
+        document.getElementById('debtorName').value = "";
+    }
+
+    async function payDebt(id) { if(confirm("Оплатив?")) await db.collection("orders").doc(id).update({ status: 'paid' }); }
+    async function deleteOrder(id) { if(confirm("Видалити?")) await db.collection("orders").doc(id).delete(); }
+
+    db.collection("orders").orderBy("date", "desc").onSnapshot(snap => {
+        const logs = document.getElementById('logs');
+        const debtList = document.getElementById('debtList');
+        let pln = 0, uah = 0;
+        logs.innerHTML = ""; debtList.innerHTML = "";
+        snap.forEach(doc => {
+            const item = doc.data(); const id = doc.id;
+            if (item.status === 'paid') {
+                if(item.currency === "PLN") pln += item.priceVal;
+                if(item.currency === "UAH") uah += item.priceVal;
+                logs.innerHTML += `<div class="order-row"><div class="order-info"><b>${item.flavor}</b><span>[${item.catalog}] ${item.size}</span></div><div class="order-right"><div class="order-price">${item.fullPrice}</div><button class="action-btn" onclick="deleteOrder('${id}')">🗑️</button></div></div>`;
+            } else {
+                debtList.innerHTML += `<div class="order-row debt"><div class="order-info"><b>${item.debtor}</b><span>${item.flavor}</span></div><div class="order-right"><div class="order-price">${item.fullPrice}</div><button class="pay-debt-btn" onclick="payDebt('${id}')">ОПЛАТИВ</button><button class="action-btn" onclick="deleteOrder('${id}')">🗑️</button></div></div>`;
+            }
+        });
+        document.getElementById('totalPLN').innerText = pln;
+        document.getElementById('totalUAH').innerText = uah;
+    });
+
+    updateFlavorList();
+</script>
+
+</body>
+</html>
