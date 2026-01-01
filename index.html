@@ -614,18 +614,20 @@
 
     // Збільшення картинки
     function zoomImg(el, e) {
-        e.stopPropagation(); // щоб не спрацьовували інші кліки
-        const src = el.querySelector('img').src;
-        document.getElementById('zoomed-img').src = src;
-        document.getElementById('image-modal').style.display = 'flex';
+    e.stopPropagation(); // щоб не спрацьовували інші кліки на картці
+    const imgElement = el.querySelector('img');
+    if (!imgElement) return;
+
+    const src = imgElement.src;
+    const modal = document.getElementById('image-modal');
+    const zoomedImg = document.getElementById('zoomed-img');
+
+    if (modal && zoomedImg) {
+        zoomedImg.src = src;
+        modal.style.display = 'flex';
         triggerHaptic();
     }
-
-    function triggerHaptic() {
-        if (window.navigator && window.navigator.vibrate) {
-            window.navigator.vibrate(15);
-        }
-    }
+   }
 
     // --- ЛОГІКА PWA ---
     let deferredPrompt;
@@ -655,8 +657,12 @@
 @keyframes slideUp { from { transform: translateY(150%); } to { transform: translateY(0); } }
 </style>
 
+    <div id="image-modal" onclick="this.style.display='none'">
+    <img id="zoomed-img" src="" alt="Збільшене фото">
+</div>
 </body>
 </html>
+
 
 
 
