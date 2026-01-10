@@ -108,15 +108,15 @@
         /* ADMIN */
  .dev-panel {
     position: fixed;
-    top: 60px; /* відразу під шапкою */
-    right: -100%; /* висунута праворуч */
+    top: 60px;
+    right: -100%;
     width: 300px;
     height: calc(100% - 80px);
     background: #1a0b2e;
     border-radius: 10px 0 0 10px;
     padding: 20px;
-    transition: 0.4s;
-    z-index: 1000; /* менше ніж картинки */
+    transition: right 0.4s ease;
+    z-index: 10000; /* достатньо високий, щоб кнопки були клікабельні */
     overflow-y: auto;
     box-shadow: -4px 0 20px rgba(0,0,0,0.5);
 }
@@ -729,6 +729,20 @@
             }
         }, 5000);
     });
+
+    function checkDevAuth() {
+    const user = document.getElementById('dev-user').value;
+    const pass = document.getElementById('dev-pass').value;
+
+    if (user === "admin" && pass === "admin123") {
+        sessionStorage.setItem('isHubAdmin', 'true');
+        alert("Вхід успішний!");
+        toggleAdminPanel(); // ховаємо панель логіну
+        location.reload();
+    } else {
+        alert("Невірний логін або пароль");
+    }
+}
 </script>
 <div id="pwa-toast" style="display: none; position: fixed; bottom: 100px; left: 20px; right: 20px; background: linear-gradient(135deg, #1a0b2e 0%, #0d0216 100%); border: 1px solid var(--accent-blue); border-radius: 20px; padding: 15px; z-index: 10001; box-shadow: 0 10px 30px rgba(0,0,0,0.8); animation: slideUp 0.5s ease;">
     <div style="display: flex; align-items: center; gap: 15px;">
@@ -751,6 +765,7 @@
 </div>
 </body>
 </html>
+
 
 
 
