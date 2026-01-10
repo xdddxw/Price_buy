@@ -106,8 +106,21 @@
         .nav-item .icon { font-size: 18px; }
 
         /* ADMIN */
-        .dev-panel { position: fixed; bottom: -100%; left: 0; right: 0; background: #1a0b2e; border-radius: 20px 20px 0 0; padding: 20px; transition: 0.4s; z-index: 2000; border-top: 2px solid var(--accent-pink); }
-        .dev-panel.active { bottom: 0; }
+ .dev-panel {
+    position: fixed;
+    top: 60px; /* відразу під шапкою */
+    right: -320px; /* висунута праворуч */
+    width: 300px;
+    height: calc(100% - 80px);
+    background: #1a0b2e;
+    border-radius: 10px 0 0 10px;
+    padding: 20px;
+    transition: 0.4s;
+    z-index: 1000; /* менше ніж картинки */
+    overflow-y: auto;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.5);
+}
+.dev-panel.active { right: 0; }
         .admin-box input, .admin-box select { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #333; background: #0f021a; color: white; box-sizing: border-box; }
         .admin-btn { width: 100%; padding: 12px; border-radius: 10px; background: var(--accent-blue); color: white; border: none; font-weight: bold; margin-bottom: 8px; font-size: 13px; text-align: center; }
         .editing-active { outline: 1px dashed var(--accent-pink) !important; background: rgba(233, 30, 99, 0.1) !important; }
@@ -659,15 +672,10 @@
     }
 
     function toggleAdminPanel() {
-        const auth = sessionStorage.getItem('isHubAdmin') === 'true';
-        document.getElementById(auth ? 'dev-menu' : 'dev-login').classList.add('active');
-    }
-
-    function checkDevAuth() {
-        if (document.getElementById('dev-user').value === "admin" && document.getElementById('dev-pass').value === "admin123") {
-            sessionStorage.setItem('isHubAdmin', 'true'); location.reload();
-        }
-    }
+    const auth = sessionStorage.getItem('isHubAdmin') === 'true';
+    const panel = document.getElementById(auth ? 'dev-menu' : 'dev-login');
+    panel.classList.toggle('active'); // просто висуваємо, не перекриваємо
+}
     
     function devLogout() { sessionStorage.removeItem('isHubAdmin'); location.reload(); }
     function closePanels() { document.querySelectorAll('.dev-panel').forEach(p => p.classList.remove('active')); }
@@ -743,6 +751,7 @@
 </div>
 </body>
 </html>
+
 
 
 
