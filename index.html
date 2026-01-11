@@ -777,22 +777,22 @@
 </div>
 
 <script>
-const ADMIN_SECRET_KEY = "smokehub2026"; // Твій секретний ключ
+const ADMIN_SECRET_KEY = "smokehub2026";
 
 // === Перевірка, чи адміністратор вже залогований ===
-window.addEventListener('load', () => {
+function initAdmin() {
     const loggedIn = localStorage.getItem('isHubAdmin') === 'true';
     if (loggedIn) {
-        // Відкриваємо панель одразу, без alert
-        toggleAdminPanel();
+        const panel = document.getElementById('dev-menu');
+        if(panel) panel.classList.add('active'); // Відкриваємо панель без alert
     }
-});
+}
 
-// Перевірка секретного ключа
+// === Перевірка секретного ключа ===
 function checkSecretKey() {
     const key = document.getElementById('secret-key').value;
     if (key === ADMIN_SECRET_KEY) {
-        localStorage.setItem('isHubAdmin', 'true'); // зберігаємо назавжди
+        localStorage.setItem('isHubAdmin', 'true'); 
         document.getElementById('secret-login').classList.remove('active');
         registerFaceId();
     } else {
@@ -800,13 +800,9 @@ function checkSecretKey() {
     }
 }
 
-// Реєстрація Face ID
+// === Реєстрація Face ID ===
 async function registerFaceId() {
-    if (!window.PublicKeyCredential) { 
-        alert("Face ID / Touch ID не підтримується на цьому пристрої!"); 
-        return; 
-    }
-
+    if (!window.PublicKeyCredential) return;
     try {
         await navigator.credentials.create({
             publicKey: {
@@ -818,17 +814,12 @@ async function registerFaceId() {
             }
         });
         localStorage.setItem('faceKeyRegistered', 'true'); 
-        toggleAdminPanel(); // Відкриваємо панель автоматично
-    } catch (e) { 
-        console.error(e); 
-        alert("Не вдалося зареєструвати Face ID: " + e); 
-    }
+    } catch(e) { console.error(e); }
 }
 
-// Вхід через Face ID
+// === Вхід через Face ID (тільки по кнопці) ===
 async function faceIdLogin() {
     if (!localStorage.getItem('faceKeyRegistered')) return false;
-
     try {
         await navigator.credentials.get({
             publicKey: { 
@@ -838,23 +829,14 @@ async function faceIdLogin() {
                 userVerification: "required" 
             }
         });
-        localStorage.setItem('isHubAdmin', 'true'); // Зберігаємо назавжди
-        toggleAdminPanel();
+        localStorage.setItem('isHubAdmin', 'true');
+        const panel = document.getElementById('dev-menu');
+        if(panel) panel.classList.add('active');
         return true;
-    } catch (e) { 
-        console.error(e); 
-        return false; 
-    }
+    } catch(e) { console.error(e); return false; }
 }
 
-// Відкриття/закриття панелі адміна
-function toggleAdminPanel() {
-    const auth = localStorage.getItem('isHubAdmin') === 'true';
-    const panel = document.getElementById('dev-menu');
-    if (panel) panel.classList.toggle('active', auth);
-}
-
-// Закриття всіх панелей
+// === Закриття панелей ===
 function closePanels() {
     document.querySelectorAll('.dev-panel').forEach(p => p.classList.remove('active'));
 }
@@ -871,9 +853,13 @@ document.querySelectorAll('.info-card').forEach(card => {
         });
     }
 });
+
+// Ініціалізація при завантаженні сторінки
+window.addEventListener('load', initAdmin);
 </script>
 </body>
 </html>
+
 
 
 
