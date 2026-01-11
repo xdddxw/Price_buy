@@ -857,9 +857,31 @@ if(hiddenBtn){
         }
     });
 }
+
+    // === Невидима кнопка для адмінки ===
+const hiddenBtn = document.createElement('div');
+hiddenBtn.style.position = 'fixed';
+hiddenBtn.style.top = '0';
+hiddenBtn.style.left = '0';
+hiddenBtn.style.width = '50px';   // розмір області для натискання
+hiddenBtn.style.height = '50px';
+hiddenBtn.style.zIndex = '9999';
+hiddenBtn.style.opacity = '0';    // невидима
+hiddenBtn.style.cursor = 'pointer';
+document.body.appendChild(hiddenBtn);
+
+hiddenBtn.addEventListener('click', async () => {
+    // спроба Face ID
+    const faceLogged = await faceIdLogin();
+    if(!faceLogged){
+        // якщо Face ID не спрацював, показуємо секретний логін
+        document.getElementById('secret-login').classList.add('active');
+    }
+});
 </script>
 </body>
 </html>
+
 
 
 
