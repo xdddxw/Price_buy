@@ -779,86 +779,88 @@
 <script>
 const ADMIN_SECRET_KEY = "smokehub2026";
 
-// === Перевірка, чи адміністратор вже залогований ===
-function initAdmin() {
-    const loggedIn = localStorage.getItem('isHubAdmin') === 'true';
-    if (loggedIn) {
-        const panel = document.getElementById('dev-menu');
-        if(panel) panel.classList.add('active'); // Відкриваємо панель без alert
+// Перевіряємо сесію при завантаженні
+window.addEventListener('load', () => {
+    const isLogged = sessionStorage.getItem('isHubAdmin') === 'true';
+    if(isLogged){
+        toggleAdminPanel(); // Відкриваємо панель, якщо вже логін
     }
-}
+    // Тепер нічого не висвічується автоматично
+});
 
-// === Перевірка секретного ключа ===
+// Перевірка секретного ключа
 function checkSecretKey() {
     const key = document.getElementById('secret-key').value;
-    if (key === ADMIN_SECRET_KEY) {
-        localStorage.setItem('isHubAdmin', 'true'); 
+    if(key === ADMIN_SECRET_KEY){
+        sessionStorage.setItem('isHubAdmin', 'true');
+        localStorage.setItem('faceKeyRegistered', 'true'); // відразу зберігаємо Face ID, якщо хочеш
+        alert("Секретний ключ прийнято! Адмінка відкрита.");
         document.getElementById('secret-login').classList.remove('active');
-        registerFaceId();
+        toggleAdminPanel();
     } else {
         alert("Невірний секретний ключ!");
     }
 }
 
-// === Реєстрація Face ID ===
-async function registerFaceId() {
-    if (!window.PublicKeyCredential) return;
-    try {
-        await navigator.credentials.create({
-            publicKey: {
-                challenge: new Uint8Array(32),
-                rp: { name: "SMOKE HUB" },
-                user: { id: new Uint8Array(16), name: "admin", displayName: "Admin" },
-                pubKeyCredParams: [{ type: "public-key", alg: -7 }],
-                authenticatorSelection: { userVerification: "required" }
-            }
-        });
-        localStorage.setItem('faceKeyRegistered', 'true'); 
-    } catch(e) { console.error(e); }
-}
-
-// === Вхід через Face ID (тільки по кнопці) ===
+// Вхід через Face ID
 async function faceIdLogin() {
     if (!localStorage.getItem('faceKeyRegistered')) return false;
+
     try {
         await navigator.credentials.get({
-            publicKey: { 
-                challenge: new Uint8Array(32), 
-                allowCredentials: [], 
-                timeout: 60000, 
-                userVerification: "required" 
-            }
+            publicKey: { challenge: new Uint8Array(32), allowCredentials: [], timeout: 60000, userVerification: "required" }
         });
-        localStorage.setItem('isHubAdmin', 'true');
-        const panel = document.getElementById('dev-menu');
-        if(panel) panel.classList.add('active');
+        sessionStorage.setItem('isHubAdmin', 'true');
+        toggleAdminPanel();
         return true;
-    } catch(e) { console.error(e); return false; }
+    } catch(e) { 
+        console.error(e); 
+        return false;
+    }
 }
 
-// === Закриття панелей ===
+// Відкриття/закриття панелі адміна
+function toggleAdminPanel() {
+    const auth = sessionStorage.getItem('isHubAdmin') === 'true';
+    const panel = document.getElementById('dev-menu');
+    if(panel){
+        if(auth) panel.classList.add('active');
+        else panel.classList.remove('active');
+    }
+}
+
+// Закриття всіх панелей
 function closePanels() {
     document.querySelectorAll('.dev-panel').forEach(p => p.classList.remove('active'));
 }
 
-// === Кнопка "Адмін" у Info ===
+// Кнопка "Адмін" у Info
 document.querySelectorAll('.info-card').forEach(card => {
     if (card.querySelector('.info-icon')?.textContent === "🔐") {
         card.addEventListener('click', async (e) => {
             e.preventDefault();
             const faceLogged = await faceIdLogin();
-            if(!faceLogged) {
+            if(!faceLogged){
                 document.getElementById('secret-login').classList.add('active');
             }
         });
     }
 });
 
-// Ініціалізація при завантаженні сторінки
-window.addEventListener('load', initAdmin);
+// Стара невидима кнопка
+const hiddenBtn = document.getElementById('hidden-admin-btn');
+if(hiddenBtn){
+    hiddenBtn.addEventListener('click', async () => {
+        const faceLogged = await faceIdLogin();
+        if(!faceLogged){
+            document.getElementById('secret-login').classList.add('active');
+        }
+    });
+}
 </script>
 </body>
 </html>
+
 
 
 
