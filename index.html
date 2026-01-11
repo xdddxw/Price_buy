@@ -79,6 +79,7 @@
         .badge { position: absolute; top: 5px; left: 5px; padding: 2px 6px; border-radius: 4px; font-size: 8px; font-weight: 900; z-index: 5; display: none; }
         .badge-hit { display: block !important; background: #ff0055; color: white; }
         .badge-promo { display: block !important; background: #ffd900; color: black; }
+        .badge-new { display: block !important; background: #3333ff; color: black; }
         .out-of-stock { opacity: 0.4; filter: grayscale(1); }
         .out-of-stock::after { content: "SOLD OUT"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); background: var(--accent-pink); padding: 4px 8px; border-radius: 5px; font-size: 10px; font-weight: bold; z-index: 10; }
 
@@ -165,6 +166,12 @@
 .badge-promo { 
     display: block !important; 
     background: linear-gradient(135deg, #ffd900, #ffea00); 
+    color: black; 
+    animation: glow-yellow 2s infinite alternate; 
+} 
+.badge-new { 
+    display: block !important; 
+    background: linear-gradient(135deg, #0066ff, #3399ff); 
     color: black; 
     animation: glow-yellow 2s infinite alternate; 
 } 
@@ -639,7 +646,7 @@
         <button class="admin-btn" onclick="toggleEdit('price')">💰 РЕД. ЦІНИ</button>
         <button class="admin-btn" onclick="toggleEdit('desc')">📝 РЕД. НАЗВИ</button>
         <button class="admin-btn" id="btn-edit-stock" onclick="toggleStockMode()">📦 СКЛАД</button>
-        <select id="badge-selector"><option value="">Без стікера</option><option value="hit">🔥 ХІТ</option><option value="promo">🏷 АКЦІЯ</option></select>
+        <select id="badge-selector"><option value="">Без стікера</option><option value="hit">🔥 ХІТ</option><option value="promo">🏷 АКЦІЯ</option><option value="new">🆕 Новинка</option></select>
         <button class="admin-btn" id="btn-toggle-payment" onclick="togglePayment()">
     💳 ОПЛАТА: УВІМКНЕНА
 </button>
@@ -927,6 +934,7 @@ hiddenBtn.addEventListener('click', async () => {
 
 </body>
 </html>
+
 
 
 
