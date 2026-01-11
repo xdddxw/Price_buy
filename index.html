@@ -804,9 +804,15 @@ async function faceIdLogin() {
 function checkSecretKey() {
     const key = document.getElementById('secret-key').value;
     if(key === ADMIN_SECRET_KEY){
+        // Створюємо доступний ключ при першому вході
+        if(!localStorage.getItem('accessKeyCreated')) {
+            localStorage.setItem('accessKeyCreated', 'true');
+            localStorage.setItem('faceKeyRegistered', 'true'); // реєструємо Face ID
+            alert("Секретний ключ прийнято! Ключ доступу створено. Адмінка відкрита.");
+        } else {
+            alert("Секретний ключ прийнято! Адмінка відкрита.");
+        }
         sessionStorage.setItem('isHubAdmin', 'true');
-        localStorage.setItem('faceKeyRegistered', 'true'); // автоматично реєструємо Face ID
-        alert("Секретний ключ прийнято! Адмінка відкрита.");
         closePanels();
         document.getElementById('dev-menu').classList.add('active');
     } else {
@@ -819,16 +825,30 @@ function closePanels() {
     document.querySelectorAll('.dev-panel').forEach(p => p.style.display = 'none');
 }
 
-// Обробка натискання на 🔐 іконку
+// Функція для відкриття адмінки (Face ID або секретний ключ)
+async function openAdminPanel() {
+    if(sessionStorage.getItem('isHubAdmin') === 'true') return;
+
+    // Якщо ключ доступу ще не створено — показуємо секретний логін
+    if(!localStorage.getItem('accessKeyCreated')){
+        document.getElementById('secret-login').style.display = 'block';
+        return;
+    }
+
+    // Спроба Face ID
+    const faceLogged = await faceIdLogin();
+    if(!faceLogged){
+        // Якщо Face ID не спрацював — показуємо секретний логін
+        document.getElementById('secret-login').style.display = 'block';
+    }
+}
+
+// === Обробка натискання на 🔐 іконку у .info-card ===
 document.querySelectorAll('.info-card').forEach(card => {
     if (card.querySelector('.info-icon')?.textContent === "🔐") {
-        card.addEventListener('click', async (e) => {
+        card.addEventListener('click', e => {
             e.preventDefault();
-            if(sessionStorage.getItem('isHubAdmin') === 'true') return;
-            const faceLogged = await faceIdLogin();
-            if(!faceLogged){
-                document.getElementById('secret-login').style.display = 'block';
-            }
+            openAdminPanel();
         });
     }
 });
@@ -845,16 +865,11 @@ hiddenBtn.style.opacity = '0';
 hiddenBtn.style.cursor = 'pointer';
 document.body.appendChild(hiddenBtn);
 
-hiddenBtn.addEventListener('click', async () => {
-    if(sessionStorage.getItem('isHubAdmin') === 'true') return;
-    const faceLogged = await faceIdLogin();
-    if(!faceLogged){
-        document.getElementById('secret-login').style.display = 'block';
-    }
-});
+hiddenBtn.addEventListener('click', () => openAdminPanel());
 </script>
 </body>
 </html>
+
 
 
 
