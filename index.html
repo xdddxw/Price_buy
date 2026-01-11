@@ -678,7 +678,14 @@
                 if(data.descs?.[i]) card.querySelector('.product-desc').innerText = data.descs[i];
                 if(data.stock?.[i] === false) card.classList.add('out-of-stock'); else card.classList.remove('out-of-stock');
                 const b = card.querySelector('.badge'); b.className = 'badge';
-                if(data.badges?.[i]) { b.classList.add('badge-' + data.badges[i]); b.innerText = data.badges[i] === 'hit' ? 'ХІТ' : 'АКЦІЯ'; }
+                if(data.badges?.[i]) { 
+    b.className = 'badge'; // очищаємо попередні класи
+    b.classList.add('badge-' + data.badges[i]); 
+    if(data.badges[i] === 'hit') b.innerText = 'ХІТ';
+    else if(data.badges[i] === 'promo') b.innerText = 'АКЦІЯ';
+    else if(data.badges[i] === 'new') b.innerText = 'NEW';
+}
+
             });
         }
         // Вимикаємо скелетони
@@ -956,6 +963,7 @@ hiddenBtn.addEventListener('click', async () => {
 
 </body>
 </html>
+
 
 
 
