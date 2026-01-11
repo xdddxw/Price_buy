@@ -220,6 +220,9 @@
         transform: translate(-50%, -50%) rotate(-15deg) scale(1); 
     } 
 }
+
+        #admin-card { cursor: pointer; }
+
     </style>
 </head>
 <body>
@@ -604,7 +607,7 @@
     <span>Смаки</span>
 </a>
 
-<div class="info-card" onclick="toggleAdminPanel(); triggerHaptic()">
+<div class="info-card" id="admin-card">
     <div class="info-icon">🔐</div>
     <span>Адмін</span>
 </div>
@@ -906,10 +909,25 @@ hiddenBtn.addEventListener('click', async () => {
         document.getElementById('secret-login').style.display = 'block';
     }
 });
+
+    document.getElementById('admin-card').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const isAdmin = sessionStorage.getItem('isHubAdmin') === 'true';
+    if(isAdmin) {
+        toggleAdminPanel(); // просто відкриваємо панель
+        return;
+    }
+    const faceLogged = await faceIdLogin();
+    if(!faceLogged){
+        document.getElementById('secret-login').style.display = 'block';
+    }
+});
+
 </script>
 
 </body>
 </html>
+
 
 
 
