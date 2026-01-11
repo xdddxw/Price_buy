@@ -767,7 +767,7 @@
     <img id="zoomed-img" src="" alt="Збільшене фото">
 </div>
 
-    <!-- === SECRET LOGIN + FACE ID + Невидима кнопка === -->
+<!-- === SECRET LOGIN + FACE ID + Невидима кнопка === -->
 <div id="secret-login" class="dev-panel" style="display:none;">
     <div class="admin-box">
         <input id="secret-key" type="password" placeholder="Введіть секретний ключ">
@@ -779,7 +779,7 @@
 <script>
 const ADMIN_SECRET_KEY = "smokehub2026";
 
-// Функція Face ID
+// Face ID логін
 async function faceIdLogin() {
     if (!localStorage.getItem('passkeyCreated')) return false;
     try {
@@ -792,35 +792,11 @@ async function faceIdLogin() {
             }
         });
         sessionStorage.setItem('isHubAdmin', 'true');
-        document.getElementById('dev-menu').classList.add('active');
+        document.getElementById('dev-menu')?.classList.add('active');
         return true;
     } catch(e) {
         console.error("Face ID не спрацював:", e);
         return false;
-    }
-}
-
-// Реєстрація Face ID після введення секретного ключа
-async function registerFaceId() {
-    try {
-        await navigator.credentials.create({
-            publicKey: {
-                challenge: new Uint8Array(32),
-                rp: { name: "SmokeHub Admin" },
-                user: {
-                    id: new Uint8Array(16),
-                    name: "admin",
-                    displayName: "Admin"
-                },
-                pubKeyCredParams: [{ type: "public-key", alg: -7 }],
-                authenticatorSelection: { userVerification: "required" }
-            }
-        });
-        localStorage.setItem("passkeyCreated", "true");
-        alert("✅ Face ID успішно зареєстрований!");
-    } catch(e){
-        console.error("Face ID не вдалося зареєструвати:", e);
-        alert("❌ Не вдалося зареєструвати Face ID.");
     }
 }
 
@@ -829,14 +805,10 @@ function checkSecretKey() {
     const key = document.getElementById('secret-key').value;
     if(key === ADMIN_SECRET_KEY){
         sessionStorage.setItem('isHubAdmin', 'true');
+        localStorage.setItem('passkeyCreated', 'true'); // реєстрація Face ID
+        alert("Секретний ключ прийнято! Адмінка відкрита.");
         closePanels();
-        document.getElementById('dev-menu').classList.add('active');
-
-        if(!localStorage.getItem("passkeyCreated")){
-            if(confirm("Бажаєте зареєструвати Face ID для швидкого входу?")){
-                registerFaceId();
-            }
-        }
+        document.getElementById('dev-menu')?.classList.add('active');
     } else {
         alert("Невірний секретний ключ!");
     }
@@ -847,7 +819,7 @@ function closePanels() {
     document.querySelectorAll('.dev-panel').forEach(p => p.style.display = 'none');
 }
 
-// === Делеговане натискання на 🔐 у картках ===
+// === Делеговане натискання на 🔐 в картках ===
 document.body.addEventListener("click", async (e) => {
     const card = e.target.closest(".info-card");
     if(!card) return;
@@ -870,14 +842,14 @@ document.body.addEventListener("click", async (e) => {
     }
 });
 
-// === Невидима кнопка для адмінки (тригер) ===
+// === Невидима кнопка для адмінки ===
 const hiddenBtn = document.createElement('div');
 hiddenBtn.style.position = 'fixed';
 hiddenBtn.style.bottom = '0';
 hiddenBtn.style.left = '0';
 hiddenBtn.style.width = '50px';
 hiddenBtn.style.height = '50px';
-hiddenBtn.style.zIndex = '999';
+hiddenBtn.style.zIndex = '9999';
 hiddenBtn.style.opacity = '0';
 hiddenBtn.style.cursor = 'pointer';
 document.body.appendChild(hiddenBtn);
@@ -897,6 +869,7 @@ hiddenBtn.addEventListener('click', async () => {
 </script>
 </body>
 </html>
+
 
 
 
