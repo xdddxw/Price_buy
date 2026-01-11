@@ -746,48 +746,7 @@
 
     
 </script>
-    <script>
-async function faceIdAuth() {
-    // Перевірка підтримки WebAuthn
-    if (!window.PublicKeyCredential) {
-        alert("Face ID / Touch ID не підтримується на цьому пристрої!");
-        return false;
-    }
-
-    try {
-        // Використовуємо WebAuthn для простого локального логіну
-        const assertion = await navigator.credentials.get({
-            publicKey: {
-                challenge: new Uint8Array(32),
-                allowCredentials: [],
-                timeout: 60000,
-                userVerification: "required"
-            }
-        });
-
-        // Якщо користувач успішно пройшов Face ID / Touch ID
-        sessionStorage.setItem('isHubAdmin', 'true');
-        toggleAdminPanel(); // висуваємо адмінку
-        alert("Адмінка відкрита через Face ID!");
-        return true;
-    } catch (err) {
-        console.error("Face ID не пройдено:", err);
-        alert("Face ID не пройдено або відмінено користувачем.");
-        return false;
-    }
-}
-
-// Автоматично запускаємо Face ID при натисканні на іконку "Адмін"
-document.querySelectorAll('.info-card').forEach(card => {
-    if (card.querySelector('.info-icon')?.textContent === "🔐") {
-        card.addEventListener('click', async (e) => {
-            e.preventDefault();
-            await faceIdAuth();
-            triggerHaptic();
-        });
-    }
-});
-</script>
+    
 <div id="pwa-toast" style="display: none; position: fixed; bottom: 100px; left: 20px; right: 20px; background: linear-gradient(135deg, #1a0b2e 0%, #0d0216 100%); border: 1px solid var(--accent-blue); border-radius: 20px; padding: 15px; z-index: 10001; box-shadow: 0 10px 30px rgba(0,0,0,0.8); animation: slideUp 0.5s ease;">
     <div style="display: flex; align-items: center; gap: 15px;">
         <img src="images/logo.png" style="width: 50px; height: 50px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
@@ -809,6 +768,7 @@ document.querySelectorAll('.info-card').forEach(card => {
 </div>
 </body>
 </html>
+
 
 
 
