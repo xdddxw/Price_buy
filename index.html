@@ -907,8 +907,72 @@ hiddenBtn.addEventListener('click', async () => {
     }
 });
 </script>
+
+    <div id="android-install" style="
+    display:none;
+    position:fixed;
+    bottom:90px;
+    left:15px;
+    right:15px;
+    background:linear-gradient(135deg,#1a0b2e,#0d0216);
+    border:1px solid #00c6ff;
+    border-radius:16px;
+    padding:14px;
+    z-index:100000;
+    box-shadow:0 10px 30px rgba(0,0,0,.8);
+">
+    <div style="display:flex;align-items:center;gap:12px;">
+        <img src="images/logo.png" style="width:44px;height:44px;border-radius:10px;">
+        <div style="flex:1;">
+            <div style="font-weight:800;font-size:14px;">SMOKE HUB</div>
+            <div style="font-size:12px;color:#bbb;">
+                Встанови додаток для швидкого доступу
+            </div>
+        </div>
+        <button id="install-btn" style="
+            background:#00c6ff;
+            border:none;
+            color:#000;
+            padding:8px 14px;
+            border-radius:10px;
+            font-weight:900;
+            font-size:12px;
+        ">ВСТАНОВИТИ</button>
+    </div>
+</div>
+
+
+    <script>
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+
+    if (isAndroid && !isStandalone) {
+        setTimeout(() => {
+            document.getElementById('android-install').style.display = 'block';
+        }, 3000);
+    }
+});
+
+document.getElementById('install-btn').addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+
+    document.getElementById('android-install').style.display = 'none';
+    deferredPrompt = null;
+});
+</script>
+
 </body>
 </html>
+
 
 
 
