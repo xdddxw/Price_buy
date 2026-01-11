@@ -680,11 +680,10 @@
         });
         set(ref(db, 'catalog'), { prices, descs, stock, badges }).then(() => { alert("Дані оновлено!"); location.reload(); });
     };
-</script>
-<script>
+
+    // ===== PAYMENT TOGGLE =====
 let paymentEnabled = true;
 
-// з Firebase
 onValue(ref(db, 'settings/payment'), (snap) => {
     paymentEnabled = snap.val() !== false;
 
@@ -700,10 +699,11 @@ onValue(ref(db, 'settings/payment'), (snap) => {
     }
 });
 
-// перемикач з адмінки
 window.togglePayment = function () {
     set(ref(db, 'settings/payment'), !paymentEnabled);
 };
+
+</script>
 </script>
 
 <script>
@@ -909,6 +909,7 @@ hiddenBtn.addEventListener('click', async () => {
 </script>
 </body>
 </html>
+
 
 
 
