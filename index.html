@@ -637,6 +637,9 @@
         <button class="admin-btn" onclick="toggleEdit('desc')">📝 РЕД. НАЗВИ</button>
         <button class="admin-btn" id="btn-edit-stock" onclick="toggleStockMode()">📦 СКЛАД</button>
         <select id="badge-selector"><option value="">Без стікера</option><option value="hit">🔥 ХІТ</option><option value="promo">🏷 АКЦІЯ</option></select>
+        <button class="admin-btn" id="btn-toggle-payment" onclick="togglePayment()">
+    💳 ОПЛАТА: УВІМКНЕНА
+</button>
         <button class="admin-btn" style="background:var(--accent-pink);" onclick="adminSave()">💾 ЗБЕРЕГТИ ВСЕ</button>
         <button class="admin-btn" style="background:none; color:#777;" onclick="devLogout()">🚪 ВИЙТИ</button>
     </div>
@@ -677,6 +680,30 @@
         });
         set(ref(db, 'catalog'), { prices, descs, stock, badges }).then(() => { alert("Дані оновлено!"); location.reload(); });
     };
+</script>
+<script>
+let paymentEnabled = true;
+
+// з Firebase
+onValue(ref(db, 'settings/payment'), (snap) => {
+    paymentEnabled = snap.val() !== false;
+
+    const payCard = document.querySelector('a[href="payment.html"]');
+    const btn = document.getElementById('btn-toggle-payment');
+
+    if (!paymentEnabled) {
+        payCard?.classList.add('hidden');
+        if (btn) btn.innerText = '💳 ОПЛАТА: ВИМКНЕНА';
+    } else {
+        payCard?.classList.remove('hidden');
+        if (btn) btn.innerText = '💳 ОПЛАТА: УВІМКНЕНА';
+    }
+});
+
+// перемикач з адмінки
+window.togglePayment = function () {
+    set(ref(db, 'settings/payment'), !paymentEnabled);
+};
 </script>
 
 <script>
@@ -882,6 +909,7 @@ hiddenBtn.addEventListener('click', async () => {
 </script>
 </body>
 </html>
+
 
 
 
