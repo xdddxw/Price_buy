@@ -766,8 +766,116 @@
     <div id="image-modal" onclick="this.style.display='none'">
     <img id="zoomed-img" src="" alt="Збільшене фото">
 </div>
+
+    <!-- === SECRET LOGIN + FACE ID === -->
+<div id="secret-login" class="dev-panel">
+    <div class="admin-box">
+        <input id="secret-key" type="password" placeholder="Введіть секретний ключ">
+        <button class="admin-btn" onclick="checkSecretKey()">УВІЙТИ</button>
+        <button class="admin-btn" style="background:none; color:#777;" onclick="closePanels()">ЗАКРИТИ</button>
+    </div>
+</div>
+
+<script>
+const ADMIN_SECRET_KEY = "smokehub2026"; // Встав свій секретний ключ тут
+
+// При завантаженні сторінки
+window.addEventListener('load', () => {
+    const faceRegistered = localStorage.getItem('faceKeyRegistered');
+    const loggedIn = sessionStorage.getItem('isHubAdmin') === 'true';
+
+    if(faceRegistered && !loggedIn) {
+        faceIdLogin();
+    } else if (!faceRegistered) {
+        // Показуємо поле для введення пароля тільки якщо Face ID ще не зареєстрований
+        document.getElementById('secret-login').classList.add('active');
+    }
+});
+
+// Перевірка секретного ключа
+function checkSecretKey() {
+    const key = document.getElementById('secret-key').value;
+    if(key === ADMIN_SECRET_KEY){
+        sessionStorage.setItem('isHubAdmin', 'true');
+        alert("Секретний ключ прийнято! Тепер зареєструйте Face ID на цьому пристрої.");
+        document.getElementById('secret-login').classList.remove('active');
+        registerFaceId();
+    } else {
+        alert("Невірний секретний ключ!");
+    }
+}
+
+// Реєстрація Face ID
+async function registerFaceId() {
+    if (!window.PublicKeyCredential) { 
+        alert("Face ID / Touch ID не підтримується на цьому пристрої!"); 
+        return; 
+    }
+
+    try {
+        await navigator.credentials.create({
+            publicKey: {
+                challenge: new Uint8Array(32),
+                rp: { name: "SMOKE HUB" },
+                user: { id: new Uint8Array(16), name: "admin", displayName: "Admin" },
+                pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+                authenticatorSelection: { userVerification: "required" }
+            }
+        });
+        localStorage.setItem('faceKeyRegistered', 'true'); 
+        alert("Face ID зареєстровано на цьому пристрої!");
+        toggleAdminPanel();
+    } catch(e) { 
+        console.error(e); 
+        alert("Не вдалося зареєструвати Face ID: " + e); 
+    }
+}
+
+// Вхід через Face ID
+async function faceIdLogin() {
+    if (!localStorage.getItem('faceKeyRegistered')) return;
+
+    try {
+        await navigator.credentials.get({
+            publicKey: { challenge: new Uint8Array(32), allowCredentials: [], timeout: 60000, userVerification: "required" }
+        });
+        sessionStorage.setItem('isHubAdmin', 'true');
+        toggleAdminPanel();
+        alert("Face ID успішний, адмінка відкрита!");
+    } catch(e) { 
+        console.error(e); 
+        alert("Face ID не пройдено: " + e); 
+    }
+}
+
+// Відкриття/закриття панелі адміна
+function toggleAdminPanel() {
+    const auth = sessionStorage.getItem('isHubAdmin') === 'true';
+    const panel = document.getElementById(auth ? 'dev-menu' : 'dev-login');
+    panel.classList.toggle('active'); 
+}
+
+// Закриття всіх панелей
+function closePanels() {
+    document.querySelectorAll('.dev-panel').forEach(p => p.classList.remove('active'));
+}
+
+// Кнопка "Адмін" у Info автоматично запускає Face ID
+document.querySelectorAll('.info-card').forEach(card => {
+    if (card.querySelector('.info-icon')?.textContent === "🔐") {
+        card.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const faceLogged = await faceIdLogin();
+            if(!faceLogged) {
+                document.getElementById('secret-login').classList.add('active');
+            }
+        });
+    }
+});
+</script>
 </body>
 </html>
+
 
 
 
