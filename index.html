@@ -779,32 +779,6 @@
 <script>
 const ADMIN_SECRET_KEY = "smokehub2026"; // Встав свій секретний ключ тут
 
-// При завантаженні сторінки
-window.addEventListener('load', () => {
-    const faceRegistered = localStorage.getItem('faceKeyRegistered');
-    const loggedIn = sessionStorage.getItem('isHubAdmin') === 'true';
-
-    if(faceRegistered && !loggedIn) {
-        faceIdLogin();
-    } else if (!faceRegistered) {
-        // Показуємо поле для введення пароля тільки якщо Face ID ще не зареєстрований
-        document.getElementById('secret-login').classList.add('active');
-    }
-});
-
-// Перевірка секретного ключа
-function checkSecretKey() {
-    const key = document.getElementById('secret-key').value;
-    if(key === ADMIN_SECRET_KEY){
-        sessionStorage.setItem('isHubAdmin', 'true');
-        alert("Секретний ключ прийнято! Тепер зареєструйте Face ID на цьому пристрої.");
-        document.getElementById('secret-login').classList.remove('active');
-        registerFaceId();
-    } else {
-        alert("Невірний секретний ключ!");
-    }
-}
-
 // Реєстрація Face ID
 async function registerFaceId() {
     if (!window.PublicKeyCredential) { 
@@ -833,7 +807,7 @@ async function registerFaceId() {
 
 // Вхід через Face ID
 async function faceIdLogin() {
-    if (!localStorage.getItem('faceKeyRegistered')) return;
+    if (!localStorage.getItem('faceKeyRegistered')) return false;
 
     try {
         await navigator.credentials.get({
@@ -842,9 +816,24 @@ async function faceIdLogin() {
         sessionStorage.setItem('isHubAdmin', 'true');
         toggleAdminPanel();
         alert("Face ID успішний, адмінка відкрита!");
+        return true;
     } catch(e) { 
         console.error(e); 
         alert("Face ID не пройдено: " + e); 
+        return false;
+    }
+}
+
+// Перевірка секретного ключа
+function checkSecretKey() {
+    const key = document.getElementById('secret-key').value;
+    if(key === ADMIN_SECRET_KEY){
+        sessionStorage.setItem('isHubAdmin', 'true');
+        alert("Секретний ключ прийнято! Тепер зареєструйте Face ID на цьому пристрої.");
+        document.getElementById('secret-login').classList.remove('active');
+        registerFaceId();
+    } else {
+        alert("Невірний секретний ключ!");
     }
 }
 
@@ -860,13 +849,15 @@ function closePanels() {
     document.querySelectorAll('.dev-panel').forEach(p => p.classList.remove('active'));
 }
 
-// Кнопка "Адмін" у Info автоматично запускає Face ID
+// Кнопка "Адмін" у Info запускає Face ID або секретний ключ
 document.querySelectorAll('.info-card').forEach(card => {
     if (card.querySelector('.info-icon')?.textContent === "🔐") {
         card.addEventListener('click', async (e) => {
             e.preventDefault();
+            // Спочатку пробуємо Face ID
             const faceLogged = await faceIdLogin();
             if(!faceLogged) {
+                // Якщо не зареєстровано або відмінено, показуємо секретний ключ
                 document.getElementById('secret-login').classList.add('active');
             }
         });
@@ -875,6 +866,7 @@ document.querySelectorAll('.info-card').forEach(card => {
 </script>
 </body>
 </html>
+
 
 
 
