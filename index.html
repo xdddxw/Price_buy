@@ -168,6 +168,19 @@
     color: black; 
     animation: glow-yellow 2s infinite alternate; 
 } 
+        .badge-new { 
+    display: block !important; 
+    background: linear-gradient(135deg, #00ff99, #00cc66); 
+    color: white; 
+    animation: glow-green 2s infinite alternate; 
+}
+
+@keyframes glow-green { 
+    0% { box-shadow: 0 4px 15px rgba(0,255,153,0.3); transform: translateY(0) rotate(-5deg); } 
+    50% { box-shadow: 0 6px 20px rgba(0,255,153,0.5); transform: translateY(-2px) rotate(0deg); } 
+    100% { box-shadow: 0 4px 15px rgba(0,255,153,0.3); transform: translateY(0) rotate(-5deg); } 
+}
+
  
 @keyframes glow { 
     0% { box-shadow: 0 4px 15px rgba(255,0,85,0.3); transform: translateY(0) rotate(-5deg); } 
@@ -639,7 +652,7 @@
         <button class="admin-btn" onclick="toggleEdit('price')">💰 РЕД. ЦІНИ</button>
         <button class="admin-btn" onclick="toggleEdit('desc')">📝 РЕД. НАЗВИ</button>
         <button class="admin-btn" id="btn-edit-stock" onclick="toggleStockMode()">📦 СКЛАД</button>
-        <select id="badge-selector"><option value="">Без стікера</option><option value="hit">🔥 ХІТ</option><option value="promo">🏷 АКЦІЯ</option></select>
+        <select id="badge-selector"><option value="">Без стікера</option><option value="hit">🔥 ХІТ</option><option value="promo">🏷 АКЦІЯ</option><option value="new">🆕 NEW</option></select>
         <button class="admin-btn" id="btn-toggle-payment" onclick="togglePayment()">
     💳 ОПЛАТА: УВІМКНЕНА
 </button>
@@ -679,10 +692,26 @@
             descs.push(card.querySelector('.product-desc').innerText);
             stock.push(!card.classList.contains('out-of-stock'));
             const b = card.querySelector('.badge');
-            badges.push(b.classList.contains('badge-hit') ? 'hit' : b.classList.contains('badge-promo') ? 'promo' : '');
+            badges.push(b.classList.contains('badge-hit') ? 'hit' : b.classList.contains('badge-promo') ? 'promo' : b.classList.contains('badge-new') ? 'new' : '');
         });
         set(ref(db, 'catalog'), { prices, descs, stock, badges }).then(() => { alert("Дані оновлено!"); location.reload(); });
     };
+    document.addEventListener('click', (e) => {
+    const card = e.target.closest('.product-card');
+    if (!card || sessionStorage.getItem('isHubAdmin') !== 'true') return;
+    if (adminModes.stock) { 
+        card.classList.toggle('out-of-stock'); 
+        return; 
+    }
+    const badgeVal = document.getElementById('badge-selector').value;
+    const b = card.querySelector('.badge'); 
+    b.className = 'badge';
+    if(badgeVal) { 
+        b.classList.add('badge-' + badgeVal); 
+        b.innerText = badgeVal === 'hit' ? 'ХІТ' : badgeVal === 'promo' ? 'АКЦІЯ' : badgeVal === 'new' ? 'NEW' : ''; 
+    }
+});
+
 
     // ===== PAYMENT TOGGLE =====
 let paymentEnabled = true;
@@ -927,6 +956,7 @@ hiddenBtn.addEventListener('click', async () => {
 
 </body>
 </html>
+
 
 
 
