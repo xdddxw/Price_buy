@@ -600,7 +600,6 @@
     <div class="admin-box">
         <input id="dev-user" type="text" placeholder="Логін"><input id="dev-pass" type="password" placeholder="Пароль">
         <button class="admin-btn" onclick="checkDevAuth()">УВІЙТИ</button>
-        <button class="admin-btn" onclick="loginWithFaceID()">🔐 Увійти з Face ID</button>
         <button class="admin-btn" style="background:none; color:#777;" onclick="closePanels()">ЗАКРИТИ</button>
     </div>
 </div>
@@ -745,35 +744,7 @@
     }
 }
 
-    <script>
-async function loginWithFaceID() {
-    if (!window.PublicKeyCredential) {
-        alert("Face ID не підтримується");
-        return;
-    }
-
-    try {
-        const challenge = new Uint8Array(32);
-        window.crypto.getRandomValues(challenge);
-
-        const credential = await navigator.credentials.get({
-            publicKey: {
-                challenge: challenge,
-                timeout: 60000,
-                userVerification: "required"
-            }
-        });
-
-        if (credential) {
-            sessionStorage.setItem('isHubAdmin', 'true');
-            alert("Face ID підтверджено ✅");
-            location.reload();
-        }
-    } catch (err) {
-        alert("Face ID не підтверджено ❌");
-    }
-}
-</script>
+    
 </script>
 <div id="pwa-toast" style="display: none; position: fixed; bottom: 100px; left: 20px; right: 20px; background: linear-gradient(135deg, #1a0b2e 0%, #0d0216 100%); border: 1px solid var(--accent-blue); border-radius: 20px; padding: 15px; z-index: 10001; box-shadow: 0 10px 30px rgba(0,0,0,0.8); animation: slideUp 0.5s ease;">
     <div style="display: flex; align-items: center; gap: 15px;">
@@ -796,6 +767,7 @@ async function loginWithFaceID() {
 </div>
 </body>
 </html>
+
 
 
 
