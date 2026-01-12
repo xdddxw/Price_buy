@@ -2,7 +2,8 @@
 <html lang="uk">
 <head>
     <script>
-        if (localStorage.getItem('hubDeviceId') || sessionStorage.getItem('isHubAdmin')) {
+        // Перевірка адміна до завантаження сторінки
+        if (localStorage.getItem('isHubAdmin') === 'true') {
             document.documentElement.classList.add('force-admin');
         }
     </script>
@@ -15,80 +16,36 @@
     <link rel="apple-touch-icon" href="images/logo.png">
 
     <style>
-        :root { 
-            --bg: #0d0216; 
-            --card-bg: rgba(255, 255, 255, 0.05); 
-            --accent-pink: #ff0055; 
-            --accent-blue: #00c6ff; 
-            --nav-bg: rgba(20, 5, 35, 0.98); 
-        }
-
-        body { 
-            background: radial-gradient(circle at top right, #1a0b2e, #0d0216); 
-            background-attachment: fixed; margin: 0; 
-            padding-bottom: calc(110px + env(safe-area-inset-bottom)); 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            color: white; overflow-x: hidden; 
-            -webkit-tap-highlight-color: transparent; min-height: 100vh;
-        }
-        
-        header { 
-            display: flex; justify-content: center; align-items: center; 
-            padding: calc(15px + env(safe-area-inset-top)) 15px 15px; 
-            background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(15px); 
-            position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
-        }
-
+        :root { --bg: #0d0216; --card-bg: rgba(255, 255, 255, 0.05); --accent-pink: #ff0055; --accent-blue: #00c6ff; --nav-bg: rgba(20, 5, 35, 0.98); }
+        body { background: radial-gradient(circle at top right, #1a0b2e, #0d0216); background-attachment: fixed; margin: 0; padding-bottom: 120px; font-family: 'Segoe UI', system-ui, sans-serif; color: white; overflow-x: hidden; -webkit-tap-highlight-color: transparent; min-height: 100vh; }
+        header { display: flex; justify-content: center; align-items: center; padding: calc(15px + env(safe-area-inset-top)) 15px 15px; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
         .logo { font-weight: 900; font-size: 22px; text-transform: uppercase; background: linear-gradient(90deg, #ff0055, #00f2ff, #ff0055); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradient-move 3s linear infinite; }
         @keyframes gradient-move { to { background-position: 200% center; } }
-
         .container { padding: 10px; }
         .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .product-card { background: var(--card-bg); border-radius: 18px; padding: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; transition: 0.3s; position: relative; }
-        
         .product-img { width: 100%; aspect-ratio: 1/1; border-radius: 12px; overflow: hidden; margin-bottom: 8px; position: relative; }
         .product-img img { width: 100%; height: 100%; object-fit: cover; }
         .product-desc { font-size: 11px; font-weight: 600; min-height: 28px; line-height: 1.2; margin: 4px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .price { font-weight: 800; font-size: 11px; color: var(--accent-blue); margin-top: auto; }
-
-        /* --- MODERN LIQUID STICKERS WITH TEXT --- */
-        .badge { 
-            position: absolute; top: 8px; left: 8px; padding: 4px 12px; 
-            border-radius: 12px; font-size: 9px; font-weight: 900; z-index: 5; 
-            display: none; text-transform: uppercase; backdrop-filter: blur(8px); 
-            color: white; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            letter-spacing: 0.5px;
-        }
-        .badge-hit { display: block !important; background: linear-gradient(135deg, #ff0055, #ff3366); animation: glow 2s infinite alternate; }
-        .badge-promo { display: block !important; background: linear-gradient(135deg, #ffd900, #ffea00); color: black; animation: glow-yellow 2s infinite alternate; }
-        .badge-new { display: block !important; background: linear-gradient(135deg, #00ff99, #00cc66); animation: glow-green 2s infinite alternate; }
-
-        @keyframes glow { 0% { transform: translateY(0) rotate(-5deg); box-shadow: 0 4px 10px rgba(255,0,85,0.3); } 100% { transform: translateY(-2px) rotate(0deg); box-shadow: 0 6px 20px rgba(255,0,85,0.6); } }
-        @keyframes glow-yellow { 0% { transform: translateY(0) rotate(-5deg); box-shadow: 0 4px 10px rgba(255,217,0,0.3); } 100% { transform: translateY(-2px) rotate(0deg); box-shadow: 0 6px 20px rgba(255,217,0,0.6); } }
-        @keyframes glow-green { 0% { transform: translateY(0) rotate(-5deg); box-shadow: 0 4px 10px rgba(0,255,153,0.3); } 100% { transform: translateY(-2px) rotate(0deg); box-shadow: 0 6px 20px rgba(0,255,153,0.6); } }
-
+        .badge { position: absolute; top: 8px; left: 8px; padding: 4px 10px; border-radius: 10px; font-size: 9px; font-weight: 900; z-index: 5; display: none; text-transform: uppercase; backdrop-filter: blur(8px); color: white; }
+        .badge-hit { display: block !important; background: linear-gradient(135deg, #ff0055, #ff3366); }
+        .badge-promo { display: block !important; background: linear-gradient(135deg, #ffd900, #ffea00); color: black; }
+        .badge-new { display: block !important; background: linear-gradient(135deg, #00ff99, #00cc66); }
         .out-of-stock { opacity: 0.4; filter: grayscale(1); }
         .out-of-stock::after { content: "SOLD OUT"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); background: #ff0055; padding: 5px 12px; border-radius: 8px; font-size: 10px; font-weight: 900; color: white; z-index: 10; }
-
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .info-card { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 22px; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; text-decoration: none; color: white; transition: 0.2s; backdrop-filter: blur(10px); }
-        .info-card:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); }
         .info-icon { font-size: 30px; margin-bottom: 8px; }
-        .info-card span { font-size: 12px; font-weight: 800; text-transform: uppercase; }
-        .full-width { grid-column: span 2; flex-direction: row; gap: 15px; padding: 18px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); }
         .section-label { grid-column: span 2; font-size: 11px; color: #666; text-transform: uppercase; margin-top: 15px; margin-left: 5px; font-weight: 800; }
-
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav-bg); backdrop-filter: blur(15px); display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); z-index: 1000; border-top: 1px solid rgba(255,255,255,0.1); }
         .nav-item { background: none; border: none; color: #888; display: flex; flex-direction: column; align-items: center; font-size: 9px; gap: 4px; text-transform: uppercase; flex: 1; }
         .nav-item.active { color: white; }
-        .nav-item span:first-child { font-size: 18px; }
-
         .dev-panel { position: fixed; top: 60px; right: -100%; width: 280px; height: 75vh; background: #1a0b2e; padding: 20px; transition: 0.4s; z-index: 2000; border-radius: 20px 0 0 20px; overflow-y: auto; border-left: 2px solid var(--accent-pink); }
         .dev-panel.active { right: 0; }
-        .admin-btn { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 10px; border: none; background: #333; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .active-mode { background: var(--accent-pink) !important; box-shadow: 0 0 10px var(--accent-pink); }
-        
-        #maintenance-overlay { position: fixed; inset: 0; z-index: 100000; background: radial-gradient(circle at top, #1a0b2e, #0d0216); display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; }
+        .admin-btn { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 10px; border: none; background: #333; color: white; font-weight: bold; cursor: pointer; }
+        .active-mode { background: var(--accent-pink) !important; }
+        #maintenance-overlay { position: fixed; inset: 0; z-index: 1000000; background: radial-gradient(circle at top, #1a0b2e, #0d0216); display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; }
         html.force-admin #maintenance-overlay { display: none !important; }
         .hidden { display: none !important; }
         [contenteditable="true"] { outline: 2px dashed var(--accent-pink); background: rgba(233, 30, 99, 0.1); }
@@ -121,21 +78,21 @@
 
     <div id="cat-prodazh" class="cat-section hidden">
         <div class="product-grid">
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/spermint.jpg"></div><h3 class="product-desc">Spermint 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/Double-grape.jpg"></div><h3 class="product-desc">Double-grape 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/apple-mixed.jpg"></div><h3 class="product-desc">Apple Mixed 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blackcurrant-grape.jpg"></div><h3 class="product-desc">Blackcurrant Grape 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blueberry-currant.jpg"></div><h3 class="product-desc">Blueberry Currant 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermalon-melon.jpg"></div><h3 class="product-desc">Watermelon Melon 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cranberry-mors.jpg"></div><h3 class="product-desc">Cranberry Mors 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/double-raspberry.jpg"></div><h3 class="product-desc">Double Raspberry 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cola-lemon.jpg"></div><h3 class="product-desc">Cola Lemon 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/RedBull-blueraspberry.jpg"></div><h3 class="product-desc">RedBull Blue Raspberry 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/pineapple-lemonade.jpg"></div><h3 class="product-desc">Pineapple Lemonade 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/multifruit.jpg"></div><h3 class="product-desc">Multifruit 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/bali-triple-shot.jpg"></div><h3 class="product-desc">Bali Triple Shot 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/chaser-ultra-granat.jpg"></div><h3 class="product-desc">Granat 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/chaser-7years-pamberry.jpg"></div><h3 class="product-desc">Pamberry 30 ml</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/spermint.jpg"></div><h3 class="product-desc">Spermint 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/Double-grape.jpg"></div><h3 class="product-desc">Double-grape 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/apple-mixed.jpg"></div><h3 class="product-desc">Apple Mixed 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blackcurrant-grape.jpg"></div><h3 class="product-desc">Blackcurrant Grape 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blueberry-currant.jpg"></div><h3 class="product-desc">Blueberry Currant 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermalon-melon.jpg"></div><h3 class="product-desc">Watermelon Melon 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cranberry-mors.jpg"></div><h3 class="product-desc">Cranberry Mors 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/double-raspberry.jpg"></div><h3 class="product-desc">Double Raspberry 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cola-lemon.jpg"></div><h3 class="product-desc">Cola Lemon 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/RedBull-blueraspberry.jpg"></div><h3 class="product-desc">RedBull Blue Raspberry 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/pineapple-lemonade.jpg"></div><h3 class="product-desc">Pineapple Lemonade 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/multifruit.jpg"></div><h3 class="product-desc">Multifruit 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/bali-triple-shot.jpg"></div><h3 class="product-desc">Bali Triple Shot 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/chaser-ultra-granat.jpg"></div><h3 class="product-desc">Granat 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/chaser-7years-pamberry.jpg"></div><h3 class="product-desc">Pamberry 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
         </div>
     </div>
 
@@ -155,8 +112,8 @@
             <a href="reviews.html" class="info-card"><div class="info-icon">⭐</div><span>Відгуки</span></a>
             <a href="kwiz.html" class="info-card"><div class="info-icon">🍷</div><span>Смаки</span></a>
             <div class="info-card" id="admin-trigger"><div class="info-icon">🔐</div><span>Адмін</span></div>
-            <div class="section-label">Соцмережі</div>
-            <a href="https://t.me/liquid_br" target="_blank" class="info-card full-width"><div class="info-icon">✈️</div><span>Telegram Канал</span></a>
+            <div class="section-label"> соцмережі</div>
+            <a href="https://t.me/liquid_br" target="_blank" class="info-card full-width" style="grid-column: span 2;"><div class="info-icon">✈️</div><span>Telegram Канал</span></a>
         </div>
     </div>
 </div>
@@ -170,7 +127,6 @@
 
 <div id="dev-menu" class="dev-panel">
     <button class="admin-btn" id="edit-price">💰 ЦІНИ (OFF)</button>
-    <button class="admin-btn" id="edit-desc">📝 НАЗВИ (OFF)</button>
     <button class="admin-btn" id="edit-stock">📦 СКЛАД (OFF)</button>
     <select id="badge-sel" class="admin-btn" style="background:#0d0216; border:1px solid #333">
         <option value="">БЕЗ СТІКЕРА</option>
@@ -178,31 +134,27 @@
         <option value="promo">🏷 АКЦІЯ</option>
         <option value="new">🆕 NEW</option>
     </select>
-    <button class="admin-btn" id="toggle-maint">🛠 ТЕХ. РОБОТИ</button>
+    <button class="admin-btn" id="toggle-maint">🛠 ТЕХ. РОБОТИ (OFF)</button>
     <button class="admin-btn" style="background:var(--accent-pink); margin-top:15px;" id="save-all">💾 ЗБЕРЕГТИ ВСЕ</button>
-    <button class="admin-btn" style="background:#000;" onclick="localStorage.clear(); sessionStorage.clear(); location.reload();">🚪 ВИЙТИ</button>
+    <button class="admin-btn" style="background:#000;" id="logout-btn">🚪 ВИЙТИ</button>
 </div>
 
 <div id="maintenance-overlay">
     <img src="images/logo.png" style="width:80px; border-radius:20px; margin-bottom:20px;">
     <h2>ОНОВЛЕННЯ</h2>
+    <p>Ми скоро повернемося 🙏</p>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, onValue, set, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const app = initializeApp({ databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/" });
     const db = getDatabase(app);
 
-    async function faceIdAuth() {
-        if (!window.PublicKeyCredential) return false;
-        try {
-            await navigator.credentials.get({ publicKey: { challenge: new Uint8Array(32), timeout: 60000, userVerification: "required" } });
-            return true;
-        } catch (e) { return false; }
-    }
+    const isAdmin = () => localStorage.getItem('isHubAdmin') === 'true';
 
+    // Таби
     document.querySelectorAll('.nav-item').forEach(btn => {
         btn.onclick = () => {
             const tab = btn.dataset.tab;
@@ -215,91 +167,81 @@
         };
     });
 
+    // Оновлення даних з бази
     onValue(ref(db, 'catalog'), (snap) => {
         const data = snap.val();
         if(data) {
             const cards = document.querySelectorAll('.product-card');
             cards.forEach((card, i) => {
-                if(!card.querySelector('.price')) return;
                 if(data.prices?.[i]) card.querySelector('.price').innerText = data.prices[i];
-                if(data.descs?.[i]) card.querySelector('.product-desc').innerText = data.descs[i];
                 if(data.stock?.[i] === false) card.classList.add('out-of-stock'); else card.classList.remove('out-of-stock');
-                
                 const b = card.querySelector('.badge');
                 b.className = 'badge';
                 if(data.badges?.[i]) {
                     const type = data.badges[i];
                     b.classList.add('badge-' + type);
-                    // Додаємо текст залежно від типу
-                    if(type === 'hit') b.innerText = '🔥 ХІТ';
-                    else if(type === 'promo') b.innerText = '🏷 АКЦІЯ';
-                    else if(type === 'new') b.innerText = '🆕 NEW';
+                    b.innerText = type === 'hit' ? '🔥 ХІТ' : type === 'promo' ? '🏷 АКЦІЯ' : '🆕 NEW';
                 }
             });
         }
     });
 
-    let maint = false;
+    // Логіка Тех Робіт
+    let currentMaintStatus = false;
     onValue(ref(db, 'settings/maintenance'), (snap) => {
-        maint = snap.val() === true;
-        const isAdmin = sessionStorage.getItem('isHubAdmin') === 'true' || localStorage.getItem('hubDeviceId');
-        document.getElementById('maintenance-overlay').style.display = (maint && !isAdmin) ? 'flex' : 'none';
-        document.body.style.overflow = (maint && !isAdmin) ? 'hidden' : '';
+        currentMaintStatus = snap.val() === true;
+        const overlay = document.getElementById('maintenance-overlay');
+        const btn = document.getElementById('toggle-maint');
+        
+        if (currentMaintStatus) {
+            if (!isAdmin()) overlay.style.display = 'flex';
+            btn.innerText = "🛠 ТЕХ. РОБОТИ (ON)";
+            btn.classList.add('active-mode');
+        } else {
+            overlay.style.display = 'none';
+            btn.innerText = "🛠 ТЕХ. РОБОТИ (OFF)";
+            btn.classList.remove('active-mode');
+        }
     });
 
-    const openAdmin = async () => {
-        if(sessionStorage.getItem('isHubAdmin') === 'true') {
+    document.getElementById('toggle-maint').onclick = () => {
+        set(ref(db, 'settings/maintenance'), !currentMaintStatus);
+    };
+
+    // Адмін вхід
+    const login = () => {
+        if (isAdmin()) {
             document.getElementById('dev-menu').classList.toggle('active');
-            return;
-        }
-        if (localStorage.getItem('faceIdEnabled') && await faceIdAuth()) { loginAdmin(); return; }
-        const key = prompt("ВВЕДІТЬ КЛЮЧ:");
-        if (key === "smokehub2026") {
-            if (confirm("Увімкнути Face ID?")) localStorage.setItem('faceIdEnabled', 'true');
-            loginAdmin();
+        } else {
+            if (prompt("КЛЮЧ:") === "smokehub2026") {
+                localStorage.setItem('isHubAdmin', 'true');
+                location.reload();
+            }
         }
     };
 
-    function loginAdmin() {
-        sessionStorage.setItem('isHubAdmin', 'true');
-        localStorage.setItem('hubDeviceId', 'admin-device');
+    document.getElementById('admin-trigger').onclick = login;
+    document.getElementById('logout-btn').onclick = () => {
+        localStorage.removeItem('isHubAdmin');
         location.reload();
-    }
+    };
 
-    document.getElementById('admin-trigger').onclick = openAdmin;
-    const secret = document.createElement('div');
-    secret.style.cssText = "position:fixed; top:0; right:0; width:65px; height:65px; z-index:99999; cursor:pointer;";
-    document.body.appendChild(secret);
-    secret.onclick = openAdmin;
-
+    // Редагування
     let editMode = null;
-    const reset = () => {
-        document.querySelectorAll('.price, .product-desc').forEach(el => el.contentEditable = false);
-        document.querySelectorAll('.admin-btn').forEach(btn => btn.classList.remove('active-mode'));
+    document.getElementById('edit-price').onclick = (e) => {
+        editMode = editMode === 'price' ? null : 'price';
+        document.querySelectorAll('.price').forEach(el => el.contentEditable = editMode === 'price');
+        e.target.classList.toggle('active-mode');
     };
 
-    document.getElementById('edit-price').onclick = (e) => {
-        editMode = (editMode === 'price' ? null : 'price');
-        reset();
-        if(editMode==='price') { e.target.classList.add('active-mode'); e.target.innerText="💰 ЦІНИ (ON)"; document.querySelectorAll('.price').forEach(el=>el.contentEditable=true); }
-        else e.target.innerText="💰 ЦІНИ (OFF)";
-    };
-    document.getElementById('edit-desc').onclick = (e) => {
-        editMode = (editMode === 'desc' ? null : 'desc');
-        reset();
-        if(editMode==='desc') { e.target.classList.add('active-mode'); e.target.innerText="📝 НАЗВИ (ON)"; document.querySelectorAll('.product-desc').forEach(el=>el.contentEditable=true); }
-        else e.target.innerText="📝 НАЗВИ (OFF)";
-    };
     document.getElementById('edit-stock').onclick = (e) => {
-        editMode = (editMode === 'stock' ? null : 'stock');
-        reset();
-        if(editMode==='stock') { e.target.classList.add('active-mode'); e.target.innerText="📦 СКЛАД (ON)"; }
-        else e.target.innerText="📦 СКЛАД (OFF)";
+        editMode = editMode === 'stock' ? null : 'stock';
+        e.target.classList.toggle('active-mode');
     };
 
     document.addEventListener('click', (e) => {
         const card = e.target.closest('.product-card');
-        if(!card || sessionStorage.getItem('isHubAdmin') !== 'true') return;
+        if(!card || !isAdmin()) return;
         if(editMode === 'stock') card.classList.toggle('out-of-stock');
         
         const bVal = document.getElementById('badge-sel').value;
@@ -308,30 +250,20 @@
             b.className = 'badge';
             if(bVal) {
                 b.classList.add('badge-' + bVal);
-                if(bVal === 'hit') b.innerText = '🔥 ХІТ';
-                else if(bVal === 'promo') b.innerText = '🏷 АКЦІЯ';
-                else if(bVal === 'new') b.innerText = '🆕 NEW';
+                b.innerText = bVal === 'hit' ? '🔥 ХІТ' : bVal === 'promo' ? '🏷 АКЦІЯ' : '🆕 NEW';
             }
         }
     });
 
-    document.getElementById('toggle-maint').onclick = () => set(ref(db, 'settings/maintenance'), !maint);
-
     document.getElementById('save-all').onclick = () => {
-        const p = [], d = [], s = [], b = [];
+        const p = [], s = [], b = [];
         document.querySelectorAll('.product-card').forEach(card => {
-            if(!card.querySelector('.price')) return;
             p.push(card.querySelector('.price').innerText);
-            d.push(card.querySelector('.product-desc').innerText);
             s.push(!card.classList.contains('out-of-stock'));
             const bc = card.querySelector('.badge').className;
-            let type = '';
-            if(bc.includes('hit')) type = 'hit';
-            else if(bc.includes('promo')) type = 'promo';
-            else if(bc.includes('new')) type = 'new';
-            b.push(type);
+            b.push(bc.includes('hit') ? 'hit' : bc.includes('promo') ? 'promo' : bc.includes('new') ? 'new' : '');
         });
-        set(ref(db, 'catalog'), { prices: p, descs: d, stock: s, badges: b }).then(() => alert("ЗБЕРЕЖЕНО В БАЗУ!"));
+        set(ref(db, 'catalog'), { prices: p, stock: s, badges: b }).then(() => alert("ЗБЕРЕЖЕНО!"));
     };
 </script>
 </body>
