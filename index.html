@@ -656,6 +656,10 @@
         <button class="admin-btn" id="btn-toggle-payment" onclick="togglePayment()">
     💳 ОПЛАТА: УВІМКНЕНА
 </button>
+        <button class="admin-btn" id="btn-toggle-maintenance" onclick="toggleMaintenance()">
+🛠 ОБСЛУГОВУВАННЯ: ВИМКНЕНО
+</button>
+
         <button class="admin-btn" style="background:var(--accent-pink);" onclick="adminSave()">💾 ЗБЕРЕГТИ ВСЕ</button>
         <button class="admin-btn" style="background:none; color:#777;" onclick="devLogout()">🚪 ВИЙТИ</button>
     </div>
@@ -742,6 +746,36 @@ window.togglePayment = function () {
     set(ref(db, 'settings/payment'), !paymentEnabled);
 };
 
+</script>
+ <script>   
+    // ===== MAINTENANCE MODE =====
+let maintenanceEnabled = false;
+
+onValue(ref(db, 'settings/maintenance'), (snap) => {
+    maintenanceEnabled = snap.val() === true;
+
+    const overlay = document.getElementById('maintenance-overlay');
+    const btn = document.getElementById('btn-toggle-maintenance');
+    const isAdmin = sessionStorage.getItem('isHubAdmin') === 'true';
+
+    if (maintenanceEnabled && !isAdmin) {
+        overlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    } else {
+        overlay.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    if (btn) {
+        btn.innerText = maintenanceEnabled
+            ? '🛠 ОБСЛУГОВУВАННЯ: УВІМКНЕНО'
+            : '🛠 ОБСЛУГОВУВАННЯ: ВИМКНЕНО';
+    }
+});
+
+window.toggleMaintenance = function () {
+    set(ref(db, 'settings/maintenance'), !maintenanceEnabled);
+};
 </script>
 </script>
 
@@ -961,8 +995,31 @@ hiddenBtn.addEventListener('click', async () => {
 
 </script>
 
+    <div id="maintenance-overlay" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:100000;
+    background: radial-gradient(circle at top, #1a0b2e, #0d0216);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:20px;
+">
+    <div style="max-width:320px;">
+        <img src="images/logo.png" style="width:80px;border-radius:20px;margin-bottom:20px;">
+        <h2 style="margin:0 0 10px;">Технічне обслуговування</h2>
+        <p style="font-size:14px;color:#bbb;">
+            Ми тимчасово оновлюємо сайт.<br>
+            Зайдіть трохи пізніше 🙏
+        </p>
+    </div>
+</div>
 </body>
 </html>
+
 
 
 
