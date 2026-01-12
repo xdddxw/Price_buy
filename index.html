@@ -243,12 +243,27 @@
 
         #admin-card { cursor: pointer; }
 
-    </style>
-    <style>
-html.force-admin #maintenance-overlay {
+        /* Якщо адмін авторизований, примусово ховаємо вікно обслуговування */
+html.force-admin #maintenance-overlay,
+body.admin-mode #maintenance-overlay {
     display: none !important;
 }
-</style>
+
+/* Стиль самого оверлея */
+#maintenance-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background: radial-gradient(circle at top, #1a0b2e, #0d0216);
+    color: white;
+    display: none; /* За замовчуванням приховано, вмикається через JS */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+}
+    </style>
 
 </head>
 <body>
@@ -786,35 +801,42 @@ window.togglePayment = function () {
     set(ref(db, 'settings/payment'), !paymentEnabled);
 };
 
-    // ===== MAINTENANCE MODE (ADMIN-FIRST) =====
+    // ===== MAINTENANCE MODE (FIXED) =====
 let maintenanceEnabled = false;
 
 onValue(ref(db, 'settings/maintenance'), (snap) => {
     maintenanceEnabled = snap.val() === true;
+    updateMaintenanceUI();
+});
 
+function updateMaintenanceUI() {
     const overlay = document.getElementById('maintenance-overlay');
     const btn = document.getElementById('btn-toggle-maintenance');
-
-    const isAdmin =
-        document.documentElement.classList.contains('force-admin') ||
+    
+    // Перевірка чи користувач адмін (через localStorage або sessionStorage)
+    const isAdmin = 
+        localStorage.getItem('hubDeviceId') !== null && 
         sessionStorage.getItem('isHubAdmin') === 'true';
 
+    // Логіка показу оверлея
     if (maintenanceEnabled && !isAdmin) {
-        overlay.hidden = false;
         overlay.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     } else {
-        overlay.hidden = true;
+        overlay.style.display = 'none';
         document.body.style.overflow = '';
     }
 
+    // Оновлення тексту кнопки в адмін-панелі
     if (btn) {
-        btn.innerText = maintenanceEnabled
-            ? '🛠 ОБСЛУГОВУВАННЯ: УВІМКНЕНО'
+        btn.innerText = maintenanceEnabled 
+            ? '🛠 ОБСЛУГОВУВАННЯ: УВІМКНЕНО' 
             : '🛠 ОБСЛУГОВУВАННЯ: ВИМКНЕНО';
+        btn.style.background = maintenanceEnabled ? 'var(--accent-pink)' : '';
     }
-});
+}
 
+// Функція перемикання для кнопки
 window.toggleMaintenance = function () {
     set(ref(db, 'settings/maintenance'), !maintenanceEnabled);
 };
@@ -959,8 +981,16 @@ async function faceIdLogin() {
                 userVerification: "required" 
             }
         });
+        
+        // Встановлюємо права адміна
         sessionStorage.setItem('isHubAdmin', 'true');
+        document.documentElement.classList.add('force-admin'); // Додаємо для CSS
+        
         set(ref(db, 'admins/devices/' + getDeviceId()), true);
+        
+        // Оновлюємо UI (ховаємо maintenance-overlay)
+        if (typeof updateMaintenanceUI === 'function') updateMaintenanceUI();
+        
         document.getElementById('dev-menu').classList.add('active');
         return true;
     } catch(e) {
@@ -973,11 +1003,19 @@ async function faceIdLogin() {
 function checkSecretKey() {
     const key = document.getElementById('secret-key').value;
     if(key === ADMIN_SECRET_KEY){
+        // Встановлюємо права адміна
         sessionStorage.setItem('isHubAdmin', 'true');
+        document.documentElement.classList.add('force-admin'); // Додаємо для CSS
+        
         set(ref(db, 'admins/devices/' + getDeviceId()), true);
-        localStorage.setItem('faceKeyRegistered', 'true'); // автоматично реєструємо Face ID
+        localStorage.setItem('faceKeyRegistered', 'true'); 
+        
         alert("Секретний ключ прийнято! Адмінка відкрита.");
         closePanels();
+        
+        // Оновлюємо UI (ховаємо maintenance-overlay)
+        if (typeof updateMaintenanceUI === 'function') updateMaintenanceUI();
+        
         document.getElementById('dev-menu').classList.add('active');
     } else {
         alert("Невірний секретний ключ!");
@@ -1064,6 +1102,7 @@ hiddenBtn.addEventListener('click', async () => {
 </div>
 </body>
 </html>
+
 
 
 
