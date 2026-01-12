@@ -813,21 +813,27 @@ function updateMaintenanceUI() {
     const overlay = document.getElementById('maintenance-overlay');
     const btn = document.getElementById('btn-toggle-maintenance');
     
-    // Перевірка чи користувач адмін (через localStorage або sessionStorage)
+    // Перевірка прав адміна
     const isAdmin = 
-        localStorage.getItem('hubDeviceId') !== null && 
+        document.documentElement.classList.contains('force-admin') || 
         sessionStorage.getItem('isHubAdmin') === 'true';
 
-    // Логіка показу оверлея
-    if (maintenanceEnabled && !isAdmin) {
-        overlay.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+    if (maintenanceEnabled) {
+        if (isAdmin) {
+            // Якщо адмін — ховаємо заставку і ДОЗВОЛЯЄМО скрол
+            overlay.style.display = 'none';
+            document.body.style.overflow = ''; 
+        } else {
+            // Якщо звичайний юзер — показуємо заставку і БЛОКУЄМО скрол
+            overlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
     } else {
+        // Якщо режим вимкнено для всіх — ховаємо заставку і ДОЗВОЛЯЄМО скрол
         overlay.style.display = 'none';
         document.body.style.overflow = '';
     }
 
-    // Оновлення тексту кнопки в адмін-панелі
     if (btn) {
         btn.innerText = maintenanceEnabled 
             ? '🛠 ОБСЛУГОВУВАННЯ: УВІМКНЕНО' 
@@ -1102,6 +1108,7 @@ hiddenBtn.addEventListener('click', async () => {
 </div>
 </body>
 </html>
+
 
 
 
