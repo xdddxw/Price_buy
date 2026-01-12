@@ -25,13 +25,11 @@
 
         body { 
             background: radial-gradient(circle at top right, #1a0b2e, #0d0216); 
-            background-attachment: fixed;
-            margin: 0; 
-            padding-bottom: calc(100px + env(safe-area-inset-bottom)); 
+            background-attachment: fixed; margin: 0; 
+            padding-bottom: calc(110px + env(safe-area-inset-bottom)); 
             font-family: 'Segoe UI', system-ui, sans-serif; 
             color: white; overflow-x: hidden; 
-            -webkit-tap-highlight-color: transparent; 
-            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent; min-height: 100vh;
         }
         
         header { 
@@ -53,7 +51,6 @@
         .product-desc { font-size: 11px; font-weight: 600; min-height: 28px; line-height: 1.2; margin: 4px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .price { font-weight: 800; font-size: 11px; color: var(--accent-blue); margin-top: auto; }
 
-        /* --- СТІКЕРИ --- */
         .badge { position: absolute; top: 8px; left: 8px; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 900; z-index: 5; display: none; text-transform: uppercase; backdrop-filter: blur(8px); color: white; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,198,255,0.3); }
         .badge-hit { display: block !important; background: linear-gradient(135deg, #ff0055, #ff3366); animation: glow 2s infinite alternate; }
         .badge-promo { display: block !important; background: linear-gradient(135deg, #ffd900, #ffea00); color: black; animation: glow-yellow 2s infinite alternate; }
@@ -66,24 +63,12 @@
         .out-of-stock { opacity: 0.4; filter: grayscale(1); }
         .out-of-stock::after { content: "SOLD OUT"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); background: #ff0055; padding: 5px 12px; border-radius: 8px; font-size: 10px; font-weight: 900; color: white; z-index: 10; }
 
-        /* --- ІНФО БЕЗ ПІДСВІЧУВАННЯ --- */
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .info-card { 
-            background: rgba(255, 255, 255, 0.04); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            border-radius: 22px; padding: 20px 10px; 
-            display: flex; flex-direction: column; align-items: center; 
-            text-decoration: none; color: white; transition: 0.2s; 
-            backdrop-filter: blur(10px);
-        }
+        .info-card { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 22px; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; text-decoration: none; color: white; transition: 0.2s; backdrop-filter: blur(10px); }
         .info-card:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); }
-        .info-icon { font-size: 30px; margin-bottom: 8px; /* Підсвічування прибрано */ }
+        .info-icon { font-size: 30px; margin-bottom: 8px; }
         .info-card span { font-size: 12px; font-weight: 800; text-transform: uppercase; }
-        .full-width { 
-            grid-column: span 2; flex-direction: row; gap: 15px; padding: 18px; 
-            background: rgba(255, 255, 255, 0.04); /* Градієнт прибрано */
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
+        .full-width { grid-column: span 2; flex-direction: row; gap: 15px; padding: 18px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); }
         .section-label { grid-column: span 2; font-size: 11px; color: #666; text-transform: uppercase; margin-top: 15px; margin-left: 5px; font-weight: 800; }
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav-bg); backdrop-filter: blur(15px); display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); z-index: 1000; border-top: 1px solid rgba(255,255,255,0.1); }
@@ -93,10 +78,10 @@
 
         .dev-panel { position: fixed; top: 60px; right: -100%; width: 280px; height: 75vh; background: #1a0b2e; padding: 20px; transition: 0.4s; z-index: 2000; border-radius: 20px 0 0 20px; overflow-y: auto; border-left: 2px solid var(--accent-pink); }
         .dev-panel.active { right: 0; }
-        .admin-btn { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 10px; border: none; background: var(--accent-blue); color: white; font-weight: bold; cursor: pointer; }
-        .active-mode { background: var(--accent-pink) !important; }
+        .admin-btn { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 10px; border: none; background: #333; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .active-mode { background: var(--accent-pink) !important; box-shadow: 0 0 10px var(--accent-pink); }
         
-        #maintenance-overlay { position: fixed; inset: 0; z-index: 100000; background: radial-gradient(circle at top, #1a0b2e, #0d0216); display: none; align-items: center; justify-content: center; text-align: center; color: white; }
+        #maintenance-overlay { position: fixed; inset: 0; z-index: 100000; background: radial-gradient(circle at top, #1a0b2e, #0d0216); display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; }
         html.force-admin #maintenance-overlay { display: none !important; }
         .hidden { display: none !important; }
         [contenteditable="true"] { outline: 2px dashed var(--accent-pink); background: rgba(233, 30, 99, 0.1); }
@@ -186,13 +171,15 @@
         <option value="promo">🏷 АКЦІЯ</option>
         <option value="new">🆕 NEW</option>
     </select>
-    <button class="admin-btn" id="toggle-maint">🛠 ТЕХ. РОБОТИ</button>
+    <button class="admin-btn" id="toggle-maint" style="background:#444">🛠 ТЕХ. РОБОТИ (OFF)</button>
     <button class="admin-btn" style="background:var(--accent-pink); margin-top:15px;" id="save-all">💾 ЗБЕРЕГТИ ВСЕ</button>
+    <button class="admin-btn" style="background:#000;" onclick="localStorage.clear(); sessionStorage.clear(); location.reload();">🚪 ВИЙТИ</button>
 </div>
 
 <div id="maintenance-overlay">
     <img src="images/logo.png" style="width:80px; border-radius:20px; margin-bottom:20px;">
     <h2>ОНОВЛЕННЯ</h2>
+    <p style="padding: 0 20px;">Ми оновлюємо каталог. Поверніться за декілька хвилин 🙏</p>
 </div>
 
 <script type="module">
@@ -202,14 +189,7 @@
     const app = initializeApp({ databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/" });
     const db = getDatabase(app);
 
-    async function faceIdAuth() {
-        if (!window.PublicKeyCredential) return false;
-        try {
-            await navigator.credentials.get({ publicKey: { challenge: new Uint8Array(32), timeout: 60000, userVerification: "required" } });
-            return true;
-        } catch (e) { return false; }
-    }
-
+    // --- ТАБИ ---
     document.querySelectorAll('.nav-item').forEach(btn => {
         btn.onclick = () => {
             const tab = btn.dataset.tab;
@@ -217,11 +197,12 @@
             document.getElementById('cat-' + tab).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             btn.classList.add('active');
-            document.getElementById('page-title').innerText = btn.innerText.split('\n')[1].toUpperCase();
+            document.getElementById('page-title').innerText = btn.innerText.split('\n').pop().toUpperCase();
             window.scrollTo(0,0);
         };
     });
 
+    // --- FIREBASE SYNC ---
     onValue(ref(db, 'catalog'), (snap) => {
         const data = snap.val();
         if(data) {
@@ -237,56 +218,75 @@
         }
     });
 
-    let maint = false;
+    // --- ТЕХ РОБОТИ (FIXED) ---
+    let isMaintMode = false;
     onValue(ref(db, 'settings/maintenance'), (snap) => {
-        maint = snap.val() === true;
+        isMaintMode = snap.val() === true;
         const isAdmin = sessionStorage.getItem('isHubAdmin') === 'true' || localStorage.getItem('hubDeviceId');
-        document.getElementById('maintenance-overlay').style.display = (maint && !isAdmin) ? 'flex' : 'none';
-        document.body.style.overflow = (maint && !isAdmin) ? 'hidden' : '';
+        const overlay = document.getElementById('maintenance-overlay');
+        const btn = document.getElementById('toggle-maint');
+
+        if (isMaintMode) {
+            if (!isAdmin) {
+                overlay.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+            btn.innerText = "🛠 ТЕХ. РОБОТИ (ON)";
+            btn.classList.add('active-mode');
+        } else {
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+            btn.innerText = "🛠 ТЕХ. РОБОТИ (OFF)";
+            btn.classList.remove('active-mode');
+        }
     });
 
-    const openAdmin = async () => {
-        if(sessionStorage.getItem('isHubAdmin') === 'true') {
-            document.getElementById('dev-menu').classList.toggle('active');
-            return;
-        }
-        if (localStorage.getItem('faceIdEnabled') && await faceIdAuth()) { loginAdmin(); return; }
-        const key = prompt("КЛЮЧ:");
-        if (key === "smokehub2026") {
-            if (confirm("Увімкнути Face ID?")) localStorage.setItem('faceIdEnabled', 'true');
-            loginAdmin();
-        }
+    document.getElementById('toggle-maint').onclick = () => {
+        set(ref(db, 'settings/maintenance'), !isMaintMode);
     };
 
-    function loginAdmin() {
-        sessionStorage.setItem('isHubAdmin', 'true');
-        localStorage.setItem('hubDeviceId', 'admin-device');
-        location.reload();
-    }
-
+    // --- АДМІН ДОСТУП ---
+    const openAdmin = () => {
+        if(sessionStorage.getItem('isHubAdmin') === 'true') {
+            document.getElementById('dev-menu').classList.toggle('active');
+        } else {
+            if(prompt("ВВЕДІТЬ КЛЮЧ:") === "smokehub2026") {
+                sessionStorage.setItem('isHubAdmin', 'true');
+                localStorage.setItem('hubDeviceId', 'admin-device');
+                location.reload();
+            }
+        }
+    };
     document.getElementById('admin-trigger').onclick = openAdmin;
     const secret = document.createElement('div');
     secret.style.cssText = "position:fixed; top:0; right:0; width:65px; height:65px; z-index:99999; cursor:pointer;";
     document.body.appendChild(secret);
     secret.onclick = openAdmin;
 
+    // --- РЕДАГУВАННЯ ---
     let editMode = null;
+    const reset = () => {
+        document.querySelectorAll('.price, .product-desc').forEach(el => el.contentEditable = false);
+        document.querySelectorAll('.admin-btn').forEach(btn => btn.classList.remove('active-mode'));
+    };
+
     document.getElementById('edit-price').onclick = (e) => {
         editMode = (editMode === 'price' ? null : 'price');
-        document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode'));
-        document.querySelectorAll('.price').forEach(el=>el.contentEditable=(editMode==='price'));
-        if(editMode==='price') e.target.classList.add('active-mode');
+        reset();
+        if(editMode==='price') { e.target.classList.add('active-mode'); e.target.innerText="💰 ЦІНИ (ON)"; document.querySelectorAll('.price').forEach(el=>el.contentEditable=true); }
+        else e.target.innerText="💰 ЦІНИ (OFF)";
     };
     document.getElementById('edit-desc').onclick = (e) => {
         editMode = (editMode === 'desc' ? null : 'desc');
-        document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode'));
-        document.querySelectorAll('.product-desc').forEach(el=>el.contentEditable=(editMode==='desc'));
-        if(editMode==='desc') e.target.classList.add('active-mode');
+        reset();
+        if(editMode==='desc') { e.target.classList.add('active-mode'); e.target.innerText="📝 НАЗВИ (ON)"; document.querySelectorAll('.product-desc').forEach(el=>el.contentEditable=true); }
+        else e.target.innerText="📝 НАЗВИ (OFF)";
     };
     document.getElementById('edit-stock').onclick = (e) => {
         editMode = (editMode === 'stock' ? null : 'stock');
-        document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode'));
-        if(editMode==='stock') e.target.classList.add('active-mode');
+        reset();
+        if(editMode==='stock') { e.target.classList.add('active-mode'); e.target.innerText="📦 СКЛАД (ON)"; }
+        else e.target.innerText="📦 СКЛАД (OFF)";
     };
 
     document.addEventListener('click', (e) => {
@@ -300,8 +300,6 @@
         }
     });
 
-    document.getElementById('toggle-maint').onclick = () => set(ref(db, 'settings/maintenance'), !maint);
-
     document.getElementById('save-all').onclick = () => {
         const p = [], d = [], s = [], b = [];
         document.querySelectorAll('.product-card').forEach(card => {
@@ -312,10 +310,10 @@
             const bc = card.querySelector('.badge').className;
             b.push(bc.includes('hit')?'hit':bc.includes('promo')?'promo':bc.includes('new')?'new':'');
         });
-        set(ref(db, 'catalog'), { prices: p, descs: d, stock: s, badges: b }).then(() => location.reload());
+        set(ref(db, 'catalog'), { prices: p, descs: d, stock: s, badges: b }).then(() => alert("ЗБЕРЕЖЕНО В БАЗУ!"));
     };
 
-    push(ref(db, "visits"), { visitor: localStorage.getItem('hubDeviceId'), time: serverTimestamp() });
+    push(ref(db, "visits"), { visitor: localStorage.getItem('hubDeviceId') || 'guest', time: serverTimestamp() });
 </script>
 </body>
 </html>
