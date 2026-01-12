@@ -25,10 +25,13 @@
 
         body { 
             background: radial-gradient(circle at top right, #1a0b2e, #0d0216); 
-            margin: 0; padding-bottom: 120px; 
+            background-attachment: fixed;
+            margin: 0; 
+            padding-bottom: calc(100px + env(safe-area-inset-bottom)); 
             font-family: 'Segoe UI', system-ui, sans-serif; 
             color: white; overflow-x: hidden; 
             -webkit-tap-highlight-color: transparent; 
+            min-height: 100vh;
         }
         
         header { 
@@ -50,13 +53,8 @@
         .product-desc { font-size: 11px; font-weight: 600; min-height: 28px; line-height: 1.2; margin: 4px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .price { font-weight: 800; font-size: 11px; color: var(--accent-blue); margin-top: auto; }
 
-        /* --- MODERN LIQUID STICKERS --- */
-        .badge { 
-            position: absolute; top: 8px; left: 8px; padding: 4px 10px; 
-            border-radius: 12px; font-size: 10px; font-weight: 900; z-index: 5; 
-            display: none; text-transform: uppercase; backdrop-filter: blur(8px); 
-            color: white; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,198,255,0.3);
-        }
+        /* --- СТІКЕРИ --- */
+        .badge { position: absolute; top: 8px; left: 8px; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 900; z-index: 5; display: none; text-transform: uppercase; backdrop-filter: blur(8px); color: white; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,198,255,0.3); }
         .badge-hit { display: block !important; background: linear-gradient(135deg, #ff0055, #ff3366); animation: glow 2s infinite alternate; }
         .badge-promo { display: block !important; background: linear-gradient(135deg, #ffd900, #ffea00); color: black; animation: glow-yellow 2s infinite alternate; }
         .badge-new { display: block !important; background: linear-gradient(135deg, #00ff99, #00cc66); animation: glow-green 2s infinite alternate; }
@@ -68,17 +66,24 @@
         .out-of-stock { opacity: 0.4; filter: grayscale(1); }
         .out-of-stock::after { content: "SOLD OUT"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); background: #ff0055; padding: 5px 12px; border-radius: 8px; font-size: 10px; font-weight: 900; color: white; z-index: 10; }
 
-        /* --- INFO STYLE --- */
+        /* --- ІНФО БЕЗ ПІДСВІЧУВАННЯ --- */
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .info-card { 
-            background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); 
-            border-radius: 22px; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; 
-            text-decoration: none; color: white; transition: 0.2s; backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.04); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 22px; padding: 20px 10px; 
+            display: flex; flex-direction: column; align-items: center; 
+            text-decoration: none; color: white; transition: 0.2s; 
+            backdrop-filter: blur(10px);
         }
         .info-card:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); }
-        .info-icon { font-size: 30px; margin-bottom: 8px; filter: drop-shadow(0 0 8px var(--accent-blue)); }
+        .info-icon { font-size: 30px; margin-bottom: 8px; /* Підсвічування прибрано */ }
         .info-card span { font-size: 12px; font-weight: 800; text-transform: uppercase; }
-        .full-width { grid-column: span 2; flex-direction: row; gap: 15px; padding: 18px; background: linear-gradient(135deg, rgba(36, 161, 222, 0.2), rgba(0, 198, 255, 0.05)); }
+        .full-width { 
+            grid-column: span 2; flex-direction: row; gap: 15px; padding: 18px; 
+            background: rgba(255, 255, 255, 0.04); /* Градієнт прибрано */
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
         .section-label { grid-column: span 2; font-size: 11px; color: #666; text-transform: uppercase; margin-top: 15px; margin-left: 5px; font-weight: 800; }
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav-bg); backdrop-filter: blur(15px); display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); z-index: 1000; border-top: 1px solid rgba(255,255,255,0.1); }
@@ -91,7 +96,8 @@
         .admin-btn { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 10px; border: none; background: var(--accent-blue); color: white; font-weight: bold; cursor: pointer; }
         .active-mode { background: var(--accent-pink) !important; }
         
-        #maintenance-overlay { position: fixed; inset: 0; z-index: 99999; background: radial-gradient(circle at top, #1a0b2e, #0d0216); display: none; align-items: center; justify-content: center; text-align: center; color: white; }
+        #maintenance-overlay { position: fixed; inset: 0; z-index: 100000; background: radial-gradient(circle at top, #1a0b2e, #0d0216); display: none; align-items: center; justify-content: center; text-align: center; color: white; }
+        html.force-admin #maintenance-overlay { display: none !important; }
         .hidden { display: none !important; }
         [contenteditable="true"] { outline: 2px dashed var(--accent-pink); background: rgba(233, 30, 99, 0.1); }
     </style>
@@ -101,23 +107,23 @@
 <header><div class="logo">SMOKE HUB</div></header>
 
 <div class="container" id="main-container">
-    <h1 id="page-title" style="text-align: center; font-size: 16px; text-transform: uppercase; letter-spacing: 2px;">Заливка</h1>
+    <h1 id="page-title" style="text-align: center; font-size: 18px; text-transform: uppercase; letter-spacing: 2px;">Заливка</h1>
 
     <div id="cat-zalivka" class="cat-section">
         <div class="product-grid">
             <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/spermint.jpg"></div><h3 class="product-desc">Spermint 2 ml</h3><div class="price">6 zł/70 грн</div></div>
             <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/Double-grape.jpg"></div><h3 class="product-desc">Double-grape 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/apple-mixed.jpg"></div><h3 class="product-desc">Apple-mixed 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blackcurrant-grape.jpg"></div><h3 class="product-desc">Blackcurrant-grape 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blueberry-currant.jpg"></div><h3 class="product-desc">Blueberry-currant 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermalon-melon.jpg"></div><h3 class="product-desc">Watermelon-melon 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cranberry-mors.jpg"></div><h3 class="product-desc">Cranberry-mors 2ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/double-raspberry.jpg"></div><h3 class="product-desc">Double-raspberry 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cola-lemon.jpg"></div><h3 class="product-desc">Cola-lemon 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/RedBull-blueraspberry.jpg"></div><h3 class="product-desc">RedBull-blueraspberry 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/pineapple-lemonade.jpg"></div><h3 class="product-desc">Pineapple-lemonade 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/apple-mixed.jpg"></div><h3 class="product-desc">Apple Mixed 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blackcurrant-grape.jpg"></div><h3 class="product-desc">Blackcurrant Grape 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blueberry-currant.jpg"></div><h3 class="product-desc">Blueberry Currant 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermalon-melon.jpg"></div><h3 class="product-desc">Watermelon Melon 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cranberry-mors.jpg"></div><h3 class="product-desc">Cranberry Mors 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/double-raspberry.jpg"></div><h3 class="product-desc">Double Raspberry 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cola-lemon.jpg"></div><h3 class="product-desc">Cola Lemon 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/RedBull-blueraspberry.jpg"></div><h3 class="product-desc">RedBull Blue Raspberry 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/pineapple-lemonade.jpg"></div><h3 class="product-desc">Pineapple Lemonade 2 ml</h3><div class="price">6 zł/70 грн</div></div>
             <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/multifruit.jpg"></div><h3 class="product-desc">Multifruit 2 ml</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/bali-triple-shot.jpg"></div><h3 class="product-desc">Balitriple-shot 2 ml</h3><div class="price">6 zł/70 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/bali-triple-shot.jpg"></div><h3 class="product-desc">Bali Triple Shot 2 ml</h3><div class="price">6 zł/70 грн</div></div>
         </div>
     </div>
 
@@ -125,17 +131,17 @@
         <div class="product-grid">
             <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/spermint.jpg"></div><h3 class="product-desc">Spermint 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
             <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/Double-grape.jpg"></div><h3 class="product-desc">Double-grape 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/apple-mixed.jpg"></div><h3 class="product-desc">Apple-mixed 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blackcurrant-grape.jpg"></div><h3 class="product-desc">Blackcurrant-grape 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blueberry-currant.jpg"></div><h3 class="product-desc">Blueberry-currant 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermalon-melon.jpg"></div><h3 class="product-desc">Watermelon-melon 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cranberry-mors.jpg"></div><h3 class="product-desc">Cranberry-mors 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/double-raspberry.jpg"></div><h3 class="product-desc">Double-raspberry 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cola-lemon.jpg"></div><h3 class="product-desc">Cola-lemon 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/RedBull-blueraspberry.jpg"></div><h3 class="product-desc">RedBull-blueraspberry 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/pineapple-lemonade.jpg"></div><h3 class="product-desc">Pineapple-lemonade 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/apple-mixed.jpg"></div><h3 class="product-desc">Apple Mixed 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blackcurrant-grape.jpg"></div><h3 class="product-desc">Blackcurrant Grape 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blueberry-currant.jpg"></div><h3 class="product-desc">Blueberry Currant 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermalon-melon.jpg"></div><h3 class="product-desc">Watermelon Melon 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cranberry-mors.jpg"></div><h3 class="product-desc">Cranberry Mors 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/double-raspberry.jpg"></div><h3 class="product-desc">Double Raspberry 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cola-lemon.jpg"></div><h3 class="product-desc">Cola Lemon 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/RedBull-blueraspberry.jpg"></div><h3 class="product-desc">RedBull Blue Raspberry 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/pineapple-lemonade.jpg"></div><h3 class="product-desc">Pineapple Lemonade 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
             <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/multifruit.jpg"></div><h3 class="product-desc">Multifruit 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/bali-triple-shot.jpg"></div><h3 class="product-desc">Balitriple-shot 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
+            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/bali-triple-shot.jpg"></div><h3 class="product-desc">Bali Triple Shot 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
             <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/chaser-ultra-granat.jpg"></div><h3 class="product-desc">Granat 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
             <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/chaser-7years-pamberry.jpg"></div><h3 class="product-desc">Pamberry 30 ml 5%</h3><div class="price">60 zł/700 грн</div></div>
         </div>
@@ -158,7 +164,7 @@
             <a href="kwiz.html" class="info-card"><div class="info-icon">🍷</div><span>Смаки</span></a>
             <div class="info-card" id="admin-trigger"><div class="info-icon">🔐</div><span>Адмін</span></div>
             <div class="section-label">Соцмережі</div>
-            <a href="https://t.me/liquid_br" target="_blank" class="info-card full-width"><div class="info-icon" style="margin:0">✈️</div><span>Telegram Канал</span></a>
+            <a href="https://t.me/liquid_br" target="_blank" class="info-card full-width"><div class="info-icon">✈️</div><span>Telegram Канал</span></a>
         </div>
     </div>
 </div>
@@ -182,7 +188,6 @@
     </select>
     <button class="admin-btn" id="toggle-maint">🛠 ТЕХ. РОБОТИ</button>
     <button class="admin-btn" style="background:var(--accent-pink); margin-top:15px;" id="save-all">💾 ЗБЕРЕГТИ ВСЕ</button>
-    <button class="admin-btn" style="background:#000;" onclick="localStorage.removeItem('hubDeviceId'); sessionStorage.clear(); location.reload();">🚪 ВИЙТИ</button>
 </div>
 
 <div id="maintenance-overlay">
@@ -205,7 +210,6 @@
         } catch (e) { return false; }
     }
 
-    // Таби
     document.querySelectorAll('.nav-item').forEach(btn => {
         btn.onclick = () => {
             const tab = btn.dataset.tab;
@@ -218,7 +222,6 @@
         };
     });
 
-    // Firebase Дані
     onValue(ref(db, 'catalog'), (snap) => {
         const data = snap.val();
         if(data) {
@@ -234,7 +237,6 @@
         }
     });
 
-    // Обслуговування
     let maint = false;
     onValue(ref(db, 'settings/maintenance'), (snap) => {
         maint = snap.val() === true;
@@ -243,14 +245,13 @@
         document.body.style.overflow = (maint && !isAdmin) ? 'hidden' : '';
     });
 
-    // Вхід в адмінку
     const openAdmin = async () => {
         if(sessionStorage.getItem('isHubAdmin') === 'true') {
             document.getElementById('dev-menu').classList.toggle('active');
             return;
         }
         if (localStorage.getItem('faceIdEnabled') && await faceIdAuth()) { loginAdmin(); return; }
-        const key = prompt("ВВЕДІТЬ КЛЮЧ:");
+        const key = prompt("КЛЮЧ:");
         if (key === "smokehub2026") {
             if (confirm("Увімкнути Face ID?")) localStorage.setItem('faceIdEnabled', 'true');
             loginAdmin();
@@ -269,34 +270,23 @@
     document.body.appendChild(secret);
     secret.onclick = openAdmin;
 
-    // Редагування
     let editMode = null;
-    const resetModes = () => {
-        document.querySelectorAll('.price, .product-desc').forEach(el => el.contentEditable = false);
-        document.querySelectorAll('.admin-btn').forEach(btn => btn.classList.remove('active-mode'));
-    };
-
     document.getElementById('edit-price').onclick = (e) => {
         editMode = (editMode === 'price' ? null : 'price');
-        resetModes();
-        if(editMode==='price') {
-            e.target.classList.add('active-mode'); e.target.innerText="💰 ЦІНИ (ON)";
-            document.querySelectorAll('.price').forEach(el=>el.contentEditable=true);
-        } else e.target.innerText="💰 ЦІНИ (OFF)";
+        document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode'));
+        document.querySelectorAll('.price').forEach(el=>el.contentEditable=(editMode==='price'));
+        if(editMode==='price') e.target.classList.add('active-mode');
     };
     document.getElementById('edit-desc').onclick = (e) => {
         editMode = (editMode === 'desc' ? null : 'desc');
-        resetModes();
-        if(editMode==='desc') {
-            e.target.classList.add('active-mode'); e.target.innerText="📝 НАЗВИ (ON)";
-            document.querySelectorAll('.product-desc').forEach(el=>el.contentEditable=true);
-        } else e.target.innerText="📝 НАЗВИ (OFF)";
+        document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode'));
+        document.querySelectorAll('.product-desc').forEach(el=>el.contentEditable=(editMode==='desc'));
+        if(editMode==='desc') e.target.classList.add('active-mode');
     };
     document.getElementById('edit-stock').onclick = (e) => {
         editMode = (editMode === 'stock' ? null : 'stock');
-        resetModes();
-        if(editMode==='stock') { e.target.classList.add('active-mode'); e.target.innerText="📦 СКЛАД (ON)"; }
-        else e.target.innerText="📦 СКЛАД (OFF)";
+        document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode'));
+        if(editMode==='stock') e.target.classList.add('active-mode');
     };
 
     document.addEventListener('click', (e) => {
@@ -322,7 +312,7 @@
             const bc = card.querySelector('.badge').className;
             b.push(bc.includes('hit')?'hit':bc.includes('promo')?'promo':bc.includes('new')?'new':'');
         });
-        set(ref(db, 'catalog'), { prices: p, descs: d, stock: s, badges: b }).then(() => alert("Збережено!"));
+        set(ref(db, 'catalog'), { prices: p, descs: d, stock: s, badges: b }).then(() => location.reload());
     };
 
     push(ref(db, "visits"), { visitor: localStorage.getItem('hubDeviceId'), time: serverTimestamp() });
