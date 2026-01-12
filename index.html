@@ -668,10 +668,27 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
+    // ===== ADMIN AUTODEVICE =====
+function getDeviceId() {
+    let id = localStorage.getItem('hubDeviceId');
+    if (!id) {
+        id = 'hub-' + crypto.randomUUID();
+        localStorage.setItem('hubDeviceId', id);
+    }
+    return id;
+}
     const firebaseConfig = { databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/" };
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+
+    // ===== AUTO ADMIN LOGIN =====
+const deviceId = getDeviceId();
+
+onValue(ref(db, 'admins/devices/' + deviceId), (snap) => {
+    if (snap.val() === true) {
+        sessionStorage.setItem('isHubAdmin', 'true');
+    }
+});
 
     onValue(ref(db, 'catalog'), (snap) => {
         const data = snap.val();
@@ -919,6 +936,7 @@ async function faceIdLogin() {
             }
         });
         sessionStorage.setItem('isHubAdmin', 'true');
+        set(ref(db, 'admins/devices/' + getDeviceId()), true);
         document.getElementById('dev-menu').classList.add('active');
         return true;
     } catch(e) {
@@ -932,6 +950,7 @@ function checkSecretKey() {
     const key = document.getElementById('secret-key').value;
     if(key === ADMIN_SECRET_KEY){
         sessionStorage.setItem('isHubAdmin', 'true');
+        set(ref(db, 'admins/devices/' + getDeviceId()), true);
         localStorage.setItem('faceKeyRegistered', 'true'); // автоматично реєструємо Face ID
         alert("Секретний ключ прийнято! Адмінка відкрита.");
         closePanels();
@@ -982,7 +1001,9 @@ hiddenBtn.addEventListener('click', async () => {
 
     document.getElementById('admin-card').addEventListener('click', async (e) => {
     e.preventDefault();
-    const isAdmin = sessionStorage.getItem('isHubAdmin') === 'true';
+    const isAdmin =
+    sessionStorage.getItem('isHubAdmin') === 'true' ||
+    localStorage.getItem('hubDeviceId') !== null;
     if(isAdmin) {
         toggleAdminPanel(); // просто відкриваємо панель
         return;
@@ -1019,6 +1040,7 @@ hiddenBtn.addEventListener('click', async () => {
 </div>
 </body>
 </html>
+
 
 
 
