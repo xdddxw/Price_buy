@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
+    <script>
+    // ===== HARD ADMIN PRECHECK =====
+    if (localStorage.getItem('hubDeviceId')) {
+        document.documentElement.classList.add('force-admin');
+    }
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SMOKE HUB</title>
@@ -10,7 +16,8 @@
     <meta property="og:image" content="https://xdddxw.github.io/Price_buy/images/logo.png">
     <link rel="apple-touch-icon" href="images/logo.png">
     <link rel="icon" type="image/png" href="images/logo.png">
-    
+
+
     <style>
         :root {
             --bg: #0d0216;
@@ -237,6 +244,12 @@
         #admin-card { cursor: pointer; }
 
     </style>
+    <style>
+html.force-admin #maintenance-overlay {
+    display: none !important;
+}
+</style>
+
 </head>
 <body>
    <div id="pwa-toast" 
@@ -773,7 +786,7 @@ window.togglePayment = function () {
     set(ref(db, 'settings/payment'), !paymentEnabled);
 };
 
-    // ===== MAINTENANCE MODE (FIXED) =====
+    // ===== MAINTENANCE MODE (ADMIN-FIRST) =====
 let maintenanceEnabled = false;
 
 onValue(ref(db, 'settings/maintenance'), (snap) => {
@@ -783,13 +796,15 @@ onValue(ref(db, 'settings/maintenance'), (snap) => {
     const btn = document.getElementById('btn-toggle-maintenance');
 
     const isAdmin =
-    sessionStorage.getItem('isHubAdmin') === 'true' || isAutoAdmin;
+        document.documentElement.classList.contains('force-admin') ||
+        sessionStorage.getItem('isHubAdmin') === 'true';
 
     if (maintenanceEnabled && !isAdmin) {
+        overlay.hidden = false;
         overlay.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     } else {
-        overlay.style.display = 'none';
+        overlay.hidden = true;
         document.body.style.overflow = '';
     }
 
@@ -1025,8 +1040,7 @@ hiddenBtn.addEventListener('click', async () => {
 
 </script>
 
-    <div id="maintenance-overlay" style="
-    display:none;
+    <div id="maintenance-overlay" hidden style="
     position:fixed;
     inset:0;
     z-index:100000;
@@ -1037,6 +1051,7 @@ hiddenBtn.addEventListener('click', async () => {
     text-align:center;
     padding:20px;
 ">
+
 
     <div style="max-width:320px;">
         <img src="images/logo.png" style="width:80px;border-radius:20px;margin-bottom:20px;">
@@ -1049,6 +1064,7 @@ hiddenBtn.addEventListener('click', async () => {
 </div>
 </body>
 </html>
+
 
 
 
