@@ -695,7 +695,9 @@ body.admin-mode #maintenance-overlay {
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, push, set, onValue, remove, serverTimestamp } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
     // ===== ADMIN AUTODEVICE =====
 function getDeviceId() {
     let id = localStorage.getItem('hubDeviceId');
@@ -708,6 +710,30 @@ function getDeviceId() {
     const firebaseConfig = { databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/" };
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+
+    // ===== VISITOR LOG =====
+function getVisitorId() {
+  let id = localStorage.getItem("visitorId");
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("visitorId", id);
+  }
+  return id;
+}
+
+if (!sessionStorage.getItem("visited")) {
+  sessionStorage.setItem("visited", "true");
+
+  push(ref(db, "visits"), {
+    visitorId: getVisitorId(),
+    page: location.pathname,
+    userAgent: navigator.userAgent,
+    language: navigator.language,
+    screen: `${screen.width}x${screen.height}`,
+    time: serverTimestamp()
+  });
+}
+
     // ===== ADMIN STATE =====
 let isAutoAdmin = false;
 
@@ -1108,6 +1134,7 @@ hiddenBtn.addEventListener('click', async () => {
 </div>
 </body>
 </html>
+
 
 
 
