@@ -311,14 +311,32 @@
     secret.style.cssText = "position:fixed; top:0; right:0; width:60px; height:60px; z-index:99999;";
     document.body.appendChild(secret); secret.onclick = login;
 
-    // ТЕХ РОБОТИ
-    let maint = false;
+    // --- ПРАВИЛЬНА ЛОГІКА ТЕХ РОБОТИ ---
+    let currentMaintStatus = false; // Змінна для зберігання поточного стану
+
+    // 1. Слухаємо базу і оновлюємо статус та вигляд кнопки
     onValue(ref(db, 'settings/maintenance'), (snap) => {
-        maint = snap.val() === true;
-        if(maint && !isAdmin()) document.getElementById('maintenance-overlay').style.display='flex';
-        else document.getElementById('maintenance-overlay').style.display='none';
+        currentMaintStatus = snap.val() === true;
+        const overlay = document.getElementById('maintenance-overlay');
+        const btn = document.getElementById('toggle-maint');
+
+        if (currentMaintStatus) {
+            // Увімкнено
+            if (!isAdmin()) overlay.style.display = 'flex';
+            btn.innerText = "🛠 ТЕХ. РОБОТИ (ON)";
+            btn.classList.add('active-mode');
+        } else {
+            // Вимкнено
+            overlay.style.display = 'none';
+            btn.innerText = "🛠 ТЕХ. РОБОТИ (OFF)";
+            btn.classList.remove('active-mode');
+        }
     });
-    document.getElementById('toggle-maint').onclick = () => set(ref(db, 'settings/maintenance'), !maint);
+
+    // 2. Клік по кнопці змінює статус на протилежний
+    document.getElementById('toggle-maint').onclick = () => {
+        set(ref(db, 'settings/maintenance'), !currentMaintStatus);
+    };
 
     // PWA
     let defP; const bnr = document.getElementById('install-banner');
@@ -327,3 +345,4 @@
 </script>
 </body>
 </html>
+
