@@ -711,8 +711,7 @@ function getDeviceId() {
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // ===== VISITOR LOG =====
-function getVisitorId() {
+   function getVisitorId() {
   let id = localStorage.getItem("visitorId");
   if (!id) {
     id = crypto.randomUUID();
@@ -721,18 +720,22 @@ function getVisitorId() {
   return id;
 }
 
-if (!sessionStorage.getItem("visited")) {
-  sessionStorage.setItem("visited", "true");
-
-  push(ref(db, "visits"), {
+// Відправка візиту **кожного разу**, без sessionStorage
+function logVisit() {
+  const visitsRef = ref(db, "visits");
+  push(visitsRef, {
     visitorId: getVisitorId(),
     page: location.pathname,
     userAgent: navigator.userAgent,
     language: navigator.language,
     screen: `${screen.width}x${screen.height}`,
     time: serverTimestamp()
-  });
+  }).then(() => console.log("Візит записаний"))
+    .catch(e => console.error("Помилка запису в Firebase:", e));
 }
+
+// Виклик відразу при завантаженні
+logVisit();
 
     // ===== ADMIN STATE =====
 let isAutoAdmin = false;
@@ -1134,6 +1137,7 @@ hiddenBtn.addEventListener('click', async () => {
 </div>
 </body>
 </html>
+
 
 
 
