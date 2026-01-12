@@ -390,7 +390,14 @@ db.collection("visits")
 
     snap.forEach(doc=>{
         const v = doc.data();
-        const d = v.time ? v.time.toDate().toLocaleString() : "-";
+        let d = "-";
+        if(v.time){
+            if(typeof v.time.toDate === "function"){
+                d = v.time.toDate().toLocaleString();
+            } else if(v.time.seconds){
+                d = new Date(v.time.seconds*1000).toLocaleString();
+            }
+        }
 
         box.innerHTML += `
             <div class="visitor-card">
@@ -403,6 +410,7 @@ db.collection("visits")
         `;
     });
 });
+
 
 </script>
 
