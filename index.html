@@ -340,12 +340,57 @@
         set(ref(db, 'settings/maintenance'), !currentMaintStatus);
     };
 
-    // PWA
-    let defP; const bnr = document.getElementById('install-banner');
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); defP = e; bnr.style.display = 'block'; });
-    document.getElementById('close-install').onclick = () => bnr.style.display = 'none';
+   // --- ПОВНІСТЮ ВИПРАВЛЕНИЙ БЛОК PWA ---
+    let deferredPrompt;
+    const banner = document.getElementById('install-banner');
+    const installBtn = document.getElementById('install-button');
+    const closeBnr = document.getElementById('close-install');
+
+    // 1. Слухач для Android/Chrome
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        // Показуємо баннер через 3 секунди після завантаження
+        setTimeout(() => {
+            if (!sessionStorage.getItem('pwaClosed')) {
+                banner.style.display = 'block';
+            }
+        }, 3000);
+    });
+
+    // 2. Логіка для iPhone (iOS) - показуємо інструкцію, бо кнопки "Встановити" там немає в коді
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.navigator.standalone === true;
+
+    if (isIOS && !isStandalone) {
+        setTimeout(() => {
+            if (!sessionStorage.getItem('pwaClosed')) {
+                const bnrText = document.querySelector('#install-banner div:nth-child(2)');
+                if(bnrText) bnrText.innerText = "Натисніть 'Поділитися' та 'Додати на початковий екран' 📲";
+                installBtn.style.display = 'none'; // Ховаємо кнопку, бо в iOS вона не працює програмно
+                banner.style.display = 'block';
+            }
+        }, 4000);
+    }
+
+    // Кнопка встановлення (Android)
+    installBtn.onclick = async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') banner.style.display = 'none';
+            deferredPrompt = null;
+        }
+    };
+
+    // Закриття баннера
+    closeBnr.onclick = () => {
+        banner.style.display = 'none';
+        sessionStorage.setItem('pwaClosed', 'true'); // Запам'ятовуємо, що користувач закрив його
+    };
 </script>
 </body>
 </html>
+
 
 
