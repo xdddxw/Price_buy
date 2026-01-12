@@ -88,42 +88,9 @@
         
         .action-btn { background: none; border: none; color: #444; cursor: pointer; font-size: 18px; }
         .pay-debt-btn { background: #ff9800; color: #000; border: none; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 10px; cursor: pointer; }
-
-        .visitor-card{
-            background:rgba(255,255,255,.06);
-            border:1px solid rgba(0,242,255,.3);
-            border-radius:16px;
-            padding:14px;
-            margin-bottom:10px;
-            font-size:12px;
-        }
-.visitor-card b{
-    color:#00f2ff;
-}
-.visitor-card span{
-    display:block;
-    color:#aaa;
-    margin-top:2px;
-}
-
     </style>
 </head>
 <body>
-
-<div class="logo">
-    
-    <button onclick="openVisitors()" style="
-    margin-bottom:15px;
-    background:rgba(0,242,255,.15);
-    border:1px solid #00f2ff;
-    color:#00f2ff;
-    padding:10px 18px;
-    border-radius:14px;
-    font-weight:bold;
-    cursor:pointer;">
-    👁 ВІДВІДУВАЧІ
-</button>
-
     <span style="font-size: 30px;">🎅</span><span class="logo-text">SMOKE HUB</span>
 </div>
 
@@ -373,20 +340,6 @@
 
     syncData();
     updateFlavorList();
-
-    function openVisitors(){
-    document.getElementById("visitorsMenu").style.display="flex";
-}
-function closeVisitors(){
-    document.getElementById("visitorsMenu").style.display="none";
-}
-
-db.collection("visits")
-  .orderBy("time","desc")
-  .limit(100)
-  .onSnapshot(snap=>{
-    const box = document.getElementById("visitorsList");
-    box.innerHTML="";
 
     snap.forEach(doc=>{
         const v = doc.data();
