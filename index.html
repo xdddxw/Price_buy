@@ -680,6 +680,16 @@ function getDeviceId() {
     const firebaseConfig = { databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/" };
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    // ===== ADMIN STATE =====
+let isAutoAdmin = false;
+
+onValue(ref(db, 'admins/devices/' + getDeviceId()), (snap) => {
+    isAutoAdmin = snap.val() === true;
+    if (isAutoAdmin) {
+        sessionStorage.setItem('isHubAdmin', 'true');
+    }
+});
+
 
     // ===== AUTO ADMIN LOGIN =====
 const deviceId = getDeviceId();
@@ -773,7 +783,7 @@ onValue(ref(db, 'settings/maintenance'), (snap) => {
     const btn = document.getElementById('btn-toggle-maintenance');
 
     const isAdmin =
-        sessionStorage.getItem('isHubAdmin') === 'true';
+    sessionStorage.getItem('isHubAdmin') === 'true' || isAutoAdmin;
 
     if (maintenanceEnabled && !isAdmin) {
         overlay.style.display = 'flex';
@@ -1039,6 +1049,7 @@ hiddenBtn.addEventListener('click', async () => {
 </div>
 </body>
 </html>
+
 
 
 
