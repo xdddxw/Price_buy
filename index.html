@@ -763,9 +763,7 @@ window.togglePayment = function () {
     set(ref(db, 'settings/payment'), !paymentEnabled);
 };
 
-</script>
- <script>   
-    // ===== MAINTENANCE MODE =====
+    // ===== MAINTENANCE MODE (FIXED) =====
 let maintenanceEnabled = false;
 
 onValue(ref(db, 'settings/maintenance'), (snap) => {
@@ -773,7 +771,9 @@ onValue(ref(db, 'settings/maintenance'), (snap) => {
 
     const overlay = document.getElementById('maintenance-overlay');
     const btn = document.getElementById('btn-toggle-maintenance');
-    const isAdmin = sessionStorage.getItem('isHubAdmin') === 'true';
+
+    const isAdmin =
+        sessionStorage.getItem('isHubAdmin') === 'true';
 
     if (maintenanceEnabled && !isAdmin) {
         overlay.style.display = 'flex';
@@ -793,7 +793,6 @@ onValue(ref(db, 'settings/maintenance'), (snap) => {
 window.toggleMaintenance = function () {
     set(ref(db, 'settings/maintenance'), !maintenanceEnabled);
 };
-</script>
 </script>
 
 <script>
@@ -1023,12 +1022,12 @@ hiddenBtn.addEventListener('click', async () => {
     z-index:100000;
     background: radial-gradient(circle at top, #1a0b2e, #0d0216);
     color:white;
-    display:flex;
     align-items:center;
     justify-content:center;
     text-align:center;
     padding:20px;
 ">
+
     <div style="max-width:320px;">
         <img src="images/logo.png" style="width:80px;border-radius:20px;margin-bottom:20px;">
         <h2 style="margin:0 0 10px;">Технічне обслуговування</h2>
@@ -1040,6 +1039,7 @@ hiddenBtn.addEventListener('click', async () => {
 </div>
 </body>
 </html>
+
 
 
 
