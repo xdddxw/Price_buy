@@ -94,6 +94,64 @@
         #maintenance-overlay { position: fixed; inset: 0; z-index: 1000000; background: radial-gradient(circle at top, #1a0b2e, #0d0216); display: none; align-items: center; justify-content: center; text-align: center; color: white; }
         .hidden { display: none !important; }
         [contenteditable="true"] { outline: 2px dashed var(--accent-pink); background: rgba(233, 30, 99, 0.1); border-radius: 4px; }
+
+        /* === РЕКЛАМНИЙ БАНЕР === */
+.promo-slider {
+    margin: 10px 0 20px 0;
+    width: 100%;
+    height: 120px; /* Оптимальна висота для мобільних */
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    background: #000;
+}
+
+.promo-track {
+    display: flex;
+    height: 100%;
+    transition: transform .6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.promo-slide {
+    min-width: 100%;
+    position: relative;
+}
+
+.promo-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.promo-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+}
+
+.promo-content {
+    position: absolute;
+    left: 15px;
+    bottom: 15px;
+    z-index: 2;
+}
+
+.promo-content h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.promo-content p {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--accent-blue);
+    font-weight: 700;
+}
     </style>
 </head>
 <body>
@@ -102,6 +160,29 @@
 
 <header><div class="logo">SMOKE HUB</div></header>
 
+    
+    <div class="promo-slider">
+    <div class="promo-track" id="promoTrack">
+        <div class="promo-slide">
+            <img src="images/banner1.gif" alt="promo">
+            <div class="promo-overlay"></div>
+            <div class="promo-content">
+                <h2>🔥 АКЦІЯ</h2>
+                <p>3 заливки — 16 zł</p>
+            </div>
+        </div>
+        <div class="promo-slide">
+            <img src="images/banner1.gif" alt="promo">
+            <div class="promo-overlay"></div>
+            <div class="promo-content">
+                <h2>🆕 НОВИНКИ</h2>
+                <p>Нові смаки 2026</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
 <div class="container" id="main-container">
     <h1 id="page-title" style="text-align: center; font-size: 16px; text-transform: uppercase; letter-spacing: 2px;">Заливка</h1>
 
@@ -407,6 +488,19 @@
         }
     };
     closeBnr.onclick = () => { banner.style.display = 'none'; sessionStorage.setItem('pwaClosed', 'true'); };
+
+    // Логіка слайдера банера
+const pTrack = document.getElementById('promoTrack');
+const pSlides = pTrack.querySelectorAll('.promo-slide');
+let pIndex = 0;
+
+if (pSlides.length > 1) {
+    setInterval(() => {
+        pIndex = (pIndex + 1) % pSlides.length;
+        pTrack.style.transform = `translateX(-${pIndex * 100}%)`;
+    }, 5000);
+}
 </script>
 </body>
 </html>
+
