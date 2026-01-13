@@ -16,6 +16,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" sizes="180x180" href="images/logo.png">
+    <meta name="theme-color" content="#0d0216">
+    <meta name="msapplication-navbutton-color" content="#0d0216">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <style>
         :root { 
@@ -56,6 +59,23 @@ body {
     padding: 10px;
     width: 100%;
     box-sizing: border-box; /* Щоб падінги не додавалися до ширини 100% */
+}
+
+        html {
+    /* Важливо: фіксуємо висоту і колір фону */
+    height: 100%;
+    background-color: #0d0216; /* Твій основний колір фону */
+    overflow: hidden; 
+}
+
+body {
+    height: 100%;
+    overflow-y: auto; /* Дозволяємо вертикальний скрол тільки тут */
+    /* Вимикаємо ефект відскоку в обох напрямках */
+    overscroll-behavior: none; 
+    -webkit-overflow-scrolling: touch; /* Плавний скрол на iOS */
+    background: radial-gradient(circle at top right, #1a0b2e, #0d0216);
+    margin: 0;
 }
 
         /* --- СНІГ --- */
@@ -355,12 +375,18 @@ body {
         snowContainer.appendChild(snowflake);
     }
 
-    // Примусова фіксація горизонтальної прокрутки
-window.addEventListener('scroll', () => {
-    if (window.scrollX !== 0) {
-        window.scrollTo(0, window.scrollY);
-    }
-}, { passive: true });
+        // Примусова фіксація горизонтальної прокрутки
+            window.addEventListener('scroll', () => {
+                if (window.scrollX !== 0) {
+                    window.scrollTo(0, window.scrollY);
+                }
+            }, { passive: true });
+            
+                document.addEventListener('touchmove', function(e) {
+                if (window.scrollY <= 0 && e.touches[0].pageY > e.touches[0].clientY) {
+        // Якщо ми в самому верху і тягнемо вниз — блокуємо
+                }
+            }, { passive: false });
     
     // ТАБИ (Банер працює на всіх вкладках, крім ІНФО)
     document.querySelectorAll('.nav-item').forEach(btn => {
@@ -569,6 +595,7 @@ if (pTrack && pSlides.length > 0) {
 </script>
 </body>
 </html>
+
 
 
 
