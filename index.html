@@ -27,11 +27,17 @@
             --nav-bg: rgba(20, 5, 35, 0.98); 
             --font-main: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
         }
+        html {
+            background: #0d0216;
+            /* Прибираємо фіксовану висоту */
+            height: auto;
+            min-height: 100%;
+        }
 
-         /* ПРИХОВУЄМО СКРОЛБАР ВСЮДИ */
+        /* ПРИХОВУЄМО СКРОЛБАР ВСЮДИ */
         * {
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE/Edge */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
         *::-webkit-scrollbar {
             display: none !important;
@@ -39,28 +45,28 @@
             height: 0 !important;
         }
 
-        html {
-            background: #0d0216;
-            height: 100%;
-            overflow: hidden; /* Фіксуємо вікно браузера від зайвих рухів */
-        }
-
         body {
-            height: 100%;
+            /* Дозволяємо контенту самому визначати висоту */
+            min-height: 100vh;
+            height: auto;
             margin: 0;
-            /* Відступ для меню + безпечна зона iPhone */
-            padding-bottom: calc(130px + env(safe-area-inset-bottom)); 
+            
+            /* Оптимальний відступ: рівно стільки, щоб меню не закривало картку */
+            padding-bottom: calc(90px + env(safe-area-inset-bottom)); 
+            
             background: radial-gradient(circle at top right, #1a0b2e, #0d0216);
             background-attachment: fixed;
             font-family: var(--font-main);
             color: white;
             
-            overflow-y: auto; /* Вертикальний скрол тільки тут */
-            overflow-x: hidden; /* Заборона горизонтального скролу */
+            /* Скрол без смужки */
+            overflow-y: auto;
+            overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
             
-            touch-action: pan-y; /* Тільки вертикальні жести */
-            overscroll-behavior-y: none; /* Вимикає білий відскок (rubber banding) */
+            /* Блокуємо білу пустоту при ривках */
+            overscroll-behavior-y: none;
+            touch-action: pan-y;
             box-sizing: border-box;
         }
 
@@ -68,6 +74,8 @@
             padding: 10px;
             width: 100%;
             box-sizing: border-box;
+            /* Важливо: прибираємо будь-які min-height тут */
+            min-height: auto; 
         }
 
         /* --- СНІГ --- */
@@ -589,6 +597,7 @@ if (pTrack && pSlides.length > 0) {
 </script>
 </body>
 </html>
+
 
 
 
