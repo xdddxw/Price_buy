@@ -19,14 +19,12 @@ body {
   overflow: hidden;
 }
 
-/* СНІГ */
 .snowflake {
   position: fixed; color: white; font-size: 1em; opacity: 0.8;
   pointer-events: none; z-index: 9999; animation: fall linear infinite;
 }
 @keyframes fall { to { transform: translateY(110vh); } }
 
-/* ЛОГО */
 .logo { display: flex; align-items: center; gap: 10px; margin: 15px 0 5px; flex-shrink: 0; }
 .logo-icon { font-size: 24px; }
 .logo-text {
@@ -37,36 +35,21 @@ body {
 }
 @keyframes gradient-move { to { background-position: 200% center; } }
 
-/* КАРТКА */
 .card {
-  width: 92%; 
-  max-width: 400px; 
-  max-height: 85vh; 
-  background: rgba(255,255,255,0.07);
-  padding: 15px;
-  border-radius: 20px;
-  backdrop-filter: blur(10px);
+  width: 92%; max-width: 400px; max-height: 85vh; 
+  background: rgba(255,255,255,0.07); padding: 15px;
+  border-radius: 20px; backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,0.1);
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+  display: flex; flex-direction: column; box-sizing: border-box;
 }
 
-.card-static-top { flex-shrink: 0; width: 100%; }
-
-/* СКРОЛ СПИСКУ */
 .list-scrollable {
-  overflow-y: auto;
-  flex-grow: 1;
-  min-height: 0;
-  margin: 10px 0;
-  padding-right: 5px;
-  -webkit-overflow-scrolling: touch;
+  overflow-y: auto; flex-grow: 1; min-height: 0;
+  margin: 10px 0; padding-right: 5px;
 }
 .list-scrollable::-webkit-scrollbar { width: 4px; }
 .list-scrollable::-webkit-scrollbar-thumb { background: #ff0055; border-radius: 10px; }
 
-/* КНОПКИ */
 .buttons button, .back-btn, .wheel-again-btn {
   padding: 14px; border-radius: 12px; border: none; font-size: 16px;
   cursor: pointer; width: 100%; font-weight: bold; text-align: center;
@@ -76,39 +59,30 @@ body {
 .buttons { display: flex; flex-direction: column; gap: 10px; }
 .buttons button { background: rgba(255,255,255,0.1); color: #fff; }
 .back-btn { background: rgba(255,255,255,0.15); color: #fff; text-decoration: none; margin-bottom: 10px; display: block; }
-.wheel-again-btn { background: linear-gradient(90deg,#ff2f92,#ff005d); color: #fff; margin-top: 10px; flex-shrink: 0; display: none; }
+.wheel-again-btn { background: linear-gradient(90deg,#ff2f92,#ff005d); color: #fff; margin-top: 10px; display: none; }
 
-/* РОЗМИТИЙ ФОН ПРИ КРУТІННІ (ВИПРАВЛЕНО) */
 #wheel-overlay { 
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: rgba(11, 4, 22, 0.4); /* Напівпрозорий темний фон */
-    backdrop-filter: blur(15px); /* ТУТ САМЕ РОЗМИТТЯ */
-    -webkit-backdrop-filter: blur(15px); /* Для iPhone */
-    z-index: 10000; display: none; 
-    align-items: center; justify-content: center; 
+    background: rgba(11, 4, 22, 0.6); backdrop-filter: blur(15px);
+    z-index: 10000; display: none; align-items: center; justify-content: center; 
 }
 
 .wheel-container { position: relative; width: 280px; height: 280px; border: 5px solid #fff; border-radius: 50%; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
 .pointer { position: absolute; right: -25px; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-top: 15px solid transparent; border-bottom: 15px solid transparent; border-right: 35px solid #fff; z-index: 100; }
-#main-wheel { width: 100%; height: 100%; border-radius: 50%; position: relative; overflow: hidden; transition: transform 7s cubic-bezier(0.1, 0, 0, 1); }
-.wheel-label {
-  position: absolute;
-  width: 50%; /* Займає радіус колеса */
-  height: 30px;
-  top: 50%;
-  left: 50%;
-  transform-origin: left center; /* Обертаємо від центру колеса */
-  display: flex;
-  align-items: center;
-  justify-content: flex-end; /* Притискаємо текст до краю колеса */
-  padding-right: 20px; /* Відступ від краю колеса */
-  box-sizing: border-box;
-  font-size: 9px;
-  font-weight: 900;
-  text-transform: uppercase;
-  white-space: nowrap;
-  text-shadow: 1px 1px 2px #000;
-  pointer-events: none;
+
+#main-wheel { 
+    width: 100%; height: 100%; border-radius: 50%; position: relative; 
+    overflow: hidden; transition: transform 7s cubic-bezier(0.1, 0, 0, 1); 
+}
+
+.wheel-label { 
+    position: absolute; width: 50%; height: 20px; 
+    top: calc(50% - 10px); left: 50%; 
+    transform-origin: left center; 
+    display: flex; align-items: center; justify-content: center; 
+    padding-left: 20px; font-size: 8px; font-weight: 900; 
+    text-transform: uppercase; white-space: nowrap; 
+    text-shadow: 1px 1px 2px #000; pointer-events: none;
 }
 
 .result-card { margin-bottom: 10px; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.1); border-left: 4px solid #00f2ff; text-align: left; }
@@ -142,7 +116,7 @@ for(let i=0;i<15;i++){
     <button onclick="pick('mint')">❄️ Холод / Мʼята</button>
     <button onclick="pick('drink')">🥤 Напої</button>
     <button onclick="pick('sweet')">🍰 Десерт</button>
-    <button style="background: #fff; color: #000;" onclick="startWheel()">🎡 Колесо Фортуни</button>
+    <button style="background: #fff; color: #000;" onclick="openWheel()">🎡 Колесо Фортуни</button>
   </div>
 </div>
 
@@ -152,7 +126,7 @@ for(let i=0;i<15;i++){
     <h2 style="text-align: center; margin: 0; font-size: 20px;">🎁 Твій вибір:</h2>
   </div>
   <div class="list-scrollable" id="list"></div>
-  <button id="wheel-btn" class="wheel-again-btn" onclick="startWheel()">Крутити ще 🎡</button>
+  <button id="wheel-btn" class="wheel-again-btn" onclick="openWheel()">Крутити ще 🎡</button>
 </div>
 
 <script>
@@ -174,19 +148,14 @@ const juices = [
 
 const wheel = document.getElementById('main-wheel');
 const step = 360 / juices.length;
-
-let currentRotation = 0; // Зберігаємо стан обертання
+let currentRotation = 0;
 
 function setupWheel() {
-    const step = 360 / juices.length;
     let gradient = juices.map((j, i) => `${j.color} ${i * step}deg ${(i + 1) * step}deg`).join(', ');
     wheel.style.background = `conic-gradient(${gradient})`;
-    
-    wheel.innerHTML = ''; // Очищуємо перед рендером
     juices.forEach((j, i) => {
         const div = document.createElement('div');
         div.className = 'wheel-label';
-        // Повертаємо мітку на кут сектору + половина кроку для центрування
         div.style.transform = `rotate(${i * step + (step / 2)}deg)`;
         div.innerText = j.name;
         wheel.appendChild(div);
@@ -194,41 +163,31 @@ function setupWheel() {
 }
 setupWheel();
 
-function startWheel() {
+function openWheel() {
     document.getElementById('wheel-btn').style.display = 'none';
-    const overlay = document.getElementById('wheel-overlay');
-    overlay.style.display = 'flex';
+    document.getElementById('wheel-overlay').style.display = 'flex';
+    setTimeout(startWheel, 50);
+}
 
+function startWheel() {
     const segments = juices.length;
     const step = 360 / segments;
     const randomIndex = Math.floor(Math.random() * segments);
+    const spins = 360 * 10; 
+    const stopAngle = (randomIndex * step) + (step / 2);
     
-    // Розрахунок: 
-    // 1. Повні оберти (10 штук)
-    // 2. Скидання до "нуля" поточної позиції
-    // 3. Поворот на потрібний сегмент. 
-    // Оскільки стрілка справа (0 градусів), нам треба крутити колесо назад відносно сектору
-    const extraDegrees = 360 * 10; 
-    const targetAngle = (randomIndex * step) + (step / 2);
-    
-    // Оновлюємо накопичувальне значення обертання
-    currentRotation += extraDegrees + (360 - (currentRotation % 360)) + (360 - targetAngle);
+    currentRotation += spins + (360 - (currentRotation % 360)) + (360 - stopAngle);
 
-    wheel.style.transition = 'transform 7s cubic-bezier(0.1, 0, 0, 1)';
+    wheel.style.transition = 'transform 7s cubic-bezier(0.1, 0, 0.1, 1)';
     wheel.style.transform = `rotate(${currentRotation}deg)`;
 
     setTimeout(() => {
-        overlay.style.display = 'none';
-        confetti({ 
-            particleCount: 150, 
-            spread: 70, 
-            origin: { y: 0.6 },
-            colors: ['#ff0055', '#00f2ff', '#ffffff'] 
-        });
+        document.getElementById('wheel-overlay').style.display = 'none';
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         showResult([juices[randomIndex]], true);
     }, 7200);
 }
-  
+
 function pick(tag){ showResult(juices.filter(j => j.tags.includes(tag)), false); }
 
 function showResult(array, fromWheel){
@@ -252,5 +211,3 @@ function restart(){
 </script>
 </body>
 </html>
-
-
