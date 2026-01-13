@@ -329,11 +329,29 @@
     }
 
     // ТАБИ
+    // ТАБИ
     document.querySelectorAll('.nav-item').forEach(btn => {
         btn.onclick = () => {
             const tab = btn.dataset.tab;
+            
+            // Ховаємо всі секції
             document.querySelectorAll('.cat-section').forEach(s => s.classList.add('hidden'));
+            
+            // Показуємо вибрану секцію
             document.getElementById('cat-' + tab).classList.remove('hidden');
+            
+            // --- ЛОГІКА БАНЕРА (додано) ---
+            const banner = document.getElementById('main-banner');
+            if (banner) {
+                // Банер показується тільки на вкладці 'zalivka' і тільки якщо він увімкнений в адмінці
+                if (tab === 'zalivka' && currentBannerStatus === true) {
+                    banner.style.display = 'block';
+                } else {
+                    banner.style.display = 'none';
+                }
+            }
+            // ------------------------------
+
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById('page-title').innerText = btn.innerText.split('\n').pop().toUpperCase();
@@ -477,13 +495,20 @@ let currentBannerStatus = true;
 const bannerElement = document.getElementById('main-banner');
 const bannerBtn = document.getElementById('toggle-banner');
 
-// 1. Слухаємо базу даних Firebase
+// Слухаємо базу даних Firebase (Оновлено)
 onValue(ref(db, 'settings/bannerVisible'), (snap) => {
     currentBannerStatus = snap.val() !== false; 
+    const activeTab = document.querySelector('.nav-item.active').dataset.tab;
+    const bannerBtn = document.getElementById('toggle-banner');
+    const bannerElement = document.getElementById('main-banner');
+
     if (currentBannerStatus) {
-        bannerElement.style.display = 'block';
         bannerBtn.innerText = "🖼️ БАНЕР (ON)";
         bannerBtn.classList.add('active-mode');
+        // Показуємо банер, тільки якщо ми зараз на вкладці "Заливка"
+        if (activeTab === 'zalivka') {
+            bannerElement.style.display = 'block';
+        }
     } else {
         bannerElement.style.display = 'none';
         bannerBtn.innerText = "🖼️ БАНЕР (OFF)";
@@ -510,6 +535,7 @@ if (pTrack && pSlides.length > 0) {
 </script>
 </body>
 </html>
+
 
 
 
