@@ -28,54 +28,32 @@
             --font-main: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-         html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    /* Повністю прибираємо горизонтальний скрол */
-    overflow-x: hidden; 
-    /* Запобігаємо зсуву контенту при жестах назад/вперед у браузері */
-    position: relative;
-}
-
-body { 
-    background: radial-gradient(circle at top right, #1a0b2e, #0d0216); 
-    background-attachment: fixed;
-    margin: 0; 
-    padding-bottom: calc(120px + env(safe-area-inset-bottom)); 
-    font-family: var(--font-main); 
-    color: white; 
-    overflow-x: hidden; 
-    -webkit-tap-highlight-color: transparent; 
-    min-height: 100vh;
-    /* Блокує горизонтальний свайп на смартфонах */
-    touch-action: pan-y; 
-    /* Прибирає "відпружинювання" (rubber banding) на iOS */
-    overscroll-behavior-x: none; 
-}
-
-/* Також важливо додати це для контейнера, щоб він не розпирав екран */
-.container { 
-    padding: 10px;
-    width: 100%;
-    box-sizing: border-box; /* Щоб падінги не додавалися до ширини 100% */
-}
-
-        html {
-    /* Важливо: фіксуємо висоту і колір фону */
+         html {
     height: 100%;
-    background-color: #0d0216; /* Твій основний колір фону */
-    overflow: hidden; 
+    background-color: #0d0216;
+    overflow: hidden; /* Важливо для PWA: фіксуємо вікно */
 }
 
 body {
     height: 100%;
-    overflow-y: auto; /* Дозволяємо вертикальний скрол тільки тут */
-    /* Вимикаємо ефект відскоку в обох напрямках */
-    overscroll-behavior: none; 
-    -webkit-overflow-scrolling: touch; /* Плавний скрол на iOS */
-    background: radial-gradient(circle at top right, #1a0b2e, #0d0216);
     margin: 0;
+    padding-bottom: calc(160px + env(safe-area-inset-bottom)); /* Великий відступ для нижньої картки */
+    background: radial-gradient(circle at top right, #1a0b2e, #0d0216);
+    background-attachment: fixed;
+    font-family: var(--font-main);
+    color: white;
+    overflow-y: auto; /* Дозволяємо вертикальний скрол тільки тут */
+    overflow-x: hidden; /* Забороняємо горизонтальний скрол */
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior: none; /* Вимикає білий "відскок" */
+    box-sizing: border-box;
+}
+
+.container {
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
         /* --- СНІГ --- */
@@ -96,7 +74,7 @@ body {
         
         .container { padding: 10px; }
         .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .product-card { background: var(--card-bg); border-radius: 18px; padding: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; transition: 0.3s; position: relative; }
+        .product-card { background: var(--card-bg); border-radius: 18px; padding: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; transition: 0.3s; position: relative; overflow: hidden;}
         .product-img { width: 100%; aspect-ratio: 1/1; border-radius: 12px; overflow: hidden; margin-bottom: 8px; position: relative; }
         .product-img img { width: 100%; height: 100%; object-fit: cover; }
         .product-desc { font-size: 11px; font-weight: 600; min-height: 28px; line-height: 1.2; margin: 4px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -555,7 +533,7 @@ let currentBannerStatus = true;
 const bannerElement = document.getElementById('main-banner');
 const bannerBtn = document.getElementById('toggle-banner');
 
-// Слухаємо базу даних Firebase (Оновлено)
+// Слухаємо базу даних Firebase (Оновлено для всіх вкладок)
 onValue(ref(db, 'settings/bannerVisible'), (snap) => {
     currentBannerStatus = snap.val() !== false; 
     const activeTab = document.querySelector('.nav-item.active').dataset.tab;
@@ -565,9 +543,11 @@ onValue(ref(db, 'settings/bannerVisible'), (snap) => {
     if (currentBannerStatus) {
         bannerBtn.innerText = "🖼️ БАНЕР (ON)";
         bannerBtn.classList.add('active-mode');
-        // Показуємо банер, тільки якщо ми зараз на вкладці "Заливка"
-        if (activeTab === 'zalivka') {
+        // Показуємо банер скрізь, КРІМ вкладки "info"
+        if (activeTab !== 'info') {
             bannerElement.style.display = 'block';
+        } else {
+            bannerElement.style.display = 'none';
         }
     } else {
         bannerElement.style.display = 'none';
@@ -595,6 +575,7 @@ if (pTrack && pSlides.length > 0) {
 </script>
 </body>
 </html>
+
 
 
 
