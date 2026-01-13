@@ -91,7 +91,25 @@ body {
 .wheel-container { position: relative; width: 280px; height: 280px; border: 5px solid #fff; border-radius: 50%; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
 .pointer { position: absolute; right: -25px; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-top: 15px solid transparent; border-bottom: 15px solid transparent; border-right: 35px solid #fff; z-index: 100; }
 #main-wheel { width: 100%; height: 100%; border-radius: 50%; position: relative; overflow: hidden; transition: transform 7s cubic-bezier(0.1, 0, 0, 1); }
-.wheel-label { position: absolute; width: 50%; height: 20px; top: calc(50% - 10px); left: 50%; transform-origin: left center; display: flex; align-items: center; justify-content: center; padding-left: 20px; font-size: 8px; font-weight: 900; text-transform: uppercase; white-space: nowrap; text-shadow: 1px 1px 2px #000; }
+.wheel-label {
+  position: absolute;
+  width: 50%; /* Займає радіус колеса */
+  height: 30px;
+  top: 50%;
+  left: 50%;
+  transform-origin: left center; /* Обертаємо від центру колеса */
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Притискаємо текст до краю колеса */
+  padding-right: 20px; /* Відступ від краю колеса */
+  box-sizing: border-box;
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow: 1px 1px 2px #000;
+  pointer-events: none;
+}
 
 .result-card { margin-bottom: 10px; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.1); border-left: 4px solid #00f2ff; text-align: left; }
 </style>
@@ -157,12 +175,18 @@ const juices = [
 const wheel = document.getElementById('main-wheel');
 const step = 360 / juices.length;
 
+let currentRotation = 0; // Зберігаємо стан обертання
+
 function setupWheel() {
+    const step = 360 / juices.length;
     let gradient = juices.map((j, i) => `${j.color} ${i * step}deg ${(i + 1) * step}deg`).join(', ');
     wheel.style.background = `conic-gradient(${gradient})`;
+    
+    wheel.innerHTML = ''; // Очищуємо перед рендером
     juices.forEach((j, i) => {
         const div = document.createElement('div');
         div.className = 'wheel-label';
+        // Повертаємо мітку на кут сектору + половина кроку для центрування
         div.style.transform = `rotate(${i * step + (step / 2)}deg)`;
         div.innerText = j.name;
         wheel.appendChild(div);
@@ -174,21 +198,37 @@ function startWheel() {
     document.getElementById('wheel-btn').style.display = 'none';
     const overlay = document.getElementById('wheel-overlay');
     overlay.style.display = 'flex';
-    wheel.style.transition = 'none';
-    wheel.style.transform = 'rotate(0deg)';
-    setTimeout(() => {
-        const randomIndex = Math.floor(Math.random() * juices.length);
-        const totalRotation = (360 * 10) - (randomIndex * step + step / 2);
-        wheel.style.transition = 'transform 7s cubic-bezier(0.1, 0, 0, 1)';
-        wheel.style.transform = `rotate(${totalRotation}deg)`;
-        setTimeout(() => {
-            overlay.style.display = 'none';
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-            showResult([juices[randomIndex]], true);
-        }, 7200);
-    }, 50);
-}
 
+    const segments = juices.length;
+    const step = 360 / segments;
+    const randomIndex = Math.floor(Math.random() * segments);
+    
+    // Розрахунок: 
+    // 1. Повні оберти (10 штук)
+    // 2. Скидання до "нуля" поточної позиції
+    // 3. Поворот на потрібний сегмент. 
+    // Оскільки стрілка справа (0 градусів), нам треба крутити колесо назад відносно сектору
+    const extraDegrees = 360 * 10; 
+    const targetAngle = (randomIndex * step) + (step / 2);
+    
+    // Оновлюємо накопичувальне значення обертання
+    currentRotation += extraDegrees + (360 - (currentRotation % 360)) + (360 - targetAngle);
+
+    wheel.style.transition = 'transform 7s cubic-bezier(0.1, 0, 0, 1)';
+    wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+    setTimeout(() => {
+        overlay.style.display = 'none';
+        confetti({ 
+            particleCount: 150, 
+            spread: 70, 
+            origin: { y: 0.6 },
+            colors: ['#ff0055', '#00f2ff', '#ffffff'] 
+        });
+        showResult([juices[randomIndex]], true);
+    }, 7200);
+}
+  
 function pick(tag){ showResult(juices.filter(j => j.tags.includes(tag)), false); }
 
 function showResult(array, fromWheel){
@@ -212,4 +252,5 @@ function restart(){
 </script>
 </body>
 </html>
+
 
