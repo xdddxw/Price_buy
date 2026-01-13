@@ -25,13 +25,38 @@
             --font-main: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-        body { 
-            background: radial-gradient(circle at top right, #1a0b2e, #0d0216); 
-            background-attachment: fixed; margin: 0; 
-            padding-bottom: calc(120px + env(safe-area-inset-bottom)); 
-            font-family: var(--font-main); color: white; overflow-x: hidden; 
-            -webkit-tap-highlight-color: transparent; min-height: 100vh;
-        }
+         html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    /* Повністю прибираємо горизонтальний скрол */
+    overflow-x: hidden; 
+    /* Запобігаємо зсуву контенту при жестах назад/вперед у браузері */
+    position: relative;
+}
+
+body { 
+    background: radial-gradient(circle at top right, #1a0b2e, #0d0216); 
+    background-attachment: fixed;
+    margin: 0; 
+    padding-bottom: calc(120px + env(safe-area-inset-bottom)); 
+    font-family: var(--font-main); 
+    color: white; 
+    overflow-x: hidden; 
+    -webkit-tap-highlight-color: transparent; 
+    min-height: 100vh;
+    /* Блокує горизонтальний свайп на смартфонах */
+    touch-action: pan-y; 
+    /* Прибирає "відпружинювання" (rubber banding) на iOS */
+    overscroll-behavior-x: none; 
+}
+
+/* Також важливо додати це для контейнера, щоб він не розпирав екран */
+.container { 
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box; /* Щоб падінги не додавалися до ширини 100% */
+}
 
         /* --- СНІГ --- */
         #snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; overflow: hidden; }
@@ -98,13 +123,15 @@
         /* Рекламний банер */
 .promo-slider {
     width: 100%;
+    max-width: 100vw; /* Щоб банер ніколи не був ширшим за екран */
     height: 125px;
     margin-bottom: 15px;
     border-radius: 20px;
-    overflow: hidden;
+    overflow: hidden; /* Критично важливо: ховає слайди, що стоять збоку */
     position: relative;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    display: none; /* за замовчуванням прихований, Firebase увімкне */
+    display: none; 
+    box-sizing: border-box; /* Враховує бордер всередині ширини 100% */
 }
 .promo-track {
     display: flex;
@@ -328,6 +355,13 @@
         snowContainer.appendChild(snowflake);
     }
 
+    // Примусова фіксація горизонтальної прокрутки
+window.addEventListener('scroll', () => {
+    if (window.scrollX !== 0) {
+        window.scrollTo(0, window.scrollY);
+    }
+}, { passive: true });
+    
     // ТАБИ (Банер працює на всіх вкладках, крім ІНФО)
     document.querySelectorAll('.nav-item').forEach(btn => {
         btn.onclick = () => {
@@ -535,6 +569,7 @@ if (pTrack && pSlides.length > 0) {
 </script>
 </body>
 </html>
+
 
 
 
