@@ -28,28 +28,29 @@
             --font-main: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-         html {
-    height: 100%;
-    background-color: #0d0216;
-    overflow: hidden; /* Важливо для PWA: фіксуємо вікно */
-}
-
-body {
-    height: 100%;
-    margin: 0;
-    padding-bottom: calc(160px + env(safe-area-inset-bottom)); /* Великий відступ для нижньої картки */
+         body {
+    /* Прибираємо фіксовану висоту 100%, залишаємо мінімальну */
+    min-height: 100vh;
+    height: auto; 
+    
+    /* Дозволяємо системі самій керувати скролом, але без відскоків */
+    overflow-y: scroll; 
+    overscroll-behavior-y: none;
+    
     background: radial-gradient(circle at top right, #1a0b2e, #0d0216);
     background-attachment: fixed;
-    font-family: var(--font-main);
-    color: white;
-    overflow-y: auto; /* Дозволяємо вертикальний скрол тільки тут */
-    overflow-x: hidden; /* Забороняємо горизонтальний скрол */
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-    overscroll-behavior: none; /* Вимикає білий "відскок" */
+    margin: 0;
+    
+    /* Зменшуємо відступ до 100px — цього вистачить, щоб перекрити меню */
+    padding-bottom: calc(100px + env(safe-area-inset-bottom)); 
     box-sizing: border-box;
 }
 
+html {
+    /* Прибираємо overflow: hidden, щоб скрол повернувся до норми */
+    height: auto;
+    background-color: #0d0216;
+}
 .container {
     padding: 10px;
     width: 100%;
@@ -575,6 +576,7 @@ if (pTrack && pSlides.length > 0) {
 </script>
 </body>
 </html>
+
 
 
 
