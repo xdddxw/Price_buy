@@ -28,40 +28,47 @@
             --font-main: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-         html {
-    background: #0d0216; /* Колір фону, щоб не було білого при скролі */
-    height: 100%;
-}
+         /* ПРИХОВУЄМО СКРОЛБАР ВСЮДИ */
+        * {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+        *::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
 
-body {
-    min-height: 100vh;
-    height: auto;
-    margin: 0;
-    padding-bottom: calc(100px + env(safe-area-inset-bottom)); /* Відступ для меню */
-    background: radial-gradient(circle at top right, #1a0b2e, #0d0216);
-    background-attachment: fixed;
-    font-family: var(--font-main);
-    color: white;
-    
-    /* Скрол працює, але смужка прихована */
-    overflow-y: scroll; 
-    overflow-x: hidden;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
-    
-    overscroll-behavior-y: none; /* Блокує білий відскок */
-    -webkit-overflow-scrolling: touch;
-}
+        html {
+            background: #0d0216;
+            height: 100%;
+            overflow: hidden; /* Фіксуємо вікно браузера від зайвих рухів */
+        }
 
-/* Приховуємо смужку для Webkit (Chrome/Safari) */
-body::-webkit-scrollbar {
-    display: none;
-}
-.container {
-    padding: 10px;
-    width: 100%;
-    box-sizing: border-box;
-}
+        body {
+            height: 100%;
+            margin: 0;
+            /* Відступ для меню + безпечна зона iPhone */
+            padding-bottom: calc(130px + env(safe-area-inset-bottom)); 
+            background: radial-gradient(circle at top right, #1a0b2e, #0d0216);
+            background-attachment: fixed;
+            font-family: var(--font-main);
+            color: white;
+            
+            overflow-y: auto; /* Вертикальний скрол тільки тут */
+            overflow-x: hidden; /* Заборона горизонтального скролу */
+            -webkit-overflow-scrolling: touch;
+            
+            touch-action: pan-y; /* Тільки вертикальні жести */
+            overscroll-behavior-y: none; /* Вимикає білий відскок (rubber banding) */
+            box-sizing: border-box;
+        }
+
+        .container {
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
         /* --- СНІГ --- */
         #snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; overflow: hidden; }
@@ -582,6 +589,7 @@ if (pTrack && pSlides.length > 0) {
 </script>
 </body>
 </html>
+
 
 
 
