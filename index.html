@@ -28,28 +28,34 @@
             --font-main: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-         body {
-    /* Прибираємо фіксовану висоту 100%, залишаємо мінімальну */
-    min-height: 100vh;
-    height: auto; 
-    
-    /* Дозволяємо системі самій керувати скролом, але без відскоків */
-    overflow-y: scroll; 
-    overscroll-behavior-y: none;
-    
-    background: radial-gradient(circle at top right, #1a0b2e, #0d0216);
-    background-attachment: fixed;
-    margin: 0;
-    
-    /* Зменшуємо відступ до 100px — цього вистачить, щоб перекрити меню */
-    padding-bottom: calc(100px + env(safe-area-inset-bottom)); 
-    box-sizing: border-box;
+         html {
+    background: #0d0216; /* Колір фону, щоб не було білого при скролі */
+    height: 100%;
 }
 
-html {
-    /* Прибираємо overflow: hidden, щоб скрол повернувся до норми */
+body {
+    min-height: 100vh;
     height: auto;
-    background-color: #0d0216;
+    margin: 0;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom)); /* Відступ для меню */
+    background: radial-gradient(circle at top right, #1a0b2e, #0d0216);
+    background-attachment: fixed;
+    font-family: var(--font-main);
+    color: white;
+    
+    /* Скрол працює, але смужка прихована */
+    overflow-y: scroll; 
+    overflow-x: hidden;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    
+    overscroll-behavior-y: none; /* Блокує білий відскок */
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Приховуємо смужку для Webkit (Chrome/Safari) */
+body::-webkit-scrollbar {
+    display: none;
 }
 .container {
     padding: 10px;
@@ -576,6 +582,7 @@ if (pTrack && pSlides.length > 0) {
 </script>
 </body>
 </html>
+
 
 
 
