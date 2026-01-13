@@ -89,9 +89,40 @@
             100% { transform: translateY(110vh) translateX(0); }
         }
         
-        header { display: flex; justify-content: center; align-items: center; padding: calc(15px + env(safe-area-inset-top)) 15px 15px; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .logo { position: relative; font-weight: 900; font-size: 22px; text-transform: uppercase; background: linear-gradient(90deg, #ff0055, #00f2ff, #ff0055); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradient-move 3s linear infinite; }
-        .logo::before { content: "🎅"; position: absolute; top: -18px; left: -18px; font-size: 24px; transform: rotate(-15deg); -webkit-text-fill-color: initial; }
+        header { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    /* Зменшено відступи */
+    padding: calc(8px + env(safe-area-inset-top)) 10px 8px; 
+    background: rgba(0, 0, 0, 0.3); 
+    backdrop-filter: blur(15px); 
+    position: sticky; 
+    top: 0; 
+    z-index: 100; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+}
+        .logo { 
+    position: relative; 
+    font-weight: 900; 
+    font-size: 18px; /* Менший розмір тексту */
+    text-transform: uppercase; 
+    background: linear-gradient(90deg, #ff0055, #00f2ff, #ff0055); 
+    background-size: 200% auto; 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+    animation: gradient-move 3s linear infinite; 
+}
+
+.logo::before { 
+    content: "🎅"; 
+    position: absolute; 
+    top: -14px; /* Піднято вище */
+    left: -16px; 
+    font-size: 18px; /* Менший Санта */
+    transform: rotate(-15deg); 
+    -webkit-text-fill-color: initial; 
+}
         @keyframes gradient-move { to { background-position: 200% center; } }
         
         .container { padding: 10px; }
@@ -597,6 +628,7 @@ if (pTrack && pSlides.length > 0) {
 </script>
 </body>
 </html>
+
 
 
 
