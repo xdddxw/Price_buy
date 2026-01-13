@@ -179,6 +179,15 @@
     <button class="admin-btn" id="edit-price">💰 ЦІНИ (OFF)</button>
     <button class="admin-btn" id="edit-desc">📝 НАЗВИ (OFF)</button>
     <button class="admin-btn" id="edit-stock">📦 СКЛАД (OFF)</button>
+    
+    <button class="admin-btn" id="edit-badge">🏷️ СТІКЕРИ (OFF)</button>
+    <select id="badge-selector" class="admin-btn" style="background: #222; color: #fff;">
+        <option value="">Без стікера</option>
+        <option value="hit">🔥 ХІТ</option>
+        <option value="promo">🏷️ АКЦІЯ</option>
+        <option value="new">🆕 НОВИНКА</option>
+    </select>
+
     <button class="admin-btn" id="toggle-maint">🛠 ТЕХ. РОБОТИ</button>
     <button class="admin-btn" style="background:var(--accent-pink); margin-top:10px;" id="save-all">💾 ЗБЕРЕГТИ ВСЕ</button>
     
@@ -278,29 +287,64 @@
                 if(data.prices?.[i]) card.querySelector('.price').innerText = data.prices[i];
                 if(data.descs?.[i]) card.querySelector('.product-desc').innerText = data.descs[i];
                 if(data.stock?.[i] === false) card.classList.add('out-of-stock'); else card.classList.remove('out-of-stock');
+                
+                // Відображення стікерів при завантаженні
+                const badgeDiv = card.querySelector('.badge');
+                if(data.badges?.[i]) {
+                    const bType = data.badges[i];
+                    card.setAttribute('data-badge', bType);
+                    badgeDiv.className = 'badge badge-' + bType;
+                    badgeDiv.innerText = bType === 'hit' ? 'ХІТ' : bType === 'promo' ? 'АКЦІЯ' : 'НОВИНКА';
+                } else {
+                    badgeDiv.className = 'badge';
+                    badgeDiv.innerText = '';
+                }
             });
         }
     });
 
     // РЕДАГУВАННЯ
     let mode = null;
-    document.getElementById('edit-price').onclick = (e) => { mode = mode === 'price' ? null : 'price'; document.querySelectorAll('.price').forEach(el => el.contentEditable = (mode === 'price')); e.target.classList.toggle('active-mode'); };
-    document.getElementById('edit-desc').onclick = (e) => { mode = mode === 'desc' ? null : 'desc'; document.querySelectorAll('.product-desc').forEach(el => el.contentEditable = (mode === 'desc')); e.target.classList.toggle('active-mode'); };
-    document.getElementById('edit-stock').onclick = (e) => { mode = mode === 'stock' ? null : 'stock'; e.target.classList.toggle('active-mode'); };
+    document.getElementById('edit-price').onclick = (e) => { mode = mode === 'price' ? null : 'price'; document.querySelectorAll('.price').forEach(el => el.contentEditable = (mode === 'price')); updateModeBtns(e.target); };
+    document.getElementById('edit-desc').onclick = (e) => { mode = mode === 'desc' ? null : 'desc'; document.querySelectorAll('.product-desc').forEach(el => el.contentEditable = (mode === 'desc')); updateModeBtns(e.target); };
+    document.getElementById('edit-stock').onclick = (e) => { mode = mode === 'stock' ? null : 'stock'; updateModeBtns(e.target); };
+    document.getElementById('edit-badge').onclick = (e) => { mode = mode === 'badge' ? null : 'badge'; updateModeBtns(e.target); };
+
+    function updateModeBtns(activeBtn) {
+        document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode'));
+        if (mode) activeBtn.classList.add('active-mode');
+    }
+
     document.addEventListener('click', (e) => {
         const card = e.target.closest('.product-card');
-        if(card && isAdmin() && mode === 'stock') card.classList.toggle('out-of-stock');
+        if(!card || !isAdmin()) return;
+
+        if(mode === 'stock') card.classList.toggle('out-of-stock');
+        
+        if(mode === 'badge') {
+            const type = document.getElementById('badge-selector').value;
+            const badgeDiv = card.querySelector('.badge');
+            card.setAttribute('data-badge', type);
+            badgeDiv.className = 'badge';
+            if(type) {
+                badgeDiv.classList.add('badge-' + type);
+                badgeDiv.innerText = type === 'hit' ? 'ХІТ' : type === 'promo' ? 'АКЦІЯ' : 'НОВИНКА';
+            } else {
+                badgeDiv.innerText = '';
+            }
+        }
     });
 
     document.getElementById('save-all').onclick = () => {
-        const p = [], d = [], s = [];
+        const p = [], d = [], s = [], b = [];
         document.querySelectorAll('.product-card').forEach(card => {
             if(!card.querySelector('.price')) return;
             p.push(card.querySelector('.price').innerText);
             d.push(card.querySelector('.product-desc').innerText);
             s.push(!card.classList.contains('out-of-stock'));
+            b.push(card.getAttribute('data-badge') || "");
         });
-        set(ref(db, 'catalog'), { prices: p, descs: d, stock: s }).then(() => alert("Збережено!"));
+        set(ref(db, 'catalog'), { prices: p, descs: d, stock: s, badges: b }).then(() => alert("Збережено!"));
     };
 
     // АДМІНКА
@@ -313,67 +357,47 @@
     secret.style.cssText = "position:fixed; top:0; right:0; width:60px; height:60px; z-index:99999;";
     document.body.appendChild(secret); secret.onclick = login;
 
-    // --- ПРАВИЛЬНА ЛОГІКА ТЕХ РОБОТИ ---
-    let currentMaintStatus = false; // Змінна для зберігання поточного стану
-
-    // 1. Слухаємо базу і оновлюємо статус та вигляд кнопки
+    // --- ЛОГІКА ТЕХ РОБОТИ ---
+    let currentMaintStatus = false;
     onValue(ref(db, 'settings/maintenance'), (snap) => {
         currentMaintStatus = snap.val() === true;
         const overlay = document.getElementById('maintenance-overlay');
         const btn = document.getElementById('toggle-maint');
-
         if (currentMaintStatus) {
-            // Увімкнено
             if (!isAdmin()) overlay.style.display = 'flex';
             btn.innerText = "🛠 ТЕХ. РОБОТИ (ON)";
             btn.classList.add('active-mode');
         } else {
-            // Вимкнено
             overlay.style.display = 'none';
             btn.innerText = "🛠 ТЕХ. РОБОТИ (OFF)";
             btn.classList.remove('active-mode');
         }
     });
-
-    // 2. Клік по кнопці змінює статус на протилежний
     document.getElementById('toggle-maint').onclick = () => {
         set(ref(db, 'settings/maintenance'), !currentMaintStatus);
     };
 
-   // --- ПОВНІСТЮ ВИПРАВЛЕНИЙ БЛОК PWA ---
+   // --- PWA ---
     let deferredPrompt;
     const banner = document.getElementById('install-banner');
     const installBtn = document.getElementById('install-button');
     const closeBnr = document.getElementById('close-install');
-
-    // 1. Слухач для Android/Chrome
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        // Показуємо баннер через 3 секунди після завантаження
-        setTimeout(() => {
-            if (!sessionStorage.getItem('pwaClosed')) {
-                banner.style.display = 'block';
-            }
-        }, 3000);
+        setTimeout(() => { if (!sessionStorage.getItem('pwaClosed')) banner.style.display = 'block'; }, 3000);
     });
-
-    // 2. Логіка для iPhone (iOS) - показуємо інструкцію, бо кнопки "Встановити" там немає в коді
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    const isStandalone = window.navigator.standalone === true;
-
-    if (isIOS && !isStandalone) {
+    if (isIOS && !window.navigator.standalone) {
         setTimeout(() => {
             if (!sessionStorage.getItem('pwaClosed')) {
                 const bnrText = document.querySelector('#install-banner div:nth-child(2)');
                 if(bnrText) bnrText.innerText = "Натисніть 'Поділитися' та 'Додати на початковий екран' 📲";
-                installBtn.style.display = 'none'; // Ховаємо кнопку, бо в iOS вона не працює програмно
+                installBtn.style.display = 'none';
                 banner.style.display = 'block';
             }
         }, 4000);
     }
-
-    // Кнопка встановлення (Android)
     installBtn.onclick = async () => {
         if (deferredPrompt) {
             deferredPrompt.prompt();
@@ -382,16 +406,7 @@
             deferredPrompt = null;
         }
     };
-
-    // Закриття баннера
-    closeBnr.onclick = () => {
-        banner.style.display = 'none';
-        sessionStorage.setItem('pwaClosed', 'true'); // Запам'ятовуємо, що користувач закрив його
-    };
+    closeBnr.onclick = () => { banner.style.display = 'none'; sessionStorage.setItem('pwaClosed', 'true'); };
 </script>
 </body>
 </html>
-
-
-
-
