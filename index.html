@@ -298,7 +298,7 @@
     <div id="cat-info" class="cat-section hidden">
         <div class="info-grid">
             <div class="section-label">Замовлення та сервіс</div>
-            <a href="payment.html" class="info-card"><div class="info-icon">💳</div><span>Оплата</span></a>
+            <a href="payment.html" class="info-card" id="payment-card"><div class="info-icon">💳</div><span>Оплата</span></a>
             <a href="reviews.html" class="info-card"><div class="info-icon">⭐</div><span>Відгуки</span></a>
             <a href="kwiz.html" class="info-card"><div class="info-icon">🍷</div><span>Смаки</span></a>
             <div class="info-card" id="admin-trigger"><div class="info-icon">🔐</div><span>Кабінет власника</span></div>
@@ -320,7 +320,7 @@
     <button class="admin-btn" id="edit-price">💰 ЦІНИ (OFF)</button>
     <button class="admin-btn" id="edit-desc">📝 НАЗВИ (OFF)</button>
     <button class="admin-btn" id="edit-stock">📦 СКЛАД (OFF)</button>
-    
+    <button class="admin-btn" id="toggle-payment">💳 ОПЛАТА (ON)</button>
     <button class="admin-btn" id="edit-badge">🏷️ СТІКЕРИ (OFF)</button>
     <select id="badge-selector" class="admin-btn" style="background: #222; color: #fff;">
         <option value="">Без стікера</option>
@@ -625,9 +625,35 @@ if (pTrack && pSlides.length > 0) {
         pTrack.style.transform = `translateX(-${pIndex * 100}%)`;
     }, 5000);
 }
+
+
+    // --- ХОВАННЯ / ПОКАЗ ПУНКТУ "ОПЛАТА" ---
+let paymentVisible = true;
+
+onValue(ref(db, 'settings/paymentVisible'), (snap) => {
+    paymentVisible = snap.val() !== false;
+
+    const card = document.getElementById('payment-card');
+    const btn  = document.getElementById('toggle-payment');
+
+    if (!card) return;
+
+    card.style.display = paymentVisible ? 'flex' : 'none';
+
+    if (btn) {
+        btn.innerText = paymentVisible ? '💳 ОПЛАТА (ON)' : '💳 ОПЛАТА (OFF)';
+        btn.classList.toggle('active-mode', paymentVisible);
+    }
+});
+
+document.getElementById('toggle-payment').onclick = () => {
+    if (!isAdmin()) return;
+    set(ref(db, 'settings/paymentVisible'), !paymentVisible);
+};
 </script>
 </body>
 </html>
+
 
 
 
