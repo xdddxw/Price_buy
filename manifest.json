@@ -1,7 +1,7 @@
 {
   "name": "SMOKE HUB",
   "short_name": "SMOKE HUB",
-  "start_url": "index.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0d0216",
   "theme_color": "#e91e63",
