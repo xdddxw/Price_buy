@@ -150,7 +150,20 @@
         @keyframes glow { 0% { transform: translateY(0) rotate(-5deg); } 100% { transform: translateY(-2px) rotate(0deg); } }
         
         .out-of-stock { opacity: 0.4; filter: grayscale(1); }
-        .out-of-stock::after { content: "Продано"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); background: #ff0055; padding: 5px 12px; border-radius: 8px; font-size: 10px; font-weight: 900; color: white; z-index: 10; }
+        .out-of-stock::after { 
+    content: attr(data-out-of-stock-text); /* Текст береться з атрибута */
+    position: absolute; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%) rotate(-15deg); 
+    background: #ff0055; 
+    padding: 5px 12px; 
+    border-radius: 8px; 
+    font-size: 10px; 
+    font-weight: 900; 
+    color: white; 
+    z-index: 10; 
+}
 
         /* ІНФО СТИЛЬ */
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -228,7 +241,22 @@
 
 <div id="snow-container"></div>
 
-<header><div class="logo">SMOKE HUB</div></header>
+<header>
+    <div class="logo">SMOKE HUB</div>
+    <button id="lang-toggle" style="
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 9999;
+">PL</button>
+
+</header>
 
     
     <div class="promo-slider" id="main-banner">
@@ -308,10 +336,10 @@
     <div id="cat-info" class="cat-section hidden">
         <div class="info-grid">
             <div class="section-label">Замовлення та сервіс</div>
-            <a href="payment.html" class="info-card" id="payment-card"><div class="info-icon">💳</div><span>Оплата</span></a>
-            <a href="reviews.html" class="info-card"><div class="info-icon">⭐</div><span>Відгуки</span></a>
-            <a href="kwiz.html" class="info-card"><div class="info-icon">🍷</div><span>Смаки</span></a>
-            <div class="info-card" id="admin-trigger"><div class="info-icon">🔐</div><span>Кабінет власника</span></div>
+            <a href="payment.html" class="info-card" id="payment-card"><div class="info-icon">💳</div><span data-i18n="payment">Оплата</span></a>
+            <a href="reviews.html" class="info-card"><div class="info-icon">⭐</div><span data-i18n="reviews">Відгуки</span></a>
+            <a href="kwiz.html" class="info-card"><div class="info-icon">🍷</div><span data-i18n="flavors">Смаки</span></a>
+            <div class="info-card" id="admin-trigger"><div class="info-icon">🔐</div><span data-i18n="admin">Кабінет власника</span></div>
             <div class="section-label">Спільнота</div>
             <a href="https://t.me/liquid_br" target="_blank" class="info-card" style="grid-column: span 2;"><div class="info-icon">✈️</div><span>Telegram</span></a>
         </div>
@@ -319,10 +347,18 @@
 </div>
 
 <nav class="bottom-nav">
-    <button class="nav-item active" data-tab="zalivka"><span>💧</span><span>Заливка</span></button>
-    <button class="nav-item" data-tab="prodazh"><span>📦</span><span>Продаж</span></button>
-    <button class="nav-item" data-tab="aktsii"><span>⚡</span><span>Інше</span></button>
-    <button class="nav-item" data-tab="info"><span>ℹ️</span><span>Інфо</span></button>
+    <button class="nav-item active" data-tab="zalivka">
+    <span>💧</span><span data-i18n="zalivka">Заливка</span>
+</button>
+<button class="nav-item" data-tab="prodazh">
+    <span>📦</span><span data-i18n="prodazh">Продаж</span>
+</button>
+<button class="nav-item" data-tab="aktsii">
+    <span>⚡</span><span data-i18n="other">Інше</span>
+</button>
+<button class="nav-item" data-tab="info">
+    <span>ℹ️</span><span data-i18n="info">Інфо</span>
+</button>
 </nav>
 
 <div id="dev-menu" class="dev-panel">
@@ -472,13 +508,16 @@
                 if(data.stock?.[i] === false) card.classList.add('out-of-stock'); else card.classList.remove('out-of-stock');
                 
                 // Відображення стікерів при завантаженні
+                // Знайти цей шматок всередині onValue(ref(db, 'catalog'))
                 const badgeDiv = card.querySelector('.badge');
                 if(data.badges?.[i]) {
                     const bType = data.badges[i];
                     card.setAttribute('data-badge', bType);
                     badgeDiv.className = 'badge badge-' + bType;
-                    badgeDiv.innerText = bType === 'hit' ? 'ХІТ' : bType === 'promo' ? 'АКЦІЯ' : 'НОВИНКА';
+                    // ЗАМІСТЬ ЖОРСТКОГО ТЕКСТУ:
+                    badgeDiv.innerText = translations[currentLang]['badge_' + bType] || "";
                 } else {
+                    card.removeAttribute('data-badge'); // очистити атрибут, якщо стікера немає
                     badgeDiv.className = 'badge';
                     badgeDiv.innerText = '';
                 }
@@ -507,12 +546,14 @@
         if(mode === 'badge') {
             const type = document.getElementById('badge-selector').value;
             const badgeDiv = card.querySelector('.badge');
-            card.setAttribute('data-badge', type);
             badgeDiv.className = 'badge';
             if(type) {
+                card.setAttribute('data-badge', type);
                 badgeDiv.classList.add('badge-' + type);
-                badgeDiv.innerText = type === 'hit' ? 'ХІТ' : type === 'promo' ? 'АКЦІЯ' : 'НОВИНКА';
+                // ЗАМІСТЬ ЖОРСТКОГО ТЕКСТУ:
+                badgeDiv.innerText = translations[currentLang]['badge_' + type];
             } else {
+                card.removeAttribute('data-badge');
                 badgeDiv.innerText = '';
             }
         }
@@ -660,9 +701,80 @@ document.getElementById('toggle-payment').onclick = () => {
     if (!isAdmin()) return;
     set(ref(db, 'settings/paymentVisible'), !paymentVisible);
 };
+
+// --- МОВИ ---
+const translations = {
+    ua: {
+        zalivka: "Заливка",
+        prodazh: "Продаж",
+        other: "Інше",
+        info: "Інфо",
+        payment: "Оплата",
+        reviews: "Відгуки",
+        flavors: "Смаки",
+        admin: "Кабінет власника",
+        sold: "ПРОДАНО",
+        badge_hit: "ХІТ",
+        badge_promo: "АКЦІЯ",
+        badge_new: "НОВИНКА"
+    },
+    pl: {
+        zalivka: "Zalewki",
+        prodazh: "Sprzedaż",
+        other: "Inne",
+        info: "Info",
+        payment: "Płatność",
+        reviews: "Opinie",
+        flavors: "Smaki",
+        admin: "Panel właściciela",
+        sold: "SPRZEDANE",
+        badge_hit: "HIT",
+        badge_promo: "PROMOCJA",
+        badge_new: "NOWOŚĆ"
+    }
+};
+
+let currentLang = localStorage.getItem("lang") || "ua";
+
+function updateBadgeTexts(lang) {
+    document.querySelectorAll('.product-card').forEach(card => {
+        const badgeDiv = card.querySelector('.badge');
+        const bType = card.getAttribute('data-badge'); // беремо тип стікера з атрибута
+        if (bType && translations[lang]['badge_' + bType]) {
+            badgeDiv.innerText = translations[lang]['badge_' + bType];
+        }
+    });
+}
+
+function applyLang(lang) {
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.dataset.i18n;
+        if (translations[lang][key]) {
+            el.innerText = translations[lang][key];
+        }
+    });
+
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.setAttribute('data-out-of-stock-text', translations[lang].sold);
+    });
+    
+    updateBadgeTexts(lang); 
+
+    document.getElementById("lang-toggle").innerText = lang === "ua" ? "PL" : "UA";
+    localStorage.setItem("lang", lang);
+}
+
+applyLang(currentLang);
+
+document.getElementById("lang-toggle").onclick = () => {
+    currentLang = currentLang === "ua" ? "pl" : "ua";
+    applyLang(currentLang);
+};
+
 </script>
 </body>
 </html>
+
 
 
 
