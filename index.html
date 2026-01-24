@@ -235,27 +235,159 @@
 }
 .promo-content h2 { margin: 0; font-size: 18px; color: #fff; }
 .promo-content p { margin: 4px 0 0; font-size: 14px; color: var(--accent-blue); font-weight: bold; }
+
+/* Модальне вікно вибору мови */
+.lang-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 2, 22, 0.9); /* Темний напівпрозорий фон */
+    backdrop-filter: blur(10px);
+    z-index: 1000001; /* Вище за всі елементи */
+    display: none; /* Спочатку приховано */
+    align-items: center;
+    justify-content: center;
+}
+
+.lang-modal-content {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 25px;
+    text-align: center;
+    width: 85%;
+    max-width: 320px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+.lang-modal-logo {
+    font-weight: 900;
+    font-size: 24px;
+    background: linear-gradient(90deg, #ff0055, #00c6ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 20px;
+}
+
+.lang-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.lang-options button {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.lang-options button:active {
+    transform: scale(0.95);
+    background: var(--accent-pink);
+}
+
+/* Анімації */
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modalSlideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.lang-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 2, 22, 0.92);
+    backdrop-filter: blur(12px);
+    z-index: 1000001;
+    display: none; /* Керується через JS */
+    align-items: center;
+    justify-content: center;
+    animation: modalFadeIn 0.4s ease;
+}
+
+.lang-modal-content {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 28px;
+    text-align: center;
+    width: 85%;
+    max-width: 320px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    animation: modalSlideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.lang-modal-logo {
+    font-weight: 900;
+    font-size: 24px;
+    background: linear-gradient(90deg, #ff0055, #00c6ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+}
+
+.lang-modal-content h3 {
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 25px;
+    font-weight: 400;
+}
+
+.lang-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.lang-options button {
+    background: rgba(255, 255, 255, 0.07);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 16px;
+    border-radius: 18px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.lang-options button:active {
+    transform: scale(0.96);
+    background: var(--accent-pink);
+    border-color: var(--accent-pink);
+}
     </style>
 </head>
 <body>
 
 <div id="snow-container"></div>
 
+<div id="language-modal" class="lang-modal-overlay">
+    <div class="lang-modal-content">
+        <div class="lang-modal-logo">SMOKE HUB</div>
+        <h3>Виберіть мову / Wybierz język</h3>
+        <div class="lang-options">
+            <button onclick="selectInitialLang('ua')">🇺🇦 Українська</button>
+            <button onclick="selectInitialLang('pl')">🇵🇱 Polski</button>
+        </div>
+    </div>
+</div>
+
 <header>
     <div class="logo">SMOKE HUB</div>
-    <button id="lang-toggle" style="
-    position: fixed;
-    top: 12px;
-    left: 12px;
-    background: none;
-    border: none;
-    color: #fff;
-    font-weight: 800;
-    font-size: 12px;
-    cursor: pointer;
-    z-index: 9999;
-">PL</button>
-
 </header>
 
     
@@ -334,16 +466,39 @@
     </div>
 
     <div id="cat-info" class="cat-section hidden">
-        <div class="info-grid">
-            <div class="section-label">Замовлення та сервіс</div>
-            <a href="payment.html" class="info-card" id="payment-card"><div class="info-icon">💳</div><span data-i18n="payment">Оплата</span></a>
-            <a href="reviews.html" class="info-card"><div class="info-icon">⭐</div><span data-i18n="reviews">Відгуки</span></a>
-            <a href="kwiz.html" class="info-card"><div class="info-icon">🍷</div><span data-i18n="flavors">Смаки</span></a>
-            <div class="info-card" id="admin-trigger"><div class="info-icon">🔐</div><span data-i18n="admin">Кабінет власника</span></div>
-            <div class="section-label">Спільнота</div>
-            <a href="https://t.me/liquid_br" target="_blank" class="info-card" style="grid-column: span 2;"><div class="info-icon">✈️</div><span>Telegram</span></a>
+    <div class="info-grid">
+        <div class="section-label">Сервіси</div>
+        <a href="payment.html" class="info-card" id="payment-card"><div class="info-icon">💳</div><span data-i18n="payment">Оплата</span></a>
+        <a href="reviews.html" class="info-card"><div class="info-icon">⭐</div><span data-i18n="reviews">Відгуки</span></a>
+        <a href="kwiz.html" class="info-card"><div class="info-icon">🍷</div><span data-i18n="flavors">Смаки</span></a>
+        <div class="info-card" id="admin-trigger"><div class="info-icon">🔐</div><span data-i18n="admin">Кабінет власника</span></div>
+        
+        <div class="section-label" style="display: flex; justify-content: space-between; align-items: center; grid-column: span 2; margin-top: 25px;">
+            <span>Соціальні мережі</span>
+            
+            <button id="lang-toggle-mini" style="
+                background: rgba(255,255,255,0.1);
+                border: 1px solid rgba(255,255,255,0.2);
+                color: white;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 10px;
+                font-weight: 800;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                cursor: pointer;
+            ">
+                <span id="lang-flag">🇺🇦</span> <span id="lang-label">UA</span>
+            </button>
         </div>
+
+        <a href="https://t.me/liquid_br" target="_blank" class="info-card" style="grid-column: span 2;">
+            <div class="info-icon">✈️</div>
+            <span>Telegram</span>
+        </a>
     </div>
+</div>
 </div>
 
 <nav class="bottom-nav">
@@ -702,7 +857,30 @@ document.getElementById('toggle-payment').onclick = () => {
     set(ref(db, 'settings/paymentVisible'), !paymentVisible);
 };
 
-// --- МОВИ ---
+// --- ОНОВЛЕНА ЛОГІКА МОВИ ТА МОДАЛЬНОГО ВІКНА ---
+
+// 1. Перевірка, чи мова вже була вибрана раніше
+window.addEventListener('DOMContentLoaded', () => {
+    const savedLang = localStorage.getItem("lang");
+    const modal = document.getElementById('language-modal');
+    
+    if (!savedLang) {
+        modal.style.display = 'flex'; // Показуємо вікно, якщо вибору немає
+    } else {
+        currentLang = savedLang;
+        applyLang(currentLang);
+    }
+});
+
+// 2. Функція вибору мови з вікна
+window.selectInitialLang = (lang) => {
+    currentLang = lang;
+    localStorage.setItem("lang", lang);
+    applyLang(lang);
+    document.getElementById('language-modal').style.display = 'none';
+};
+
+// Ваш існуючий об'єкт translations (залишається без змін)
 const translations = {
     ua: {
         zalivka: "Заливка",
@@ -739,7 +917,7 @@ let currentLang = localStorage.getItem("lang") || "ua";
 function updateBadgeTexts(lang) {
     document.querySelectorAll('.product-card').forEach(card => {
         const badgeDiv = card.querySelector('.badge');
-        const bType = card.getAttribute('data-badge'); // беремо тип стікера з атрибута
+        const bType = card.getAttribute('data-badge');
         if (bType && translations[lang]['badge_' + bType]) {
             badgeDiv.innerText = translations[lang]['badge_' + bType];
         }
@@ -760,21 +938,74 @@ function applyLang(lang) {
     
     updateBadgeTexts(lang); 
 
-    document.getElementById("lang-toggle").innerText = lang === "ua" ? "PL" : "UA";
+    // Оновлення міні-кнопки
+    const langLabel = document.getElementById("lang-label");
+    const langFlag = document.getElementById("lang-flag");
+    if(langLabel) {
+        langLabel.innerText = lang.toUpperCase();
+        langFlag.innerText = lang === "ua" ? "🇺🇦" : "🇵🇱";
+    }
+    
     localStorage.setItem("lang", lang);
+    currentLang = lang;
 }
 
-applyLang(currentLang);
+// Клік по міні-кнопці
+const miniLangBtn = document.getElementById("lang-toggle-mini");
+if (miniLangBtn) {
+    miniLangBtn.onclick = () => {
+        currentLang = currentLang === "ua" ? "pl" : "ua";
+        applyLang(currentLang);
+    };
+}
 
+// Новий обробник кліку для картки в Інфо
+const newLangBtn = document.getElementById("lang-toggle-new");
+if (newLangBtn) {
+    newLangBtn.onclick = () => {
+        currentLang = currentLang === "ua" ? "pl" : "ua";
+        applyLang(currentLang);
+    };
+}
+
+// Кнопка швидкої зміни мови в хедері
 document.getElementById("lang-toggle").onclick = () => {
     currentLang = currentLang === "ua" ? "pl" : "ua";
     applyLang(currentLang);
 };
 
+// Перевірка та показ модального вікна
+window.addEventListener('DOMContentLoaded', () => {
+    const savedLang = localStorage.getItem("lang");
+    const modal = document.getElementById('language-modal');
+    
+    if (!savedLang) {
+        // Невелика затримка для ефекту "Wow"
+        setTimeout(() => {
+            modal.style.display = 'flex';
+        }, 600); 
+    } else {
+        applyLang(savedLang);
+    }
+});
+
+// Функція вибору мови
+window.selectInitialLang = (lang) => {
+    const modal = document.getElementById('language-modal');
+    
+    // Плавне зникнення перед закриттям
+    modal.style.opacity = '0';
+    modal.style.transition = '0.3s';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+        applyLang(lang);
+    }, 300);
+};
+
 </script>
 </body>
 </html>
-
 
 
 
