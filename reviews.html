@@ -310,13 +310,44 @@ window.toggleLogin = () => document.getElementById('dev-login').classList.toggle
 window.closePanels = () => document.getElementById('dev-login').classList.remove('active');
 
 // Відправка відгуків
+const BOT_TOKEN = '7977759430:AAFZii8NRVg0sI-mOo3QsINXsMZb09SA0b4';
+const ADMIN_ID = '7607671432';
+
 window.sendReview = () => {
     const n = document.getElementById('rev-name').value.trim();
     const t = document.getElementById('rev-text').value.trim();
     if(!n || !t) return alert("Будь ласка, заповни всі поля!");
     
-    const newRef = push(reviewsRef);
-    set(newRef, { name: n, text: t, date: new Date().toLocaleDateString('uk-UA') }).then(() => {
+    // 1. Відправляємо в pending_reviews
+    const pendingRef = push(ref(db, 'pending_reviews'));
+    const reviewId = pendingRef.key;
+    const reviewData = { 
+        name: n, 
+        text: t, 
+        date: new Date().toLocaleDateString('uk-UA') 
+    };
+
+    set(pendingRef, reviewData).then(() => {
+        // 2. Надсилаємо боту повідомлення з кнопками
+        const message = `🔔 Новий відгук!\n👤 Ім'я: ${n}\n📝 Текст: ${t}`;
+        const keyboard = {
+            inline_keyboard: [[
+                { text: "✅ Опублікувати", callback_data: `approve_${reviewId}` },
+                { text: "🗑 Видалити", callback_data: `delete_${reviewId}` }
+            ]]
+        };
+
+        fetch(`https://api.telegram.org/bot7977759430:AAFZii8NRVg0sI-mOo3QsINXsMZb09SA0b4/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: '7607671432',
+                text: message,
+                reply_markup: keyboard
+            })
+        });
+
+        alert("Відгук надіслано на модерацію!");
         document.getElementById('rev-name').value = "";
         document.getElementById('rev-text').value = "";
     });
