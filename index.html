@@ -488,13 +488,12 @@
         </span>
     </div>
     
-    <a id="send-id-btn" 
-       href="https://t.me/liquid_br" 
-       target="_blank" 
-       onclick="prepareTgLink(this)"
-       style="background: var(--accent-blue); color: #000; text-decoration: none; padding: 14px; border-radius: 12px; font-size: 11px; font-weight: 800; display: block;">
-        📲 ПІДТВЕРДИТИ МІЙ ID (TELEGRAM)
-    </a>
+   <a id="send-id-btn" 
+   href="#" 
+   target="_blank" 
+   style="background: var(--accent-blue); color: #000; text-decoration: none; padding: 14px; border-radius: 12px; font-size: 11px; font-weight: 800; display: block; text-align: center;">
+   📲 ПІДТВЕРДИТИ МІЙ ID (TELEGRAM)
+</a>
 </div>
 
 <script>
@@ -1101,9 +1100,24 @@ if (myIdForWallet) {
         if (balEl) balEl.innerText = snap.val() || 0;
     });
 }
+
+    // --- ЛОГІКА ТЕЛЕГРАМ-ПОСИЛАННЯ ---
+const updateTgLink = () => {
+    const tgBtn = document.getElementById('send-id-btn');
+    const currentId = localStorage.getItem('hub_user_id');
+    
+    if (tgBtn && currentId) {
+        const message = encodeURIComponent(`Привіт! Мій ID: ${currentId}. Закріпіть його за мною!`);
+        tgBtn.href = `https://t.me/liquid_br?text=${message}`;
+    }
+};
+
+// Викликаємо функцію відразу
+updateTgLink();
 </script>
 </body>
 </html>
+
 
 
 
