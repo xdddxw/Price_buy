@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="uk">
 <head>
   <script>
@@ -604,12 +604,16 @@
 </div>
 
 <script type="module">
+    <script type="module">
+    // 1. ПЕРШИМ ДІЛОМ ІМПОРТУЄМО ВСІ ФУНКЦІЇ (Додали 'get')
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, onValue, set, push, serverTimestamp, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, onValue, set, push, serverTimestamp, query, limitToLast, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+    // 2. ІНІЦІАЛІЗАЦІЯ БАЗИ (Це залишається як було)
     const app = initializeApp({ databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/" });
     const db = getDatabase(app);
     const isAdmin = () => localStorage.getItem('isHubAdmin') === 'true';
+
 
     // ЛОГУВАННЯ ВІЗИТУ
     async function logVisit() {
@@ -1071,61 +1075,61 @@ function syncUserWallet() {
 }
 setTimeout(syncUserWallet, 500);
 
-// 3. АДМІН-ФУНКЦІЇ КЕШБЕКУ
+// --- ПОВНІСТЮ РОБОЧІ АДМІН-ФУНКЦІЇ КЕШБЕКУ ---
 if (isAdmin()) {
     const giveBtn = document.getElementById('give-cashback');
     const removeBtn = document.getElementById('remove-cashback');
     const targetInput = document.getElementById('target-user-id');
     const amountInput = document.getElementById('cashback-amount');
 
-    // Універсальна функція для зміни балансу
-    const changeBalance = async (isAdding) => {
-        const tId = targetInput.value.trim();
+    const updateBalance = async (isAdding) => {
+        const tId = targetInput.value.trim().split(' ')[0]; // Беремо тільки ID
         const amt = parseFloat(amountInput.value);
         
-        if (!tId || isNaN(amt)) return alert("Введіть коректний ID та суму!");
+        if (!tId || isNaN(amt)) return alert("Введіть ID та суму!");
 
-        // Важливо: забираємо тільки чистий ID (до першого пробілу)
-        const cleanId = tId.split(' ')[0]; 
-        const walletRef = ref(db, `wallets/${cleanId}`);
+        const walletRef = ref(db, `wallets/${tId}`);
         
         try {
-            // Використовуємо один запит замість постійного слухача
-            const snapshot = await get(walletRef); 
-            const currentBalance = snapshot.val() || 0;
-            const newBalance = isAdding ? (currentBalance + amt) : (currentBalance - amt);
+            // Отримуємо поточний баланс
+            const snapshot = await get(walletRef);
+            const current = snapshot.val() || 0;
             
-            await set(walletRef, newBalance);
-            alert(`Успішно! Новий баланс ${cleanId}: ${newBalance}`);
-            amountInput.value = ""; // Очистити суму після успіху
+            // Рахуємо новий
+            const next = isAdding ? (current + amt) : (current - amt);
+            
+            // Записуємо в базу
+            await set(walletRef, next);
+            
+            alert(`Успішно! Новий баланс ${tId}: ${next}`);
+            amountInput.value = ""; // Очищаємо поле суми
         } catch (err) {
-            alert("Помилка бази даних: " + err.message);
+            console.error(err);
+            alert("Помилка бази: " + err.message);
         }
     };
 
-    if (giveBtn) giveBtn.onclick = () => changeBalance(true);
-    if (removeBtn) removeBtn.onclick = () => changeBalance(false);
+    if (giveBtn) giveBtn.onclick = () => updateBalance(true);
+    if (removeBtn) removeBtn.onclick = () => updateBalance(false);
 
-    // Клік по списку відвідувачів (Беремо ТІЛЬКИ ID)
+    // Клік по списку відвідувачів
     const visitorsList = document.getElementById('visitors-list');
     if (visitorsList) {
-        visitorsList.addEventListener('click', (e) => {
+        visitorsList.onclick = (e) => {
             const item = e.target.closest('.visitor-item');
             if (item) {
-                // Витягуємо тільки текст всередині <span> (це наш ID)
-                const idFromList = item.querySelector('span').innerText.split(' ')[0];
-                if (idFromList) {
-                    targetInput.value = idFromList;
-                    targetInput.style.borderColor = 'var(--accent-blue)';
-                    setTimeout(() => targetInput.style.borderColor = '', 1000);
-                }
+                const cleanId = item.querySelector('span').innerText.split(' ')[0];
+                targetInput.value = cleanId;
+                targetInput.style.borderColor = 'var(--accent-blue)';
+                setTimeout(() => targetInput.style.borderColor = '', 1000);
             }
-        });
+        };
     }
 }
 </script>
 </body>
 </html>
+
 
 
 
