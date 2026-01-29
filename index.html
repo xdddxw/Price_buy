@@ -585,7 +585,7 @@
 <hr style="border: 0.5px solid rgba(255,255,255,0.1); margin: 15px 0;">
     <h3 style="color:var(--accent-blue); font-size: 12px; margin-bottom:10px;">💰 КЕРУВАННЯ КЕШБЕКОМ</h3>
     <input type="text" id="target-user-id" placeholder="ID Користувача" class="admin-btn" style="background:#222; text-align:left;">
-    <input type="number" id="cashback-amount" placeholder="Сума нарахованого" class="admin-btn" style="background:#222; text-align:left;">
+   <input type="number" id="cashback-amount" placeholder="Сума..." class="admin-btn" style="background:#222; text-align:left;">
     <button class="admin-btn" id="give-cashback" style="background:var(--accent-blue); color:black;">НАРАХУВАТИ</button>
     <button class="admin-btn" id="remove-cashback" style="background:#444; margin-top:5px;">СПИСАТИ (ВІДНЯТИ)</button>
     
@@ -1075,27 +1075,69 @@ function syncUserWallet() {
 // Запускаємо перевірку балансу
 setTimeout(syncUserWallet, 500);
 
-// Додатково для Адміна: логіка нарахування (якщо її ще немає в модулі)
+// --- ПОВНІСТЮ РОБОЧІ АДМІН-ФУНКЦІЇ КЕШБЕКУ ---
 if (isAdmin()) {
     const giveBtn = document.getElementById('give-cashback');
     const removeBtn = document.getElementById('remove-cashback');
+    const targetInput = document.getElementById('target-user-id');
+    const amountInput = document.getElementById('cashback-amount');
 
+    // Функція нарахування (ПЛЮС)
     if (giveBtn) {
         giveBtn.onclick = () => {
-            const tId = document.getElementById('target-user-id').value.trim();
-            const amt = parseFloat(document.getElementById('cashback-amount').value);
-            if (!tId || isNaN(amt)) return alert("Вкажіть ID та суму");
-            const refW = ref(db, `wallets/${tId}`);
-            onValue(refW, (s) => {
-                set(refW, (s.val() || 0) + amt);
-                alert("Додано!");
+            const tId = targetInput.value.trim();
+            const amt = parseFloat(amountInput.value);
+            
+            if (!tId || isNaN(amt)) return alert("Введіть коректний ID та суму!");
+
+            const walletRef = ref(db, `wallets/${tId}`);
+            onValue(walletRef, (snap) => {
+                const currentBalance = snap.val() || 0;
+                set(walletRef, currentBalance + amt)
+                    .then(() => alert(`Додано! Новий баланс ${tId}: ${currentBalance + amt}`))
+                    .catch((err) => alert("Помилка запису: " + err));
             }, { onlyOnce: true });
         };
+    }
+
+    // Функція списання (МІНУС)
+    if (removeBtn) {
+        removeBtn.onclick = () => {
+            const tId = targetInput.value.trim();
+            const amt = parseFloat(amountInput.value);
+            
+            if (!tId || isNaN(amt)) return alert("Введіть коректний ID та суму!");
+
+            const walletRef = ref(db, `wallets/${tId}`);
+            onValue(walletRef, (snap) => {
+                const currentBalance = snap.val() || 0;
+                set(walletRef, currentBalance - amt)
+                    .then(() => alert(`Списано! Новий баланс ${tId}: ${currentBalance - amt}`))
+                    .catch((err) => alert("Помилка запису: " + err));
+            }, { onlyOnce: true });
+        };
+    }
+
+    // Клік по списку відвідувачів для швидкого копіювання ID
+    const visitorsList = document.getElementById('visitors-list');
+    if (visitorsList) {
+        visitorsList.addEventListener('click', (e) => {
+            const item = e.target.closest('.visitor-item');
+            if (item) {
+                const idFromList = item.querySelector('span').innerText;
+                if (idFromList) {
+                    targetInput.value = idFromList;
+                    targetInput.style.borderColor = 'var(--accent-blue)';
+                    setTimeout(() => targetInput.style.borderColor = '', 1000);
+                }
+            }
+        });
     }
 }
 </script>
 </body>
 </html>
+
 
 
 
