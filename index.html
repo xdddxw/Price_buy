@@ -375,16 +375,27 @@
     border-color: var(--accent-pink);
 }
 
-/* Якщо активовано режим приховування і товар має статус out-of-stock — ховаємо */
-html.hide-sold-active .product-card.out-of-stock {
-    display: none !important;
-}
+<style>
+    /* Твої оригінальні стилі залишаються, додаємо тільки ці правила в кінець */
+    
+    /* Для звичайних користувачів: видаляємо товар з коду, якщо режим увімкнено */
+    html.hide-sold-active:not(.force-admin) .product-card.out-of-stock {
+        display: none !important;
+    }
 
-/* Але якщо це адмін — показуємо напівпрозорим, щоб можна було повернути */
-html.force-admin.hide-sold-active .product-card.out-of-stock {
-    display: flex !important;
-    opacity: 0.3;
-}
+    /* Для тебе (адміна): робимо товар прозорим, щоб ти міг його бачити і повернути в продаж */
+    html.force-admin.hide-sold-active .product-card.out-of-stock {
+        display: flex !important;
+        opacity: 0.25;
+        filter: grayscale(1);
+    }
+
+    /* Підсвітка активних кнопок в адмінці */
+    .admin-btn.active-mode {
+        background: var(--accent-pink) !important;
+        box-shadow: 0 0 15px var(--accent-pink);
+    }
+</style>
     </style>
 </head>
 <body>
@@ -619,7 +630,7 @@ html.force-admin.hide-sold-active .product-card.out-of-stock {
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, onValue, set, push, serverTimestamp, query, limitToLast, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
     import { runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
+let currentHideSoldStatus = false;
     // 2. ІНІЦІАЛІЗАЦІЯ БАЗИ (Це залишається як було)
     const app = initializeApp({ databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/" });
     const db = getDatabase(app);
@@ -827,21 +838,31 @@ if (pageTitle) {
         set(ref(db, 'settings/maintenance'), !currentMaintStatus);
     };
     
-    // --- ЛОГІКА ПРИХОВУВАННЯ ТОВАРІВ ---
-let currentHideSoldStatus = false;
+// Слухаємо статус приховування з бази
 onValue(ref(db, 'settings/hideSold'), (snap) => {
     currentHideSoldStatus = snap.val() === true;
     const btn = document.getElementById('toggle-hide-sold');
+    
     if (currentHideSoldStatus) {
         document.documentElement.classList.add('hide-sold-active');
-        if(btn) { btn.innerText = "🚫 ПРИХОВАТИ SOLD (ON)"; btn.classList.add('active-mode'); }
+        if(btn) {
+            btn.innerText = "🚫 ПРИХОВАТИ SOLD (ON)";
+            btn.classList.add('active-mode');
+        }
     } else {
         document.documentElement.classList.remove('hide-sold-active');
-        if(btn) { btn.innerText = "🚫 ПРИХОВАТИ SOLD (OFF)"; btn.classList.remove('active-mode'); }
+        if(btn) {
+            btn.innerText = "🚫 ПРИХОВАТИ SOLD (OFF)";
+            btn.classList.remove('active-mode');
+        }
     }
 });
+
+// Логіка натискання на кнопку в адмінці
 document.getElementById('toggle-hide-sold').onclick = () => {
-    if (isAdmin()) set(ref(db, 'settings/hideSold'), !currentHideSoldStatus);
+    if (isAdmin()) {
+        set(ref(db, 'settings/hideSold'), !currentHideSoldStatus);
+    }
 };
 
    // --- PWA ---
@@ -1151,7 +1172,6 @@ updateTgLink();
 </script>
 </body>
 </html>
-
 
 
 
