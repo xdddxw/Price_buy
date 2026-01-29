@@ -479,9 +479,9 @@
     
     <div style="font-size: 10px; opacity: 0.5; margin-bottom: 15px;">Ваш ID: <span id="display-my-id" style="color:white; font-weight: bold;">Визначаємо...</span></div>
     
-    <button id="send-id-btn" style="background: var(--accent-blue); color: #000; border: none; padding: 12px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; width: 100%; display: block;">
-        📲 ПІДТВЕРДИТИ МІЙ ID (TELEGRAM)
-    </button>
+    <a id="send-id-btn" href="#" target="_blank" style="background: var(--accent-blue); color: #000; text-decoration: none; padding: 12px; border-radius: 12px; font-size: 11px; font-weight: 800; width: calc(100% - 24px); display: block; text-align: center;">
+    📲 ПІДТВЕРДИТИ МІЙ ID (TELEGRAM)
+</a>
 </div>
         
         <div class="section-label">Сервіси</div>
@@ -1028,10 +1028,8 @@ window.selectInitialLang = (lang) => {
     }, 300);
 };
 
-   // --- ФІНАЛЬНА РЕАНІМАЦІЯ КЕШБЕКУ ---
-
-function startCashback() {
-    // 1. Отримуємо або створюємо ID негайно
+   function startCashback() {
+    // 1. Отримуємо або створюємо ID
     let myId = localStorage.getItem('hub_user_id');
     if (!myId) {
         myId = 'User_' + Math.floor(Math.random() * 9000 + 1000);
@@ -1044,65 +1042,27 @@ function startCashback() {
         displayIdEl.innerText = myId;
     }
 
-    // 3. Підтягуємо баланс з Firebase
+    // 3. Підтягуємо баланс
     const balanceEl = document.getElementById('user-balance');
     if (balanceEl) {
-        // Отримуємо посилання на баланс конкретного юзера
         const walletRef = ref(db, 'wallets/' + myId);
         onValue(walletRef, (snap) => {
             balanceEl.innerText = snap.val() || 0;
         });
     }
 
-    // 4. Оживляємо кнопку Telegram
-    const sendBtn = document.getElementById('send-id-btn');
-    if (sendBtn) {
-        // Використовуємо onclick безпосередньо для надійності
-        sendBtn.addEventListener('click', () => {
-            const currentId = localStorage.getItem('hub_user_id') || myId;
-            const text = encodeURIComponent(`Привіт! Мій ID в SMOKE HUB: ${currentId}. Закріпіть за мною цей аккаунт для кешбеку!`);
-            window.location.href = `https://t.me/liquid_br?text=${text}`;
-        });
-    }
-}
-
-// Запускаємо через 300мс, щоб DOM встиг прогрузитися
-setTimeout(startCashback, 300);
-
-// --- АДМІН-ФУНКЦІЇ (НАРАХУВАННЯ) ---
-if (isAdmin()) {
-    const giveBtn = document.getElementById('give-cashback');
-    const removeBtn = document.getElementById('remove-cashback');
-
-    if (giveBtn) {
-        giveBtn.onclick = () => {
-            const tId = document.getElementById('target-user-id').value.trim();
-            const amt = parseFloat(document.getElementById('cashback-amount').value);
-            if (!tId || isNaN(amt)) return alert("Вкажіть ID та суму");
-            
-            const refW = ref(db, `wallets/${tId}`);
-            onValue(refW, (s) => {
-                set(refW, (s.val() || 0) + amt);
-                alert("Додано!");
-            }, { onlyOnce: true });
-        };
-    }
-    
-    if (removeBtn) {
-        removeBtn.onclick = () => {
-            const tId = document.getElementById('target-user-id').value.trim();
-            const amt = parseFloat(document.getElementById('cashback-amount').value);
-            const refW = ref(db, `wallets/${tId}`);
-            onValue(refW, (s) => {
-                set(refW, (s.val() || 0) - amt);
-                alert("Списано!");
-            }, { onlyOnce: true });
-        };
+    // 4. ПРЯМА ПРИВ'ЯЗКА ПОСИЛАННЯ (Для iPhone)
+    const sendLink = document.getElementById('send-id-btn');
+    if (sendLink) {
+        const text = encodeURIComponent(`Привіт! Мій ID в SMOKE HUB: ${myId}. Закріпіть за мною цей аккаунт для кешбеку!`);
+        // Встановлюємо пряму адресу
+        sendLink.href = `https://t.me/liquid_br?text=${text}`;
     }
 }
 </script>
 </body>
 </html>
+
 
 
 
