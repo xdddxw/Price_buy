@@ -1082,6 +1082,8 @@ if (isAdmin()) {
     const amountInput = document.getElementById('cashback-amount');
 
     const updateBalance = async (isAdding) => {
+    console.log("🔥 updateBalance called", isAdding);
+
     const tId = targetInput.value.trim().split(' ')[0];
     const amt = parseFloat(amountInput.value);
 
@@ -1096,7 +1098,7 @@ if (isAdmin()) {
             const balance = current || 0;
             return isAdding
                 ? balance + amt
-                : Math.max(0, balance - amt); // не даємо піти в мінус
+                : Math.max(0, balance - amt);
         });
 
         alert(`✅ Успішно! Баланс оновлено для ${tId}`);
@@ -1128,6 +1130,7 @@ if (isAdmin()) {
 </script>
 </body>
 </html>
+
 
 
 
