@@ -471,23 +471,18 @@
     <div class="info-grid">
 
         <div class="info-card" id="cashback-section" style="grid-column: span 2; background: linear-gradient(135deg, rgba(0, 198, 255, 0.1), rgba(0, 0, 0, 0.4)); border: 1px solid var(--accent-blue); padding: 20px 10px;">
-    
-    <div id="pwa-only-content" class="hidden">
-        <div style="font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px;">Мій бонусний баланс</div>
-        <div style="font-size: 32px; font-weight: 900; color: var(--accent-blue); margin: 5px 0;">
-            <span id="user-balance">0</span> <small style="font-size: 14px;">UAH/PLN</small>
-        </div>
-        <div style="font-size: 10px; opacity: 0.5; margin-bottom: 15px;">Ваш ID: <span id="display-my-id" style="color:white"></span></div>
-        <button id="send-id-btn" style="background: var(--accent-blue); color: #000; border: none; padding: 10px 20px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; width: 100%;">
-            📲 ПІДТВЕРДИТИ МІЙ ID В TELEGRAM
-        </button>
+    <div style="font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px;">Мій бонусний баланс</div>
+    <div style="font-size: 32px; font-weight: 900; color: var(--accent-blue); margin: 5px 0;">
+        <span id="user-balance">0</span> <small style="font-size: 14px;">UAH/PLN</small>
     </div>
+    <div style="font-size: 10px; opacity: 0.5; margin-bottom: 15px;">Ваш ID: <span id="display-my-id" style="color:white"></span></div>
+    
+    <button id="send-id-btn" style="background: var(--accent-blue); color: #000; border: none; padding: 12px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; width: 100%; margin-bottom: 10px;">
+        📲 ПІДТВЕРДИТИ МІЙ ID В TELEGRAM
+    </button>
 
-    <div id="browser-only-content" style="text-align: center;">
-        <div style="font-size: 24px; margin-bottom: 5px;">🎁</div>
-        <div style="font-size: 13px; font-weight: 800; color: var(--accent-pink);">КЕШБЕК ДОСТУПНИЙ ТІЛЬКИ В ДОДАТКУ</div>
-        <p style="font-size: 10px; opacity: 0.8; margin: 8px 0;">Встановіть застосунок на головний екран, щоб отримувати бонуси з кожної покупки.</p>
-        <button onclick="document.getElementById('install-banner').style.display='block'" style="background: none; color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 10px; font-size: 10px; font-weight: 600;">ЯК ВСТАНОВИТИ?</button>
+    <div id="pwa-hint" style="font-size: 9px; opacity: 0.5; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); pt: 10px; padding-top: 8px;">
+        Встановіть додаток на головний екран для швидкого доступу ⚡
     </div>
 </div>
         
@@ -1035,59 +1030,43 @@ window.selectInitialLang = (lang) => {
     }, 300);
 };
 
-    // --- ЛОГІКА КЕШБЕКУ ТА PWA ---
+    // --- ЛОГІКА КЕШБЕКУ (ДОСТУПНО ДЛЯ ВСІХ) ---
 
-function initCashback() {
-    const pwaView = document.getElementById('pwa-only-content');
-    const browserView = document.getElementById('browser-only-content');
+function initCashbackSystem() {
     const myId = localStorage.getItem('hub_user_id');
+    const balanceEl = document.getElementById('user-balance');
+    const displayIdEl = document.getElementById('display-my-id');
 
-    // 1. Стандартна перевірка
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    
-    // 2. Специфічна перевірка для iOS
-    const isIOSStandalone = window.navigator.standalone === true;
-    
-    // 3. Перевірка через відсутність UI браузера (висота екрана)
-    const isTall = (window.innerHeight / window.screen.height) > 0.9;
-    
-    // Підсумковий результат
-    const isActualPWA = isStandalone || isIOSStandalone || (isTall && !navigator.userAgent.includes('Version/'));
+    // Відображаємо ID користувача
+    if (displayIdEl) displayIdEl.innerText = myId;
 
-    if (isActualPWA) {
-        console.log("PWA Mode Detected");
-        pwaView.classList.remove('hidden');
-        browserView.classList.add('hidden');
-        
-        if (document.getElementById('display-my-id')) {
-            document.getElementById('display-my-id').innerText = myId;
-        }
-
+    // Підключаємося до бази даних для отримання балансу
+    if (balanceEl) {
         onValue(ref(db, `wallets/${myId}`), (snap) => {
-            const balance = snap.val() || 0;
-            if (document.getElementById('user-balance')) {
-                document.getElementById('user-balance').innerText = balance;
-            }
+            balanceEl.innerText = snap.val() || 0;
         });
-    } else {
-        console.log("Browser Mode Detected");
-        pwaView.classList.add('hidden');
-        browserView.classList.remove('hidden');
+    }
+
+    // Додаткова перевірка: якщо людина ТАКІ ЗАЙШЛА з PWA, ховаємо підказку про встановлення
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const pwaHint = document.getElementById('pwa-hint');
+    if (isPWA && pwaHint) {
+        pwaHint.style.display = 'none';
     }
 }
 
-// Запускаємо з невеликою затримкою, щоб iOS встигла прокинутись
-setTimeout(initCashback, 500);
+// Запускаємо систему
+initCashbackSystem();
 
-// На всяк випадок перевіряємо при фокусі (якщо юзер звернув/розгорнув додаток)
-window.addEventListener('focus', initCashback);
-
-// 2. Кнопка зв'язку з власником через Telegram
-document.getElementById('send-id-btn').onclick = () => {
-    const myId = localStorage.getItem('hub_user_id');
-    const text = encodeURIComponent(`Привіт! Мій ID в SMOKE HUB: ${myId}. Закріпіть за мною цей аккаунт для кешбеку!`);
-    window.open(`https://t.me/liquid_br?text=${text}`, '_blank');
-};
+// Кнопка зв'язку з власником через Telegram (Відправка ID)
+const sendIdBtn = document.getElementById('send-id-btn');
+if (sendIdBtn) {
+    sendIdBtn.onclick = () => {
+        const myId = localStorage.getItem('hub_user_id');
+        const text = encodeURIComponent(`Привіт! Мій ID в SMOKE HUB: ${myId}. Закріпіть за мною цей аккаунт для кешбеку!`);
+        window.open(`https://t.me/liquid_br?text=${text}`, '_blank');
+    };
+}
 
 // 3. Адмін-функції: Нарахування та Списання
 if (isAdmin()) {
@@ -1106,24 +1085,34 @@ if (isAdmin()) {
         }, { onlyOnce: true });
     };
 
-    document.getElementById('give-cashback').onclick = () => processCashback(true);
-    document.getElementById('remove-cashback').onclick = () => processCashback(false);
+    if (document.getElementById('give-cashback')) {
+        document.getElementById('give-cashback').onclick = () => processCashback(true);
+    }
+    if (document.getElementById('remove-cashback')) {
+        document.getElementById('remove-cashback').onclick = () => processCashback(false);
+    }
     
-    // Авто-підстановка ID клікаючи на список відвідувачів
-    document.getElementById('visitors-list').addEventListener('click', (e) => {
-        const item = e.target.closest('.visitor-item');
-        if (item) {
-            const id = item.querySelector('span').innerText;
-            document.getElementById('target-user-id').value = id;
-            // Підсвітка для зручності
-            document.getElementById('target-user-id').style.borderColor = 'var(--accent-blue)';
-            setTimeout(() => document.getElementById('target-user-id').style.borderColor = '', 1000);
-        }
-    });
+    // Авто-підстановка ID при кліку на відвідувача
+    const visitorsList = document.getElementById('visitors-list');
+    if (visitorsList) {
+        visitorsList.addEventListener('click', (e) => {
+            const item = e.target.closest('.visitor-item');
+            if (item) {
+                const id = item.querySelector('span').innerText;
+                const targetInput = document.getElementById('target-user-id');
+                if (targetInput) {
+                    targetInput.value = id;
+                    targetInput.style.borderColor = 'var(--accent-blue)';
+                    setTimeout(() => targetInput.style.borderColor = '', 1000);
+                }
+            }
+        });
+    }
 }
 </script>
 </body>
 </html>
+
 
 
 
