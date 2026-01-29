@@ -1,20 +1,15 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-   <script>
-    // 1. Функція для отримання/створення ID
-    function getPermanentId() {
-        let id = localStorage.getItem('hub_user_id');
-        if (!id) {
-            id = 'User_' + Math.floor(Math.random() * 9000 + 1000);
-            localStorage.setItem('hub_user_id', id);
-        }
-        return id;
+  <script>
+    // 1. Отримуємо або створюємо ID миттєво
+    let myId = localStorage.getItem('hub_user_id');
+    if (!myId || myId === 'null') {
+        myId = 'User_' + Math.floor(Math.random() * 9000 + 1000);
+        localStorage.setItem('hub_user_id', myId);
     }
 
-    // Присвоюємо ID відразу при завантаженні
-    const myId = getPermanentId();
-
+    // 2. Перевірка адміна
     if (localStorage.getItem('isHubAdmin') === 'true') {
         document.documentElement.classList.add('force-admin');
     }
@@ -487,12 +482,29 @@
         <span id="user-balance">0</span> <small style="font-size: 14px;">UAH/PLN</small>
     </div>
     
-    <div style="font-size: 10px; opacity: 0.5; margin-bottom: 15px;">Ваш ID: <span id="display-my-id" style="color:white; font-weight: bold;">...</span></div>
+    <div style="font-size: 10px; opacity: 0.5; margin-bottom: 15px;">Ваш ID: 
+        <span id="display-my-id" style="color:white; font-weight: bold;">
+            <script>document.write(localStorage.getItem('hub_user_id') || '...');</script>
+        </span>
+    </div>
     
-    <a id="send-id-btn" href="https://t.me/liquid_br" target="_blank" style="background: var(--accent-blue); color: #000; text-decoration: none; padding: 14px; border-radius: 12px; font-size: 11px; font-weight: 800; display: block;">
+    <a id="send-id-btn" 
+       href="https://t.me/liquid_br" 
+       target="_blank" 
+       onclick="prepareTgLink(this)"
+       style="background: var(--accent-blue); color: #000; text-decoration: none; padding: 14px; border-radius: 12px; font-size: 11px; font-weight: 800; display: block;">
         📲 ПІДТВЕРДИТИ МІЙ ID (TELEGRAM)
     </a>
 </div>
+
+<script>
+    // Ця функція спрацює миттєво при кліку, Safari її не заблокує
+    function sendIdToTg(event) {
+        const id = localStorage.getItem('hub_user_id');
+        const text = encodeURIComponent("Привіт! Мій ID: " + id + ". Закріпіть його за мною!");
+        event.currentTarget.href = "https://t.me/liquid_br?text=" + text;
+    }
+</script>
         
         <div class="section-label">Сервіси</div>
         <a href="payment.html" class="info-card" id="payment-card"><div class="info-icon">💳</div><span data-i18n="payment">Оплата</span></a>
@@ -1038,22 +1050,19 @@ window.selectInitialLang = (lang) => {
     }, 300);
 };
 
-   function startCashback() {
+   // 1. Функція для формування посилання ПРЯМО ПРИ КЛІКУ (Safari це обожнює)
+window.prepareTgLink = function(el) {
     const currentId = localStorage.getItem('hub_user_id');
-    
-    // Показуємо ID (він вже точно є в localStorage)
-    const displayIdEl = document.getElementById('display-my-id');
-    if (displayIdEl) displayIdEl.innerText = currentId;
+    const text = encodeURIComponent(`Привіт! Мій ID в SMOKE HUB: ${currentId}. Закріпіть його за мною!`);
+    el.href = `https://t.me/liquid_br?text=${text}`;
+};
 
-    // Оновлюємо посилання для Telegram
-    const sendLink = document.getElementById('send-id-btn');
-    if (sendLink) {
-        const text = encodeURIComponent(`Привіт! Мій ID: ${currentId}. Закріпіть його за мною!`);
-        // Використовуємо універсальне посилання t.me
-        sendLink.href = `https://t.me/liquid_br?text=${text}`;
-    }
+// 2. Функція тільки для синхронізації балансу та відображення ID
+function syncUserWallet() {
+    const currentId = localStorage.getItem('hub_user_id');
+    if (!currentId) return;
 
-    // Баланс
+    // Підтягуємо баланс з бази
     const balanceEl = document.getElementById('user-balance');
     if (balanceEl && typeof db !== 'undefined') {
         const walletRef = ref(db, 'wallets/' + currentId);
@@ -1063,13 +1072,31 @@ window.selectInitialLang = (lang) => {
     }
 }
 
-// Запускаємо відразу після завантаження
-window.addEventListener('load', startCashback);
-// І про всяк випадок через секунду (якщо Safari ще спить)
-setTimeout(startCashback, 1000);
+// Запускаємо перевірку балансу
+setTimeout(syncUserWallet, 500);
+
+// Додатково для Адміна: логіка нарахування (якщо її ще немає в модулі)
+if (isAdmin()) {
+    const giveBtn = document.getElementById('give-cashback');
+    const removeBtn = document.getElementById('remove-cashback');
+
+    if (giveBtn) {
+        giveBtn.onclick = () => {
+            const tId = document.getElementById('target-user-id').value.trim();
+            const amt = parseFloat(document.getElementById('cashback-amount').value);
+            if (!tId || isNaN(amt)) return alert("Вкажіть ID та суму");
+            const refW = ref(db, `wallets/${tId}`);
+            onValue(refW, (s) => {
+                set(refW, (s.val() || 0) + amt);
+                alert("Додано!");
+            }, { onlyOnce: true });
+        };
+    }
+}
 </script>
 </body>
 </html>
+
 
 
 
