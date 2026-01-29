@@ -607,6 +607,7 @@
     // 1. ПЕРШИМ ДІЛОМ ІМПОРТУЄМО ВСІ ФУНКЦІЇ (Додали 'get')
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, onValue, set, push, serverTimestamp, query, limitToLast, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     // 2. ІНІЦІАЛІЗАЦІЯ БАЗИ (Це залишається як було)
     const app = initializeApp({ databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/" });
@@ -1081,31 +1082,31 @@ if (isAdmin()) {
     const amountInput = document.getElementById('cashback-amount');
 
     const updateBalance = async (isAdding) => {
-        const tId = targetInput.value.trim().split(' ')[0]; // Беремо тільки ID
-        const amt = parseFloat(amountInput.value);
-        
-        if (!tId || isNaN(amt)) return alert("Введіть ID та суму!");
+    const tId = targetInput.value.trim().split(' ')[0];
+    const amt = parseFloat(amountInput.value);
 
-        const walletRef = ref(db, `wallets/${tId}`);
-        
-        try {
-            // Отримуємо поточний баланс
-            const snapshot = await get(walletRef);
-            const current = snapshot.val() || 0;
-            
-            // Рахуємо новий
-            const next = isAdding ? (current + amt) : (current - amt);
-            
-            // Записуємо в базу
-            await set(walletRef, next);
-            
-            alert(`Успішно! Новий баланс ${tId}: ${next}`);
-            amountInput.value = ""; // Очищаємо поле суми
-        } catch (err) {
-            console.error(err);
-            alert("Помилка бази: " + err.message);
-        }
-    };
+    if (!tId || isNaN(amt) || amt <= 0) {
+        return alert("Введіть коректний ID та суму");
+    }
+
+    const walletRef = ref(db, `wallets/${tId}`);
+
+    try {
+        await runTransaction(walletRef, (current) => {
+            const balance = current || 0;
+            return isAdding
+                ? balance + amt
+                : Math.max(0, balance - amt); // не даємо піти в мінус
+        });
+
+        alert(`✅ Успішно! Баланс оновлено для ${tId}`);
+        amountInput.value = "";
+    } catch (err) {
+        console.error(err);
+        alert("❌ Помилка бази: " + err.message);
+    }
+};
+
 
     if (giveBtn) giveBtn.onclick = () => updateBalance(true);
     if (removeBtn) removeBtn.onclick = () => updateBalance(false);
@@ -1127,6 +1128,7 @@ if (isAdmin()) {
 </script>
 </body>
 </html>
+
 
 
 
