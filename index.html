@@ -470,20 +470,23 @@
     <div id="cat-info" class="cat-section hidden">
     <div class="info-grid">
 
-        <div class="info-card" id="cashback-section" style="grid-column: span 2; background: linear-gradient(135deg, rgba(0, 198, 255, 0.1), rgba(0, 0, 0, 0.4)); border: 1px solid var(--accent-blue); padding: 20px 10px;">
+        <div class="info-card" id="cashback-section" style="grid-column: span 2; background: linear-gradient(135deg, rgba(0, 198, 255, 0.1), rgba(0, 0, 0, 0.4)); border: 1px solid var(--accent-blue); padding: 20px 15px; text-align: center;">
+    
     <div style="font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px;">Мій бонусний баланс</div>
+    
     <div style="font-size: 32px; font-weight: 900; color: var(--accent-blue); margin: 5px 0;">
         <span id="user-balance">0</span> <small style="font-size: 14px;">UAH/PLN</small>
     </div>
-    <div style="font-size: 10px; opacity: 0.5; margin-bottom: 15px;">Ваш ID: <span id="display-my-id" style="color:white"></span></div>
     
-    <button id="send-id-btn" style="background: var(--accent-blue); color: #000; border: none; padding: 12px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; width: 100%; margin-bottom: 10px;">
-        📲 ПІДТВЕРДИТИ МІЙ ID В TELEGRAM
+    <div style="font-size: 10px; opacity: 0.5; margin-bottom: 15px;">Ваш ID: <span id="display-my-id" style="color:white; font-weight: bold;">Завантаження...</span></div>
+    
+    <button id="send-id-btn" style="background: var(--accent-blue); color: #000; border: none; padding: 12px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; width: 100%; margin-bottom: 10px; display: block;">
+        📲 ПІДТВЕРДИТИ МІЙ ID (TELEGRAM)
     </button>
 
-    <div id="pwa-hint" style="font-size: 9px; opacity: 0.5; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); pt: 10px; padding-top: 8px;">
-        Встановіть додаток на головний екран для швидкого доступу ⚡
-    </div>
+    <button id="manual-install-btn" onclick="document.getElementById('install-banner').style.display='block'" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 12px; font-size: 10px; width: 100%; cursor: pointer;">
+        📥 ЯК ВСТАНОВИТИ ДОДАТОК?
+    </button>
 </div>
         
         <div class="section-label">Сервіси</div>
@@ -1030,50 +1033,48 @@ window.selectInitialLang = (lang) => {
     }, 300);
 };
 
-    // --- ЛОГІКА КЕШБЕКУ (ДОСТУПНО ДЛЯ ВСІХ) ---
+    // --- НОВА РОБОЧА ЛОГІКА КЕШБЕКУ ---
 
-function initCashbackSystem() {
-    const myId = localStorage.getItem('hub_user_id');
+function setupCashback() {
+    const myId = localStorage.getItem('hub_user_id') || "User_Guest";
     const balanceEl = document.getElementById('user-balance');
     const displayIdEl = document.getElementById('display-my-id');
+    const installBtn = document.getElementById('manual-install-btn');
 
-    // Відображаємо ID користувача
+    // Відображаємо ID
     if (displayIdEl) displayIdEl.innerText = myId;
 
-    // Підключаємося до бази даних для отримання балансу
+    // Підтягуємо баланс
     if (balanceEl) {
         onValue(ref(db, `wallets/${myId}`), (snap) => {
             balanceEl.innerText = snap.val() || 0;
         });
     }
 
-    // Додаткова перевірка: якщо людина ТАКІ ЗАЙШЛА з PWA, ховаємо підказку про встановлення
+    // Робота кнопки Telegram
+    const sendBtn = document.getElementById('send-id-btn');
+    if (sendBtn) {
+        sendBtn.onclick = () => {
+            const text = encodeURIComponent(`Привіт! Мій ID в SMOKE HUB: ${myId}. Закріпіть за мною цей аккаунт для кешбеку!`);
+            window.open(`https://t.me/liquid_br?text=${text}`, '_blank');
+        };
+    }
+
+    // Ховаємо кнопку "Встановити", якщо вже в PWA
     const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-    const pwaHint = document.getElementById('pwa-hint');
-    if (isPWA && pwaHint) {
-        pwaHint.style.display = 'none';
+    if (isPWA && installBtn) {
+        installBtn.style.display = 'none';
     }
 }
 
-// Запускаємо систему
-initCashbackSystem();
+// Запускаємо відразу
+setupCashback();
 
-// Кнопка зв'язку з власником через Telegram (Відправка ID)
-const sendIdBtn = document.getElementById('send-id-btn');
-if (sendIdBtn) {
-    sendIdBtn.onclick = () => {
-        const myId = localStorage.getItem('hub_user_id');
-        const text = encodeURIComponent(`Привіт! Мій ID в SMOKE HUB: ${myId}. Закріпіть за мною цей аккаунт для кешбеку!`);
-        window.open(`https://t.me/liquid_br?text=${text}`, '_blank');
-    };
-}
-
-// 3. Адмін-функції: Нарахування та Списання
+// Копіюємо частину для АДМІНА (нарахування), щоб вона не зникла
 if (isAdmin()) {
     const processCashback = (isAdding) => {
         const targetId = document.getElementById('target-user-id').value.trim();
         const amount = parseFloat(document.getElementById('cashback-amount').value);
-
         if (!targetId || isNaN(amount)) return alert("Введіть ID та суму!");
 
         const userWalletRef = ref(db, `wallets/${targetId}`);
@@ -1081,37 +1082,17 @@ if (isAdmin()) {
             const current = snap.val() || 0;
             const newBalance = isAdding ? (current + amount) : (current - amount);
             set(userWalletRef, newBalance);
-            alert(`Успішно! Новий баланс ${targetId}: ${newBalance}`);
+            alert(`Готово! Новий баланс: ${newBalance}`);
         }, { onlyOnce: true });
     };
 
-    if (document.getElementById('give-cashback')) {
-        document.getElementById('give-cashback').onclick = () => processCashback(true);
-    }
-    if (document.getElementById('remove-cashback')) {
-        document.getElementById('remove-cashback').onclick = () => processCashback(false);
-    }
-    
-    // Авто-підстановка ID при кліку на відвідувача
-    const visitorsList = document.getElementById('visitors-list');
-    if (visitorsList) {
-        visitorsList.addEventListener('click', (e) => {
-            const item = e.target.closest('.visitor-item');
-            if (item) {
-                const id = item.querySelector('span').innerText;
-                const targetInput = document.getElementById('target-user-id');
-                if (targetInput) {
-                    targetInput.value = id;
-                    targetInput.style.borderColor = 'var(--accent-blue)';
-                    setTimeout(() => targetInput.style.borderColor = '', 1000);
-                }
-            }
-        });
-    }
+    document.getElementById('give-cashback').onclick = () => processCashback(true);
+    document.getElementById('remove-cashback').onclick = () => processCashback(false);
 }
 </script>
 </body>
 </html>
+
 
 
 
