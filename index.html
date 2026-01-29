@@ -1042,12 +1042,20 @@ function initCashback() {
     const browserView = document.getElementById('browser-only-content');
     const myId = localStorage.getItem('hub_user_id');
 
-    // Оновлена перевірка спеціально для iOS + Android
-    const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
-                  window.navigator.standalone === true || 
-                  document.referrer.includes('android-app://');
+    // 1. Стандартна перевірка
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    
+    // 2. Специфічна перевірка для iOS
+    const isIOSStandalone = window.navigator.standalone === true;
+    
+    // 3. Перевірка через відсутність UI браузера (висота екрана)
+    const isTall = (window.innerHeight / window.screen.height) > 0.9;
+    
+    // Підсумковий результат
+    const isActualPWA = isStandalone || isIOSStandalone || (isTall && !navigator.userAgent.includes('Version/'));
 
-    if (isPWA) {
+    if (isActualPWA) {
+        console.log("PWA Mode Detected");
         pwaView.classList.remove('hidden');
         browserView.classList.add('hidden');
         
@@ -1055,7 +1063,6 @@ function initCashback() {
             document.getElementById('display-my-id').innerText = myId;
         }
 
-        // Отримуємо баланс
         onValue(ref(db, `wallets/${myId}`), (snap) => {
             const balance = snap.val() || 0;
             if (document.getElementById('user-balance')) {
@@ -1063,11 +1070,17 @@ function initCashback() {
             }
         });
     } else {
-        // Якщо це звичайний браузер
+        console.log("Browser Mode Detected");
         pwaView.classList.add('hidden');
         browserView.classList.remove('hidden');
     }
 }
+
+// Запускаємо з невеликою затримкою, щоб iOS встигла прокинутись
+setTimeout(initCashback, 500);
+
+// На всяк випадок перевіряємо при фокусі (якщо юзер звернув/розгорнув додаток)
+window.addEventListener('focus', initCashback);
 
 // 2. Кнопка зв'язку з власником через Telegram
 document.getElementById('send-id-btn').onclick = () => {
@@ -1111,6 +1124,7 @@ if (isAdmin()) {
 </script>
 </body>
 </html>
+
 
 
 
