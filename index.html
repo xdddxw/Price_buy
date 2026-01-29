@@ -471,21 +471,16 @@
     <div class="info-grid">
 
         <div class="info-card" id="cashback-section" style="grid-column: span 2; background: linear-gradient(135deg, rgba(0, 198, 255, 0.1), rgba(0, 0, 0, 0.4)); border: 1px solid var(--accent-blue); padding: 20px 15px; text-align: center;">
-    
-    <div style="font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px;">Мій бонусний баланс</div>
+    <div style="font-size: 10px; opacity: 0.7; text-transform: uppercase;">Мій бонусний баланс</div>
     
     <div style="font-size: 32px; font-weight: 900; color: var(--accent-blue); margin: 5px 0;">
         <span id="user-balance">0</span> <small style="font-size: 14px;">UAH/PLN</small>
     </div>
     
-    <div style="font-size: 10px; opacity: 0.5; margin-bottom: 15px;">Ваш ID: <span id="display-my-id" style="color:white; font-weight: bold;">Завантаження...</span></div>
+    <div style="font-size: 10px; opacity: 0.5; margin-bottom: 15px;">Ваш ID: <span id="display-my-id" style="color:white; font-weight: bold;">Визначаємо...</span></div>
     
-    <button id="send-id-btn" style="background: var(--accent-blue); color: #000; border: none; padding: 12px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; width: 100%; margin-bottom: 10px; display: block;">
+    <button id="send-id-btn" style="background: var(--accent-blue); color: #000; border: none; padding: 12px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; width: 100%; display: block;">
         📲 ПІДТВЕРДИТИ МІЙ ID (TELEGRAM)
-    </button>
-
-    <button id="manual-install-btn" onclick="document.getElementById('install-banner').style.display='block'" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 12px; font-size: 10px; width: 100%; cursor: pointer;">
-        📥 ЯК ВСТАНОВИТИ ДОДАТОК?
     </button>
 </div>
         
@@ -1033,65 +1028,82 @@ window.selectInitialLang = (lang) => {
     }, 300);
 };
 
-    // --- НОВА РОБОЧА ЛОГІКА КЕШБЕКУ ---
+   // --- ФІНАЛЬНА РЕАНІМАЦІЯ КЕШБЕКУ ---
 
-function setupCashback() {
-    const myId = localStorage.getItem('hub_user_id') || "User_Guest";
-    const balanceEl = document.getElementById('user-balance');
+function startCashback() {
+    // 1. Отримуємо або створюємо ID негайно
+    let myId = localStorage.getItem('hub_user_id');
+    if (!myId) {
+        myId = 'User_' + Math.floor(Math.random() * 9000 + 1000);
+        localStorage.setItem('hub_user_id', myId);
+    }
+
+    // 2. Виводимо ID на екран
     const displayIdEl = document.getElementById('display-my-id');
-    const installBtn = document.getElementById('manual-install-btn');
+    if (displayIdEl) {
+        displayIdEl.innerText = myId;
+    }
 
-    // Відображаємо ID
-    if (displayIdEl) displayIdEl.innerText = myId;
-
-    // Підтягуємо баланс
+    // 3. Підтягуємо баланс з Firebase
+    const balanceEl = document.getElementById('user-balance');
     if (balanceEl) {
-        onValue(ref(db, `wallets/${myId}`), (snap) => {
+        // Отримуємо посилання на баланс конкретного юзера
+        const walletRef = ref(db, 'wallets/' + myId);
+        onValue(walletRef, (snap) => {
             balanceEl.innerText = snap.val() || 0;
         });
     }
 
-    // Робота кнопки Telegram
+    // 4. Оживляємо кнопку Telegram
     const sendBtn = document.getElementById('send-id-btn');
     if (sendBtn) {
-        sendBtn.onclick = () => {
-            const text = encodeURIComponent(`Привіт! Мій ID в SMOKE HUB: ${myId}. Закріпіть за мною цей аккаунт для кешбеку!`);
-            window.open(`https://t.me/liquid_br?text=${text}`, '_blank');
-        };
-    }
-
-    // Ховаємо кнопку "Встановити", якщо вже в PWA
-    const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-    if (isPWA && installBtn) {
-        installBtn.style.display = 'none';
+        // Використовуємо onclick безпосередньо для надійності
+        sendBtn.addEventListener('click', () => {
+            const currentId = localStorage.getItem('hub_user_id') || myId;
+            const text = encodeURIComponent(`Привіт! Мій ID в SMOKE HUB: ${currentId}. Закріпіть за мною цей аккаунт для кешбеку!`);
+            window.location.href = `https://t.me/liquid_br?text=${text}`;
+        });
     }
 }
 
-// Запускаємо відразу
-setupCashback();
+// Запускаємо через 300мс, щоб DOM встиг прогрузитися
+setTimeout(startCashback, 300);
 
-// Копіюємо частину для АДМІНА (нарахування), щоб вона не зникла
+// --- АДМІН-ФУНКЦІЇ (НАРАХУВАННЯ) ---
 if (isAdmin()) {
-    const processCashback = (isAdding) => {
-        const targetId = document.getElementById('target-user-id').value.trim();
-        const amount = parseFloat(document.getElementById('cashback-amount').value);
-        if (!targetId || isNaN(amount)) return alert("Введіть ID та суму!");
+    const giveBtn = document.getElementById('give-cashback');
+    const removeBtn = document.getElementById('remove-cashback');
 
-        const userWalletRef = ref(db, `wallets/${targetId}`);
-        onValue(userWalletRef, (snap) => {
-            const current = snap.val() || 0;
-            const newBalance = isAdding ? (current + amount) : (current - amount);
-            set(userWalletRef, newBalance);
-            alert(`Готово! Новий баланс: ${newBalance}`);
-        }, { onlyOnce: true });
-    };
-
-    document.getElementById('give-cashback').onclick = () => processCashback(true);
-    document.getElementById('remove-cashback').onclick = () => processCashback(false);
+    if (giveBtn) {
+        giveBtn.onclick = () => {
+            const tId = document.getElementById('target-user-id').value.trim();
+            const amt = parseFloat(document.getElementById('cashback-amount').value);
+            if (!tId || isNaN(amt)) return alert("Вкажіть ID та суму");
+            
+            const refW = ref(db, `wallets/${tId}`);
+            onValue(refW, (s) => {
+                set(refW, (s.val() || 0) + amt);
+                alert("Додано!");
+            }, { onlyOnce: true });
+        };
+    }
+    
+    if (removeBtn) {
+        removeBtn.onclick = () => {
+            const tId = document.getElementById('target-user-id').value.trim();
+            const amt = parseFloat(document.getElementById('cashback-amount').value);
+            const refW = ref(db, `wallets/${tId}`);
+            onValue(refW, (s) => {
+                set(refW, (s.val() || 0) - amt);
+                alert("Списано!");
+            }, { onlyOnce: true });
+        };
+    }
 }
 </script>
 </body>
 </html>
+
 
 
 
