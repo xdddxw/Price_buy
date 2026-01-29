@@ -1037,30 +1037,37 @@ window.selectInitialLang = (lang) => {
 
     // --- ЛОГІКА КЕШБЕКУ ТА PWA ---
 
-// 1. Перевірка: чи додаток відкритий як PWA
-const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-
 function initCashback() {
     const pwaView = document.getElementById('pwa-only-content');
     const browserView = document.getElementById('browser-only-content');
     const myId = localStorage.getItem('hub_user_id');
 
+    // Оновлена перевірка спеціально для iOS + Android
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                  window.navigator.standalone === true || 
+                  document.referrer.includes('android-app://');
+
     if (isPWA) {
         pwaView.classList.remove('hidden');
         browserView.classList.add('hidden');
-        document.getElementById('display-my-id').innerText = myId;
+        
+        if (document.getElementById('display-my-id')) {
+            document.getElementById('display-my-id').innerText = myId;
+        }
 
-        // Отримуємо баланс з бази
+        // Отримуємо баланс
         onValue(ref(db, `wallets/${myId}`), (snap) => {
-            document.getElementById('user-balance').innerText = snap.val() || 0;
+            const balance = snap.val() || 0;
+            if (document.getElementById('user-balance')) {
+                document.getElementById('user-balance').innerText = balance;
+            }
         });
     } else {
+        // Якщо це звичайний браузер
         pwaView.classList.add('hidden');
         browserView.classList.remove('hidden');
     }
 }
-
-initCashback();
 
 // 2. Кнопка зв'язку з власником через Telegram
 document.getElementById('send-id-btn').onclick = () => {
@@ -1104,6 +1111,7 @@ if (isAdmin()) {
 </script>
 </body>
 </html>
+
 
 
 
