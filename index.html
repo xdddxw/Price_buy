@@ -374,6 +374,17 @@
     background: var(--accent-pink);
     border-color: var(--accent-pink);
 }
+
+/* Якщо активовано режим приховування і товар має статус out-of-stock — ховаємо */
+html.hide-sold-active .product-card.out-of-stock {
+    display: none !important;
+}
+
+/* Але якщо це адмін — показуємо напівпрозорим, щоб можна було повернути */
+html.force-admin.hide-sold-active .product-card.out-of-stock {
+    display: flex !important;
+    opacity: 0.3;
+}
     </style>
 </head>
 <body>
@@ -559,6 +570,7 @@
     <button class="admin-btn" id="edit-price">💰 ЦІНИ (OFF)</button>
     <button class="admin-btn" id="edit-desc">📝 НАЗВИ (OFF)</button>
     <button class="admin-btn" id="edit-stock">📦 СКЛАД (OFF)</button>
+    <button class="admin-btn" id="toggle-hide-sold">🚫 ПРИХОВАТИ SOLD (OFF)</button>
     <button class="admin-btn" id="toggle-payment">💳 ОПЛАТА (ON)</button>
     <button class="admin-btn" id="edit-badge">🏷️ СТІКЕРИ (OFF)</button>
     <select id="badge-selector" class="admin-btn" style="background: #222; color: #fff;">
@@ -747,26 +759,31 @@ if (pageTitle) {
     }
 
     document.addEventListener('click', (e) => {
-        const card = e.target.closest('.product-card');
-        if(!card || !isAdmin()) return;
+    const card = e.target.closest('.product-card');
+    if(!card || !isAdmin()) return;
 
-        if(mode === 'stock') card.classList.toggle('out-of-stock');
+    if(mode === 'stock') {
+        // Тепер при кліку в режимі складу товар стає "Продано" або навпаки
+        card.classList.toggle('out-of-stock');
         
-        if(mode === 'badge') {
-            const type = document.getElementById('badge-selector').value;
-            const badgeDiv = card.querySelector('.badge');
-            badgeDiv.className = 'badge';
-            if(type) {
-                card.setAttribute('data-badge', type);
-                badgeDiv.classList.add('badge-' + type);
-                // ЗАМІСТЬ ЖОРСТКОГО ТЕКСТУ:
-                badgeDiv.innerText = translations[currentLang]['badge_' + type];
-            } else {
-                card.removeAttribute('data-badge');
-                badgeDiv.innerText = '';
-            }
+        // Обов'язково додаємо атрибут тексту, щоб він з'явився при перекладі
+        card.setAttribute('data-out-of-stock-text', translations[currentLang].sold);
+    }
+    
+    if(mode === 'badge') {
+        const type = document.getElementById('badge-selector').value;
+        const badgeDiv = card.querySelector('.badge');
+        badgeDiv.className = 'badge';
+        if(type) {
+            card.setAttribute('data-badge', type);
+            badgeDiv.classList.add('badge-' + type);
+            badgeDiv.innerText = translations[currentLang]['badge_' + type];
+        } else {
+            card.removeAttribute('data-badge');
+            badgeDiv.innerText = '';
         }
-    });
+    }
+});
 
     document.getElementById('save-all').onclick = () => {
         const p = [], d = [], s = [], b = [];
@@ -809,6 +826,23 @@ if (pageTitle) {
     document.getElementById('toggle-maint').onclick = () => {
         set(ref(db, 'settings/maintenance'), !currentMaintStatus);
     };
+    
+    // --- ЛОГІКА ПРИХОВУВАННЯ ТОВАРІВ ---
+let currentHideSoldStatus = false;
+onValue(ref(db, 'settings/hideSold'), (snap) => {
+    currentHideSoldStatus = snap.val() === true;
+    const btn = document.getElementById('toggle-hide-sold');
+    if (currentHideSoldStatus) {
+        document.documentElement.classList.add('hide-sold-active');
+        if(btn) { btn.innerText = "🚫 ПРИХОВАТИ SOLD (ON)"; btn.classList.add('active-mode'); }
+    } else {
+        document.documentElement.classList.remove('hide-sold-active');
+        if(btn) { btn.innerText = "🚫 ПРИХОВАТИ SOLD (OFF)"; btn.classList.remove('active-mode'); }
+    }
+});
+document.getElementById('toggle-hide-sold').onclick = () => {
+    if (isAdmin()) set(ref(db, 'settings/hideSold'), !currentHideSoldStatus);
+};
 
    // --- PWA ---
     let deferredPrompt;
@@ -1117,7 +1151,6 @@ updateTgLink();
 </script>
 </body>
 </html>
-
 
 
 
