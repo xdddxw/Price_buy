@@ -1023,12 +1023,14 @@ if (newLangBtn) {
     };
 }
 
-// Кнопка швидкої зміни мови в хедері
-document.getElementById("lang-toggle").onclick = () => {
-    currentLang = currentLang === "ua" ? "pl" : "ua";
-    applyLang(currentLang);
-};
-
+// Безпечна зміна мови (з перевіркою на існування кнопки)
+const langToggleBtn = document.getElementById("lang-toggle");
+if (langToggleBtn) {
+    langToggleBtn.onclick = () => {
+        currentLang = currentLang === "ua" ? "pl" : "ua";
+        applyLang(currentLang);
+    };
+}
 // Перевірка та показ модального вікна
 window.addEventListener('DOMContentLoaded', () => {
     const savedLang = localStorage.getItem("lang");
@@ -1102,6 +1104,7 @@ if (myIdForWallet) {
 </script>
 </body>
 </html>
+
 
 
 
