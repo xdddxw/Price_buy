@@ -1058,29 +1058,9 @@ window.selectInitialLang = (lang) => {
     }, 300);
 };
 
-   // 1. Формування посилання для Telegram (Safari-friendly)
-window.prepareTgLink = function(el) {
-    const currentId = localStorage.getItem('hub_user_id');
-    const text = encodeURIComponent(`Привіт! Мій ID в SMOKE HUB: ${currentId}. Закріпіть його за мною!`);
-    el.href = `https://t.me/liquid_br?text=${text}`;
-};
+   // ВСТАВИТИ ЦЕ ВСЕРЕДИНУ ТЕГУ <script type="module">
 
-// 2. Синхронізація балансу юзера
-function syncUserWallet() {
-    const currentId = localStorage.getItem('hub_user_id');
-    if (!currentId) return;
-
-    const balanceEl = document.getElementById('user-balance');
-    if (balanceEl && typeof db !== 'undefined') {
-        onValue(ref(db, 'wallets/' + currentId), (snap) => {
-            balanceEl.innerText = snap.val() || 0;
-        });
-    }
-}
-setTimeout(syncUserWallet, 500);
-
-// --- АДМІН-ФУНКЦІЇ КЕШБЕКУ (СТАБІЛЬНА ВЕРСІЯ) ---
-setTimeout(() => {
+const setupAdminWalletActions = () => {
     if (!isAdmin()) return;
 
     const giveBtn = document.getElementById('give-cashback');
@@ -1088,74 +1068,51 @@ setTimeout(() => {
     const targetInput = document.getElementById('target-user-id');
     const amountInput = document.getElementById('cashback-amount');
 
-    if (!targetInput || !amountInput) {
-        console.warn("❌ Поля адмінки не знайдені");
-        return;
-    }
-
-    const updateBalance = async (isAdding) => {
-        console.log("🔥 updateBalance called", isAdding);
-
-        const tId = targetInput.value.trim().split(' ')[0];
+    const handleUpdate = async (isAdding) => {
+        const tId = targetInput.value.trim();
         const amt = parseFloat(amountInput.value);
 
         if (!tId || isNaN(amt) || amt <= 0) {
-            alert("Введіть коректний ID та суму");
+            alert("Введіть ID (напр. User_1234) та суму");
             return;
         }
 
         try {
+            // Тут ми використовуємо "db", яка вже є в модулі
             const walletRef = ref(db, `wallets/${tId}`);
 
             await runTransaction(walletRef, (current) => {
                 const balance = Number(current) || 0;
-                return isAdding
-                    ? balance + amt
-                    : Math.max(0, balance - amt);
+                return isAdding ? balance + amt : Math.max(0, balance - amt);
             });
 
-            alert(`✅ Баланс оновлено для ${tId}`);
+            alert(`✅ Виконано для ${tId}`);
             amountInput.value = "";
-        } catch (err) {
-            console.error("❌ Firebase error:", err);
+        } catch (e) {
+            console.error(e);
             alert("Помилка бази");
         }
     };
 
-    if (giveBtn) {
-        giveBtn.addEventListener('click', () => updateBalance(true));
-    } else {
-        console.warn("❌ give-cashback не знайдений");
-    }
+    if (giveBtn) giveBtn.onclick = () => handleUpdate(true);
+    if (removeBtn) removeBtn.onclick = () => handleUpdate(false);
+};
 
-    if (removeBtn) {
-        removeBtn.addEventListener('click', () => updateBalance(false));
-    } else {
-        console.warn("❌ remove-cashback не знайдений");
-    }
+// Викликаємо функцію відразу
+setupAdminWalletActions();
 
-    // Клік по списку відвідувачів
-    const visitorsList = document.getElementById('visitors-list');
-    if (visitorsList) {
-        visitorsList.addEventListener('click', (e) => {
-            const item = e.target.closest('.visitor-item');
-            if (!item) return;
-
-            const span = item.querySelector('span');
-            if (!span) return;
-
-            const cleanId = span.innerText.split(' ')[0];
-            targetInput.value = cleanId;
-
-            targetInput.style.borderColor = 'var(--accent-blue)';
-            setTimeout(() => (targetInput.style.borderColor = ''), 800);
-        });
-    }
-}, 0);
-
+// Також перенесіть сюди функцію синхронізації, щоб вона бачила "db"
+const currentId = localStorage.getItem('hub_user_id');
+if (currentId) {
+    onValue(ref(db, 'wallets/' + currentId), (snap) => {
+        const balEl = document.getElementById('user-balance');
+        if (balEl) balEl.innerText = snap.val() || 0;
+    });
+}
 </script>
 </body>
 </html>
+
 
 
 
