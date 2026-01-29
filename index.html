@@ -696,7 +696,9 @@
             // 4. Оновлюємо кнопки та заголовок (твій стандартний код)
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             btn.classList.add('active');
-            document.getElementById('page-title').innerText = btn.innerText.split('\n').pop().toUpperCase();
+            document.getElementById('page-title')?.innerText =
+    btn.innerText.split('\n').pop().toUpperCase();
+
             window.scrollTo(0,0);
         };
     });
@@ -1151,6 +1153,7 @@ setTimeout(() => {
 </script>
 </body>
 </html>
+
 
 
 
