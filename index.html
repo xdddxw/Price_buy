@@ -1074,62 +1074,84 @@ function syncUserWallet() {
 }
 setTimeout(syncUserWallet, 500);
 
-// --- ПОВНІСТЮ РОБОЧІ АДМІН-ФУНКЦІЇ КЕШБЕКУ ---
-if (isAdmin()) {
+// --- АДМІН-ФУНКЦІЇ КЕШБЕКУ (СТАБІЛЬНА ВЕРСІЯ) ---
+setTimeout(() => {
+    if (!isAdmin()) return;
+
     const giveBtn = document.getElementById('give-cashback');
     const removeBtn = document.getElementById('remove-cashback');
     const targetInput = document.getElementById('target-user-id');
     const amountInput = document.getElementById('cashback-amount');
 
+    if (!targetInput || !amountInput) {
+        console.warn("❌ Поля адмінки не знайдені");
+        return;
+    }
+
     const updateBalance = async (isAdding) => {
-    console.log("🔥 updateBalance called", isAdding);
+        console.log("🔥 updateBalance called", isAdding);
 
-    const tId = targetInput.value.trim().split(' ')[0];
-    const amt = parseFloat(amountInput.value);
+        const tId = targetInput.value.trim().split(' ')[0];
+        const amt = parseFloat(amountInput.value);
 
-    if (!tId || isNaN(amt) || amt <= 0) {
-        return alert("Введіть коректний ID та суму");
+        if (!tId || isNaN(amt) || amt <= 0) {
+            alert("Введіть коректний ID та суму");
+            return;
+        }
+
+        try {
+            const walletRef = ref(db, `wallets/${tId}`);
+
+            await runTransaction(walletRef, (current) => {
+                const balance = Number(current) || 0;
+                return isAdding
+                    ? balance + amt
+                    : Math.max(0, balance - amt);
+            });
+
+            alert(`✅ Баланс оновлено для ${tId}`);
+            amountInput.value = "";
+        } catch (err) {
+            console.error("❌ Firebase error:", err);
+            alert("Помилка бази");
+        }
+    };
+
+    if (giveBtn) {
+        giveBtn.addEventListener('click', () => updateBalance(true));
+    } else {
+        console.warn("❌ give-cashback не знайдений");
     }
 
-    const walletRef = ref(db, `wallets/${tId}`);
-
-    try {
-        await runTransaction(walletRef, (current) => {
-            const balance = current || 0;
-            return isAdding
-                ? balance + amt
-                : Math.max(0, balance - amt);
-        });
-
-        alert(`✅ Успішно! Баланс оновлено для ${tId}`);
-        amountInput.value = "";
-    } catch (err) {
-        console.error(err);
-        alert("❌ Помилка бази: " + err.message);
+    if (removeBtn) {
+        removeBtn.addEventListener('click', () => updateBalance(false));
+    } else {
+        console.warn("❌ remove-cashback не знайдений");
     }
-};
-
-
-    if (giveBtn) giveBtn.onclick = () => updateBalance(true);
-    if (removeBtn) removeBtn.onclick = () => updateBalance(false);
 
     // Клік по списку відвідувачів
     const visitorsList = document.getElementById('visitors-list');
     if (visitorsList) {
-        visitorsList.onclick = (e) => {
+        visitorsList.addEventListener('click', (e) => {
             const item = e.target.closest('.visitor-item');
-            if (item) {
-                const cleanId = item.querySelector('span').innerText.split(' ')[0];
-                targetInput.value = cleanId;
-                targetInput.style.borderColor = 'var(--accent-blue)';
-                setTimeout(() => targetInput.style.borderColor = '', 1000);
-            }
-        };
+            if (!item) return;
+
+            const span = item.querySelector('span');
+            if (!span) return;
+
+            const cleanId = span.innerText.split(' ')[0];
+            targetInput.value = cleanId;
+
+            targetInput.style.borderColor = 'var(--accent-blue)';
+            setTimeout(() => (targetInput.style.borderColor = ''), 800);
+        });
     }
-}
+}, 0);
+
 </script>
 </body>
 </html>
+
 
 
 
