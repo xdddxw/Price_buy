@@ -1058,85 +1058,54 @@ window.selectInitialLang = (lang) => {
     }, 300);
 };
 
-   // --- КОД ДЛЯ КЕШБЕКУ (ВСТАВЛЯТИ ВСЕРЕДИНУ <script type="module">) ---
+   // --- КЕШБЕК СИСТЕМА ---
 
-// 1. СИНХРОНІЗАЦІЯ БАЛАНСУ (ДЛЯ КЛІЄНТА)
-const userId = localStorage.getItem('hub_user_id');
-if (userId) {
-    const balanceRef = ref(db, `wallets/${userId}`);
-    onValue(balanceRef, (snapshot) => {
-        const balanceEl = document.getElementById('user-balance');
-        if (balanceEl) {
-            balanceEl.innerText = snapshot.val() || 0;
-        }
+// Показ балансу юзеру
+const myIdForWallet = localStorage.getItem('hub_user_id');
+if (myIdForWallet) {
+    onValue(ref(db, 'wallets/' + myIdForWallet), (s) => {
+        const el = document.getElementById('user-balance');
+        if (el) el.innerText = s.val() || 0;
     });
 }
 
-// 2. АДМІН-ПАНЕЛЬ (НАРАХУВАННЯ ТА СПИСАННЯ)
+// Функції адміна
 if (isAdmin()) {
-    const targetInput = document.getElementById('target-user-id');
-    const amountInput = document.getElementById('cashback-amount');
-    const giveBtn = document.getElementById('give-cashback');
-    const removeBtn = document.getElementById('remove-cashback');
+    const tInput = document.getElementById('target-user-id');
+    const aInput = document.getElementById('cashback-amount');
 
-    const updateWallet = async (isAdding) => {
-        const tId = targetInput.value.trim();
-        const amt = parseFloat(amountInput.value);
+    window.updateWallet = async (isAdd) => {
+        const id = tInput.value.trim();
+        const val = parseFloat(aInput.value);
 
-        if (!tId || isNaN(amt) || amt <= 0) {
-            alert("Помилка: введіть правильний ID та суму!");
-            return;
-        }
+        if (!id || isNaN(val)) return alert("Заповніть ID та Суму");
 
         try {
-            const walletRef = ref(db, `wallets/${tId}`);
-            
-            // Використовуємо транзакцію для безпечного оновлення
-            await runTransaction(walletRef, (currentValue) => {
-                const currentBalance = Number(currentValue) || 0;
-                let newBalance = isAdding 
-                    ? currentBalance + amt 
-                    : currentBalance - amt;
-
-                return Math.max(0, newBalance); // Баланс не може бути менше 0
+            await runTransaction(ref(db, 'wallets/' + id), (current) => {
+                const old = Number(current) || 0;
+                return isAdd ? old + val : Math.max(0, old - val);
             });
-
-            alert(`✅ Успішно! ID: ${tId} | Сума: ${amt}`);
-            amountInput.value = ""; // Очищуємо поле суми
-        } catch (error) {
-            console.error("Firebase Error:", error);
-            alert("Помилка бази даних! Перевірте Rules у Firebase.");
+            alert("Збережено!");
+            aInput.value = "";
+        } catch (e) {
+            alert("Помилка! Перевірте Rules у Firebase");
         }
     };
 
-    if (giveBtn) giveBtn.onclick = () => updateWallet(true);
-    if (removeBtn) removeBtn.onclick = () => updateWallet(false);
-
-    // Клік по списку відвідувачів для миттєвого копіювання ID в поле
-    const vList = document.getElementById('visitors-list');
-    if (vList) {
-        vList.addEventListener('click', (e) => {
-            const item = e.target.closest('.visitor-item');
-            if (item) {
-                const idSpan = item.querySelector('span');
-                if (idSpan) {
-                    targetInput.value = idSpan.innerText.trim();
-                    targetInput.focus();
-                }
-            }
-        });
-    }
+    // Прив'язка кнопок
+    document.getElementById('give-cashback').onclick = () => window.updateWallet(true);
+    document.getElementById('remove-cashback').onclick = () => window.updateWallet(false);
 }
 
-// 3. TELEGRAM LINK HELPER
-window.prepareTgLink = function(el) {
+// Telegram Helper
+window.prepareTgLink = (el) => {
     const id = localStorage.getItem('hub_user_id');
-    const text = encodeURIComponent(`Привіт! Мій ID: ${id}. Закріпіть його за мною для кешбеку!`);
-    el.href = `https://t.me/liquid_br?text=${text}`;
+    el.href = `https://t.me/liquid_br?text=${encodeURIComponent("Мій ID: " + id)}`;
 };
 </script>
 </body>
 </html>
+
 
 
 
