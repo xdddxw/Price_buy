@@ -1058,20 +1058,20 @@ window.selectInitialLang = (lang) => {
     }, 300);
 };
 
-  // --- БЕЗПЕЧНА СИСТЕМА КЕШБЕКУ ---
+  // --- БЕЗПЕЧНЕ НАРАХУВАННЯ КЕШБЕКУ ---
 
-// 1. Функція оновлення балансу
-const updateWallet = async (isAdding) => {
-    const targetInput = document.getElementById('target-user-id');
-    const amountInput = document.getElementById('cashback-amount');
+const updateBalance = async (isAdding) => {
+    const tInput = document.getElementById('target-user-id');
+    const aInput = document.getElementById('cashback-amount');
     
-    const tId = targetInput?.value.trim();
-    const amt = parseFloat(amountInput?.value);
-
-    if (!tId || isNaN(amt) || amt <= 0) {
-        alert("Помилка: введіть коректний ID та суму!");
+    // Перевіряємо чи поля існують і чи вони не порожні
+    if (!tInput?.value || !aInput?.value) {
+        alert("Заповніть ID користувача та суму!");
         return;
     }
+
+    const tId = tInput.value.trim();
+    const amt = parseFloat(aInput.value);
 
     try {
         const walletRef = ref(db, `wallets/${tId}`);
@@ -1079,33 +1079,22 @@ const updateWallet = async (isAdding) => {
             const balance = Number(current) || 0;
             return isAdding ? balance + amt : Math.max(0, balance - amt);
         });
-        alert(`✅ Успішно! ID: ${tId} оновлено.`);
-        if (amountInput) amountInput.value = ""; 
+        alert(`✅ Виконано для ${tId}`);
+        aInput.value = ""; // Очистити суму після успіху
     } catch (e) {
         console.error("Firebase Error:", e);
         alert("Помилка бази! Перевірте вкладку Rules у Firebase Console.");
     }
 };
 
-// 2. Безпечне призначення подій кнопкам
-// Використовуємо перевірку 'if', щоб не було помилки "null"
-const btnGive = document.getElementById('give-cashback');
-const btnRemove = document.getElementById('remove-cashback');
+// Безпечне призначення подій (не викликає помилку, якщо кнопки немає)
+document.getElementById('give-cashback')?.addEventListener('click', () => updateBalance(true));
+document.getElementById('remove-cashback')?.addEventListener('click', () => updateBalance(false));
 
-if (btnGive) {
-    btnGive.onclick = () => updateWallet(true);
-} else {
-    console.warn("Кнопка 'give-cashback' не знайдена в HTML");
-}
-
-if (btnRemove) {
-    btnRemove.onclick = () => updateWallet(false);
-}
-
-// 3. Синхронізація балансу для клієнта
-const myId = localStorage.getItem('hub_user_id');
-if (myId && typeof db !== 'undefined') {
-    onValue(ref(db, 'wallets/' + myId), (snap) => {
+// Синхронізація балансу (для клієнта)
+const myIdForWallet = localStorage.getItem('hub_user_id');
+if (myIdForWallet) {
+    onValue(ref(db, 'wallets/' + myIdForWallet), (snap) => {
         const balEl = document.getElementById('user-balance');
         if (balEl) balEl.innerText = snap.val() || 0;
     });
@@ -1113,6 +1102,7 @@ if (myId && typeof db !== 'undefined') {
 </script>
 </body>
 </html>
+
 
 
 
