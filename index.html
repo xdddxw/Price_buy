@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <script>
-        if (localStorage.getItem('isHubAdmin') === 'true') {
-            document.documentElement.classList.add('force-admin');
+   <script>
+    // 1. Функція для отримання/створення ID
+    function getPermanentId() {
+        let id = localStorage.getItem('hub_user_id');
+        if (!id) {
+            id = 'User_' + Math.floor(Math.random() * 9000 + 1000);
+            localStorage.setItem('hub_user_id', id);
         }
-        if (!localStorage.getItem('hub_user_id')) {
-            localStorage.setItem('hub_user_id', 'User_' + Math.floor(Math.random() * 9000 + 1000));
-        }
-    </script>
+        return id;
+    }
+
+    // Присвоюємо ID відразу при завантаженні
+    const myId = getPermanentId();
+
+    if (localStorage.getItem('isHubAdmin') === 'true') {
+        document.documentElement.classList.add('force-admin');
+    }
+</script>
    <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>SMOKE HUB 2026</title>
@@ -477,11 +487,11 @@
         <span id="user-balance">0</span> <small style="font-size: 14px;">UAH/PLN</small>
     </div>
     
-    <div style="font-size: 10px; opacity: 0.5; margin-bottom: 15px;">Ваш ID: <span id="display-my-id" style="color:white; font-weight: bold;">Визначаємо...</span></div>
+    <div style="font-size: 10px; opacity: 0.5; margin-bottom: 15px;">Ваш ID: <span id="display-my-id" style="color:white; font-weight: bold;">...</span></div>
     
-    <a id="send-id-btn" href="#" target="_blank" style="background: var(--accent-blue); color: #000; text-decoration: none; padding: 12px; border-radius: 12px; font-size: 11px; font-weight: 800; width: calc(100% - 24px); display: block; text-align: center;">
-    📲 ПІДТВЕРДИТИ МІЙ ID (TELEGRAM)
-</a>
+    <a id="send-id-btn" href="https://t.me/liquid_br" target="_blank" style="background: var(--accent-blue); color: #000; text-decoration: none; padding: 14px; border-radius: 12px; font-size: 11px; font-weight: 800; display: block;">
+        📲 ПІДТВЕРДИТИ МІЙ ID (TELEGRAM)
+    </a>
 </div>
         
         <div class="section-label">Сервіси</div>
@@ -1029,39 +1039,38 @@ window.selectInitialLang = (lang) => {
 };
 
    function startCashback() {
-    // 1. Отримуємо або створюємо ID
-    let myId = localStorage.getItem('hub_user_id');
-    if (!myId) {
-        myId = 'User_' + Math.floor(Math.random() * 9000 + 1000);
-        localStorage.setItem('hub_user_id', myId);
-    }
-
-    // 2. Виводимо ID на екран
+    const currentId = localStorage.getItem('hub_user_id');
+    
+    // Показуємо ID (він вже точно є в localStorage)
     const displayIdEl = document.getElementById('display-my-id');
-    if (displayIdEl) {
-        displayIdEl.innerText = myId;
+    if (displayIdEl) displayIdEl.innerText = currentId;
+
+    // Оновлюємо посилання для Telegram
+    const sendLink = document.getElementById('send-id-btn');
+    if (sendLink) {
+        const text = encodeURIComponent(`Привіт! Мій ID: ${currentId}. Закріпіть його за мною!`);
+        // Використовуємо універсальне посилання t.me
+        sendLink.href = `https://t.me/liquid_br?text=${text}`;
     }
 
-    // 3. Підтягуємо баланс
+    // Баланс
     const balanceEl = document.getElementById('user-balance');
-    if (balanceEl) {
-        const walletRef = ref(db, 'wallets/' + myId);
+    if (balanceEl && typeof db !== 'undefined') {
+        const walletRef = ref(db, 'wallets/' + currentId);
         onValue(walletRef, (snap) => {
             balanceEl.innerText = snap.val() || 0;
         });
     }
-
-    // 4. ПРЯМА ПРИВ'ЯЗКА ПОСИЛАННЯ (Для iPhone)
-    const sendLink = document.getElementById('send-id-btn');
-    if (sendLink) {
-        const text = encodeURIComponent(`Привіт! Мій ID в SMOKE HUB: ${myId}. Закріпіть за мною цей аккаунт для кешбеку!`);
-        // Встановлюємо пряму адресу
-        sendLink.href = `https://t.me/liquid_br?text=${text}`;
-    }
 }
+
+// Запускаємо відразу після завантаження
+window.addEventListener('load', startCashback);
+// І про всяк випадок через секунду (якщо Safari ще спить)
+setTimeout(startCashback, 1000);
 </script>
 </body>
 </html>
+
 
 
 
