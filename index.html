@@ -1058,58 +1058,62 @@ window.selectInitialLang = (lang) => {
     }, 300);
 };
 
-   // --- БЕЗПЕЧНИЙ КОД КЕШБЕКУ ---
+  // --- БЕЗПЕЧНА СИСТЕМА КЕШБЕКУ ---
 
-// Функція оновлення балансу (Адмін)
-const updateWallet = async (isAdd) => {
-    const tInput = document.getElementById('target-user-id');
-    const aInput = document.getElementById('cashback-amount');
+// 1. Функція оновлення балансу
+const updateWallet = async (isAdding) => {
+    const targetInput = document.getElementById('target-user-id');
+    const amountInput = document.getElementById('cashback-amount');
     
-    const id = tInput?.value.trim();
-    const val = parseFloat(aInput?.value);
+    const tId = targetInput?.value.trim();
+    const amt = parseFloat(amountInput?.value);
 
-    if (!id || isNaN(val)) {
-        alert("Введіть ID та суму");
+    if (!tId || isNaN(amt) || amt <= 0) {
+        alert("Помилка: введіть коректний ID та суму!");
         return;
     }
 
     try {
-        await runTransaction(ref(db, 'wallets/' + id), (current) => {
-            const old = Number(current) || 0;
-            return isAdd ? old + val : Math.max(0, old - val);
+        const walletRef = ref(db, `wallets/${tId}`);
+        await runTransaction(walletRef, (current) => {
+            const balance = Number(current) || 0;
+            return isAdding ? balance + amt : Math.max(0, balance - amt);
         });
-        alert("✅ Успішно оновлено!");
-        if (aInput) aInput.value = "";
+        alert(`✅ Успішно! ID: ${tId} оновлено.`);
+        if (amountInput) amountInput.value = ""; 
     } catch (e) {
-        console.error(e);
-        alert("Помилка бази! Перевірте Rules у Firebase.");
+        console.error("Firebase Error:", e);
+        alert("Помилка бази! Перевірте вкладку Rules у Firebase Console.");
     }
 };
 
-// Призначаємо події тільки якщо кнопки існують (захист від TypeError)
-const giveBtn = document.getElementById('give-cashback');
-const removeBtn = document.getElementById('remove-cashback');
+// 2. Безпечне призначення подій кнопкам
+// Використовуємо перевірку 'if', щоб не було помилки "null"
+const btnGive = document.getElementById('give-cashback');
+const btnRemove = document.getElementById('remove-cashback');
 
-if (giveBtn) giveBtn.onclick = () => updateWallet(true);
-if (removeBtn) removeBtn.onclick = () => updateWallet(false);
-
-// Відображення балансу клієнту
-const myUserId = localStorage.getItem('hub_user_id');
-if (myUserId) {
-    onValue(ref(db, 'wallets/' + myUserId), (s) => {
-        const balEl = document.getElementById('user-balance');
-        if (balEl) balEl.innerText = s.val() || 0;
-    });
+if (btnGive) {
+    btnGive.onclick = () => updateWallet(true);
+} else {
+    console.warn("Кнопка 'give-cashback' не знайдена в HTML");
 }
 
-// Telegram Helper (винесено у window для доступу з HTML)
-window.prepareTgLink = (el) => {
-    const id = localStorage.getItem('hub_user_id');
-    el.href = `https://t.me/liquid_br?text=${encodeURIComponent("Мій ID: " + id)}`;
-};
+if (btnRemove) {
+    btnRemove.onclick = () => updateWallet(false);
+}
+
+// 3. Синхронізація балансу для клієнта
+const myId = localStorage.getItem('hub_user_id');
+if (myId && typeof db !== 'undefined') {
+    onValue(ref(db, 'wallets/' + myId), (snap) => {
+        const balEl = document.getElementById('user-balance');
+        if (balEl) balEl.innerText = snap.val() || 0;
+    });
+}
 </script>
 </body>
 </html>
+
 
 
 
