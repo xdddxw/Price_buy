@@ -469,6 +469,28 @@
 
     <div id="cat-info" class="cat-section hidden">
     <div class="info-grid">
+
+        <div class="info-card" id="cashback-section" style="grid-column: span 2; background: linear-gradient(135deg, rgba(0, 198, 255, 0.1), rgba(0, 0, 0, 0.4)); border: 1px solid var(--accent-blue); padding: 20px 10px;">
+    
+    <div id="pwa-only-content" class="hidden">
+        <div style="font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px;">Мій бонусний баланс</div>
+        <div style="font-size: 32px; font-weight: 900; color: var(--accent-blue); margin: 5px 0;">
+            <span id="user-balance">0</span> <small style="font-size: 14px;">UAH/PLN</small>
+        </div>
+        <div style="font-size: 10px; opacity: 0.5; margin-bottom: 15px;">Ваш ID: <span id="display-my-id" style="color:white"></span></div>
+        <button id="send-id-btn" style="background: var(--accent-blue); color: #000; border: none; padding: 10px 20px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; width: 100%;">
+            📲 ПІДТВЕРДИТИ МІЙ ID В TELEGRAM
+        </button>
+    </div>
+
+    <div id="browser-only-content" style="text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 5px;">🎁</div>
+        <div style="font-size: 13px; font-weight: 800; color: var(--accent-pink);">КЕШБЕК ДОСТУПНИЙ ТІЛЬКИ В ДОДАТКУ</div>
+        <p style="font-size: 10px; opacity: 0.8; margin: 8px 0;">Встановіть застосунок на головний екран, щоб отримувати бонуси з кожної покупки.</p>
+        <button onclick="document.getElementById('install-banner').style.display='block'" style="background: none; color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 10px; font-size: 10px; font-weight: 600;">ЯК ВСТАНОВИТИ?</button>
+    </div>
+</div>
+        
         <div class="section-label">Сервіси</div>
         <a href="payment.html" class="info-card" id="payment-card"><div class="info-icon">💳</div><span data-i18n="payment">Оплата</span></a>
         <a href="reviews.html" class="info-card"><div class="info-icon">⭐</div><span data-i18n="reviews">Відгуки</span></a>
@@ -544,6 +566,14 @@
         <div id="visitors-list" style="max-height: 200px; overflow-y: auto;">Завантаження...</div>
     </div>
 
+
+<hr style="border: 0.5px solid rgba(255,255,255,0.1); margin: 15px 0;">
+    <h3 style="color:var(--accent-blue); font-size: 12px; margin-bottom:10px;">💰 КЕРУВАННЯ КЕШБЕКОМ</h3>
+    <input type="text" id="target-user-id" placeholder="ID Користувача" class="admin-btn" style="background:#222; text-align:left;">
+    <input type="number" id="cashback-amount" placeholder="Сума нарахованого" class="admin-btn" style="background:#222; text-align:left;">
+    <button class="admin-btn" id="give-cashback" style="background:var(--accent-blue); color:black;">НАРАХУВАТИ</button>
+    <button class="admin-btn" id="remove-cashback" style="background:#444; margin-top:5px;">СПИСАТИ (ВІДНЯТИ)</button>
+    
     <button class="admin-btn" style="background:#000; margin-top:20px;" onclick="localStorage.clear(); location.reload();">🚪 ВИЙТИ</button>
 </div>
 
@@ -1005,9 +1035,76 @@ window.selectInitialLang = (lang) => {
     }, 300);
 };
 
+    // --- ЛОГІКА КЕШБЕКУ ТА PWA ---
+
+// 1. Перевірка: чи додаток відкритий як PWA
+const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+function initCashback() {
+    const pwaView = document.getElementById('pwa-only-content');
+    const browserView = document.getElementById('browser-only-content');
+    const myId = localStorage.getItem('hub_user_id');
+
+    if (isPWA) {
+        pwaView.classList.remove('hidden');
+        browserView.classList.add('hidden');
+        document.getElementById('display-my-id').innerText = myId;
+
+        // Отримуємо баланс з бази
+        onValue(ref(db, `wallets/${myId}`), (snap) => {
+            document.getElementById('user-balance').innerText = snap.val() || 0;
+        });
+    } else {
+        pwaView.classList.add('hidden');
+        browserView.classList.remove('hidden');
+    }
+}
+
+initCashback();
+
+// 2. Кнопка зв'язку з власником через Telegram
+document.getElementById('send-id-btn').onclick = () => {
+    const myId = localStorage.getItem('hub_user_id');
+    const text = encodeURIComponent(`Привіт! Мій ID в SMOKE HUB: ${myId}. Закріпіть за мною цей аккаунт для кешбеку!`);
+    window.open(`https://t.me/liquid_br?text=${text}`, '_blank');
+};
+
+// 3. Адмін-функції: Нарахування та Списання
+if (isAdmin()) {
+    const processCashback = (isAdding) => {
+        const targetId = document.getElementById('target-user-id').value.trim();
+        const amount = parseFloat(document.getElementById('cashback-amount').value);
+
+        if (!targetId || isNaN(amount)) return alert("Введіть ID та суму!");
+
+        const userWalletRef = ref(db, `wallets/${targetId}`);
+        onValue(userWalletRef, (snap) => {
+            const current = snap.val() || 0;
+            const newBalance = isAdding ? (current + amount) : (current - amount);
+            set(userWalletRef, newBalance);
+            alert(`Успішно! Новий баланс ${targetId}: ${newBalance}`);
+        }, { onlyOnce: true });
+    };
+
+    document.getElementById('give-cashback').onclick = () => processCashback(true);
+    document.getElementById('remove-cashback').onclick = () => processCashback(false);
+    
+    // Авто-підстановка ID клікаючи на список відвідувачів
+    document.getElementById('visitors-list').addEventListener('click', (e) => {
+        const item = e.target.closest('.visitor-item');
+        if (item) {
+            const id = item.querySelector('span').innerText;
+            document.getElementById('target-user-id').value = id;
+            // Підсвітка для зручності
+            document.getElementById('target-user-id').style.borderColor = 'var(--accent-blue)';
+            setTimeout(() => document.getElementById('target-user-id').style.borderColor = '', 1000);
+        }
+    });
+}
 </script>
 </body>
 </html>
+
 
 
 
