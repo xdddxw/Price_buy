@@ -1080,35 +1080,34 @@ if (isAdmin()) {
     const targetInput = document.getElementById('target-user-id');
     const amountInput = document.getElementById('cashback-amount');
 
-    const updateBalance = async (isAdding) => {
-        const tId = targetInput.value.trim().split(' ')[0]; // Беремо тільки ID
-        const amt = parseFloat(amountInput.value);
-        
-        if (!tId || isNaN(amt)) return alert("Введіть ID та суму!");
+    const changeBalance = async (isAdding) => {
+        const userId = targetInput.value.trim().split(' ')[0];
+        const amount = parseFloat(amountInput.value);
 
-        const walletRef = ref(db, `wallets/${tId}`);
-        
+        if (!userId || isNaN(amount) || amount <= 0) {
+            alert("Введіть коректний ID та суму");
+            return;
+        }
+
+        const walletRef = ref(db, 'wallets/' + userId);
+
         try {
-            // Отримуємо поточний баланс
-            const snapshot = await get(walletRef);
-            const current = snapshot.val() || 0;
-            
-            // Рахуємо новий
-            const next = isAdding ? (current + amt) : (current - amt);
-            
-            // Записуємо в базу
-            await set(walletRef, next);
-            
-            alert(`Успішно! Новий баланс ${tId}: ${next}`);
-            amountInput.value = ""; // Очищаємо поле суми
+            await runTransaction(walletRef, (currentBalance) => {
+                const current = currentBalance || 0;
+                return isAdding ? current + amount : Math.max(0, current - amount);
+            });
+
+            alert(`✅ Успішно! Кешбек оновлено для ${userId}`);
+            amountInput.value = "";
         } catch (err) {
             console.error(err);
-            alert("Помилка бази: " + err.message);
+            alert("❌ Помилка нарахування");
         }
     };
 
-    if (giveBtn) giveBtn.onclick = () => updateBalance(true);
-    if (removeBtn) removeBtn.onclick = () => updateBalance(false);
+    giveBtn.onclick = () => changeBalance(true);
+    removeBtn.onclick = () => changeBalance(false);
+}
 
     // Клік по списку відвідувачів
     const visitorsList = document.getElementById('visitors-list');
@@ -1127,6 +1126,7 @@ if (isAdmin()) {
 </script>
 </body>
 </html>
+
 
 
 
