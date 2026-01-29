@@ -1058,60 +1058,81 @@ window.selectInitialLang = (lang) => {
     }, 300);
 };
 
-   // ВСТАВИТИ ЦЕ ВСЕРЕДИНУ ТЕГУ <script type="module">
+   // --- ВСЕ ЦЕ МАЄ БУТИ ВСЕРЕДИНІ <script type="module"> ---
 
-const setupAdminWalletActions = () => {
-    if (!isAdmin()) return;
+// 1. Функція для Telegram (Safari-friendly)
+window.prepareTgLink = function(el) {
+    const currentId = localStorage.getItem('hub_user_id');
+    const text = encodeURIComponent(`Привіт! Мій ID в SMOKE HUB: ${currentId}. Закріпіть його за мною!`);
+    el.href = `https://t.me/liquid_br?text=${text}`;
+};
 
-    const giveBtn = document.getElementById('give-cashback');
-    const removeBtn = document.getElementById('remove-cashback');
+// 2. Синхронізація балансу (працює через db модуля)
+const syncWallet = () => {
+    const currentId = localStorage.getItem('hub_user_id');
+    if (currentId && typeof db !== 'undefined') {
+        onValue(ref(db, 'wallets/' + currentId), (snap) => {
+            const balEl = document.getElementById('user-balance');
+            if (balEl) balEl.innerText = snap.val() || 0;
+        });
+    }
+};
+syncWallet();
+
+// 3. Адмін-функції (тільки якщо isAdmin === true)
+if (isAdmin()) {
     const targetInput = document.getElementById('target-user-id');
     const amountInput = document.getElementById('cashback-amount');
+    const giveBtn = document.getElementById('give-cashback');
+    const removeBtn = document.getElementById('remove-cashback');
 
-    const handleUpdate = async (isAdding) => {
+    const updateWallet = async (isAdding) => {
         const tId = targetInput.value.trim();
         const amt = parseFloat(amountInput.value);
 
         if (!tId || isNaN(amt) || amt <= 0) {
-            alert("Введіть ID (напр. User_1234) та суму");
+            alert("Введіть ID та суму!");
             return;
         }
 
         try {
-            // Тут ми використовуємо "db", яка вже є в модулі
             const walletRef = ref(db, `wallets/${tId}`);
-
             await runTransaction(walletRef, (current) => {
                 const balance = Number(current) || 0;
                 return isAdding ? balance + amt : Math.max(0, balance - amt);
             });
-
-            alert(`✅ Виконано для ${tId}`);
+            alert("✅ Баланс оновлено!");
             amountInput.value = "";
         } catch (e) {
             console.error(e);
-            alert("Помилка бази");
+            alert("Помилка бази даних!");
         }
     };
 
-    if (giveBtn) giveBtn.onclick = () => handleUpdate(true);
-    if (removeBtn) removeBtn.onclick = () => handleUpdate(false);
-};
+    if (giveBtn) giveBtn.onclick = () => updateWallet(true);
+    if (removeBtn) removeBtn.onclick = () => updateWallet(false);
 
-// Викликаємо функцію відразу
-setupAdminWalletActions();
-
-// Також перенесіть сюди функцію синхронізації, щоб вона бачила "db"
-const currentId = localStorage.getItem('hub_user_id');
-if (currentId) {
-    onValue(ref(db, 'wallets/' + currentId), (snap) => {
-        const balEl = document.getElementById('user-balance');
-        if (balEl) balEl.innerText = snap.val() || 0;
-    });
+    // Клік по списку відвідувачів для швидкого копіювання ID
+    const vList = document.getElementById('visitors-list');
+    if (vList) {
+        vList.onclick = (e) => {
+            const item = e.target.closest('.visitor-item');
+            if (item) {
+                const idSpan = item.querySelector('span');
+                if (idSpan) {
+                    targetInput.value = idSpan.innerText.trim();
+                    targetInput.style.boxShadow = "0 0 10px #00c6ff";
+                    setTimeout(() => targetInput.style.boxShadow = "none", 500);
+                }
+            }
+        };
+    }
 }
+// --- КІНЕЦЬ БЛОКУ ДЛЯ МОДУЛЯ ---
 </script>
 </body>
 </html>
+
 
 
 
