@@ -3,147 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SMOKE HUB">
-    
-    <link rel="apple-touch-icon" href="images/IMG_3689.jpeg">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="apple-touch-icon" href="images/IMG_3689.jpeg"> 
     <link rel="icon" type="image/png" href="images/IMG_3689.jpeg">
     
-    <title>SMOKE HUB | ADMIN PANEL</title>
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5024/5024445.png">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/5024/5024445.png">
+
+    <title>SMOKE HUB PRO</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
     
     <style>
+        :root {
+            --bg-main: #0f172a;
+            --card-surface: #1e293b;
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --text-p: #94a3b8;
+        }
+
         body {
-            margin: 0; font-family: 'Segoe UI', sans-serif;
-            background: radial-gradient(circle at top, #1b0b2e, #0b0416);
-            color: #fff; display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; padding-bottom: 50px;
-            padding-top: env(safe-area-inset-top);
+            margin: 0;
+            font-family: 'SF Pro Display', -apple-system, system-ui, sans-serif;
+            background-color: var(--bg-main);
+            color: #f8fafc;
+            padding: 10px 16px 100px;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
-        .logo-text {
-            font-weight: 900; font-size: 26px; margin: 15px 0;
-            background: linear-gradient(90deg, #ff0055, #00f2ff, #ff0055);
-            background-size: 200% auto; -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent; animation: gradient-move 3s linear infinite;
+
+        /* Dashboard & Layout */
+        .dashboard-header { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; padding-top: 10px; }
+        .balance-card {
+            background: linear-gradient(135deg, var(--card-surface), #334155);
+            padding: 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        @keyframes gradient-move { to { background-position: 200% center; } }
-        
-        .card {
-            width: 92%; max-width: 400px; padding: 20px; border-radius: 20px;
-            background: rgba(255,255,255,0.07); backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.1); box-sizing: border-box;
+        .balance-card span { font-size: 10px; color: var(--text-p); text-transform: uppercase; letter-spacing: 0.5px; }
+        .balance-card div { font-size: 20px; font-weight: 700; margin-top: 4px; }
+
+        .nav-tabs { 
+            display: flex; background: var(--card-surface); padding: 4px; border-radius: 14px; 
+            margin-bottom: 20px; overflow-x: auto; gap: 4px; position: sticky; top: 10px; z-index: 100;
         }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-box {
-            background: rgba(0, 242, 255, 0.05); padding: 10px; border-radius: 12px; text-align: center;
-            border: 1px solid rgba(0, 242, 255, 0.2);
-        }
-        .stat-box b { font-size: 22px; color: #fff; display: block; }
-        .stat-box span { font-size: 10px; color: #00f2ff; text-transform: uppercase; }
-        
-        label { display: block; margin: 12px 0 5px; font-size: 10px; color: #00f2ff; font-weight: bold; text-transform: uppercase; }
+        .tab-btn { flex: 1; padding: 10px 4px; border: none; background: transparent; color: var(--text-p); font-weight: 600; font-size: 11px; border-radius: 10px; white-space: nowrap; }
+        .tab-btn.active { background: var(--accent-primary); color: white; box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4); }
+
+        /* Forms */
+        .main-form, .admin-panel { background: var(--card-surface); border-radius: 24px; padding: 18px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.03); }
+        .form-row { margin-bottom: 12px; }
+        label { display: block; font-size: 10px; color: var(--accent-secondary); margin-bottom: 5px; font-weight: bold; text-transform: uppercase; }
+
         select, input {
-            width: 100%; padding: 14px; border-radius: 12px; border: none; 
-            background: rgba(255,255,255,0.1); color: #fff; font-size: 16px; outline: none; box-sizing: border-box;
+            width: 100%; height: 48px; background: #0f172a; border: 1px solid #334155;
+            border-radius: 12px; padding: 0 14px; color: white; font-size: 16px; box-sizing: border-box; outline: none;
+            -webkit-appearance: none;
         }
-        #location-info {
-            margin-top: 10px; padding: 10px; border-radius: 12px;
-            background: rgba(255, 47, 146, 0.1); border: 1px dashed #ff2f92;
-            text-align: center; font-size: 13px; color: #fff; font-weight: bold; display: none;
+
+        .price-tag { text-align: center; font-size: 36px; font-weight: 800; margin: 15px 0; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .btn-submit { width: 100%; height: 55px; background: linear-gradient(135deg, var(--accent-primary), #7c3aed); border: none; border-radius: 16px; color: white; font-weight: 700; font-size: 16px; cursor: pointer; }
+        
+        /* Lists */
+        .list-item {
+            background: var(--card-surface); padding: 14px; border-radius: 18px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--accent-secondary);
         }
-        .price-display { font-size: 36px; text-align: center; margin: 10px 0; font-weight: 900; text-shadow: 0 0 15px #ff0055; }
-        .main-btn {
-            width: 100%; padding: 18px; border-radius: 15px; border: none;
-            background: linear-gradient(90deg, #ff2f92, #ff005d);
-            color: #fff; font-weight: bold; font-size: 18px; cursor: pointer;
-        }
-        .table-card { width: 92%; max-width: 400px; margin-top: 25px; }
-        .section-title { font-size: 11px; color: #666; text-transform: uppercase; margin: 15px 0 8px 5px; letter-spacing: 1px; }
-        .top-badge { background: rgba(255, 215, 0, 0.1); border: 1px solid gold; padding: 10px; border-radius: 15px; }
-        .order-row {
-            background: rgba(255,255,255,0.04); padding: 14px; border-radius: 15px;
-            margin-bottom: 8px; border-left: 4px solid #00f2ff;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .order-row.debt { border-left-color: #ff9800; background: rgba(255, 152, 0, 0.1); }
-        .order-info b { color: #00f2ff; display: block; font-size: 14px; }
-        .order-info span { font-size: 11px; color: #888; }
-        .order-right { display: flex; align-items: center; gap: 12px; }
-        .order-price { font-weight: bold; color: #ff2f92; font-size: 16px; }
-        .action-btn { background: none; border: none; color: #444; cursor: pointer; font-size: 18px; }
-        .pay-debt-btn { background: #ff9800; color: #000; border: none; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 10px; }
+        .item-main b { display: block; font-size: 14px; margin-bottom: 2px; }
+        .item-main span { font-size: 11px; color: var(--text-p); }
+        .qty-badge { background: #0f172a; padding: 2px 6px; border-radius: 6px; font-size: 10px; color: var(--accent-secondary); margin-left: 5px; }
+        
+        #location-box { background: rgba(6, 182, 212, 0.1); padding: 12px; border-radius: 12px; margin-bottom: 15px; display: none; font-size: 13px; border: 1px dashed var(--accent-secondary); }
     </style>
 </head>
 <body>
 
-<div class="logo-text">🎅 SMOKE HUB</div>
-
-<div class="card">
-    <div class="stats-grid">
-        <div class="stat-box"><span>PLN</span><b id="totalPLN">0</b></div>
-        <div class="stat-box"><span>UAH</span><b id="totalUAH">0</b></div>
-    </div>
-
-    <label>Каталог</label>
-    <select id="catalog" onchange="updateFlavorList()">
-        <option value="заливка">ЗАЛИВКА 🧪</option>
-        <option value="продаж">ПРОДАЖ 📦</option>
-    </select>
-
-    <label>Статус</label>
-    <select id="status" onchange="toggleDebtInput()">
-        <option value="paid">ОПЛАЧЕНО ✅</option>
-        <option value="debt">БОРГ 🚩</option>
-    </select>
-
-    <div id="debtorBox" style="display: none; margin-top: 10px;">
-        <label>Хто винен?</label>
-        <input type="text" id="debtorName" placeholder="Ім'я">
-    </div>
-
-    <label>Оплата</label>
-    <select id="pay" onchange="calc()">
-        <option value="Готівка">Готівка (PLN)</option>
-        <option value="Польська карта">Польська карта (PLN)</option>
-        <option value="Монобанк">Монобанк (UAH)</option>
-    </select>
-
-    <div id="volBox">
-        <label>Об'єм</label>
-        <select id="size" onchange="calc()">
-            <option value="2">2 ml</option>
-            <option value="3">3 ml</option>
-        </select>
-    </div>
-
-    <label>Смак</label>
-    <select id="flavor" onchange="handleFlavorChange()"></select>
-    
-    <div id="location-info">📍 Місце: <span id="loc-text">-</span></div>
-
-    <label>Своя ціна</label>
-    <input type="number" id="manualPrice" placeholder="Введіть число" oninput="calc()">
-
-    <div class="price-display" id="total">6 зл</div>
-    
-    <button class="main-btn" onclick="saveOrder()">ЗБЕРЕГТИ</button>
+<div class="dashboard-header">
+    <div class="balance-card"><span>PLN</span><div id="totalPLN">0</div></div>
+    <div class="balance-card"><span>UAH</span><div id="totalUAH">0</div></div>
 </div>
 
-<div class="table-card">
-    <div class="section-title">Популярні смаки 🔥</div>
-    <div id="topFlavors" class="top-badge"></div>
-
-    <div class="section-title">Боржники 🚩</div>
-    <div id="debtList"></div>
-
-    <div class="section-title">Останні продажі ✅</div>
-    <div id="logs"></div>
+<div class="nav-tabs">
+    <button class="tab-btn active" onclick="showTab('new')">КАСА</button>
+    <button class="tab-btn" onclick="showTab('debts')">БОРГИ</button>
+    <button class="tab-btn" onclick="showTab('history')">АРХІВ</button>
+    <button class="tab-btn" onclick="showTab('admin')">⚙️ СКЛАД</button>
 </div>
+
+<div id="tab-new" class="tab-content">
+    <div class="main-form">
+        <div class="form-row">
+            <label>КАТАЛОГ</label>
+            <select id="catalog" onchange="updateFlavorList()"><option value="заливка">🧪 Заливка рідини</option><option value="продаж">📦 Готовий товар</option></select>
+        </div>
+        <div class="form-row">
+            <label>ПОШУК ТА СМАК</label>
+            <input type="text" id="flavorSearch" placeholder="🔍 Пошук смаку..." oninput="updateFlavorList()">
+            <select id="flavor" onchange="handleFlavor()" style="margin-top:8px;"></select>
+        </div>
+        <div id="location-box">📍 <b>Де лежить:</b> <span id="loc-text"></span></div>
+        <div class="form-row" id="vol-box"><label>ОБ'ЄМ</label><select id="size" onchange="calc()"><option value="2">2 ml</option><option value="3">3 ml</option></select></div>
+        <div class="form-row"><label>МЕТОД ОПЛАТИ</label><select id="pay" onchange="calc()"><option value="Готівка">Готівка PLN</option><option value="Карта">Карта PLN</option><option value="Монобанк">Mono UAH</option></select></div>
+        <div class="form-row"><label>СТАТУС</label><select id="status" onchange="toggleDebt()"><option value="paid">✅ Оплачено</option><option value="debt">🚩 Борг</option></select></div>
+        <div id="debtor-row" class="form-row" style="display:none"><label>ХТО БЕРЕ?</label><input type="text" id="debtorName" placeholder="Ім'я"></div>
+        <div class="form-row"><label>ВЛАСНА ЦІНА</label><input type="number" id="manualPrice" oninput="calc()" placeholder="Введіть якщо інша"></div>
+        <div class="price-tag" id="total">0</div>
+        <button class="btn-submit" onclick="saveOrder()">ПІДТВЕРДИТИ</button>
+    </div>
+</div>
+
+<div id="tab-admin" class="tab-content" style="display:none">
+    <div class="admin-panel">
+        <input type="hidden" id="editId">
+        <div class="form-row"><label>НАЗВА СМАКУ</label><input type="text" id="newFlavorName"></div>
+        <div class="form-row"><label>ЛОКАЦІЯ</label><input type="text" id="newLoc"></div>
+        <div class="form-row"><label>КІЛЬКІСТЬ (ДЛЯ ТОВАРУ)</label><input type="number" id="newQty" value="10"></div>
+        <button class="btn-submit" id="saveFlavorBtn" onclick="addFlavorToInventory()">ЗБЕРЕГТИ</button>
+        <button class="btn-submit" id="cancelEditBtn" style="display:none; background:#475569; margin-top:8px;" onclick="cancelEdit()">СКАСУВАТИ</button>
+    </div>
+    <div id="inventoryList"></div>
+</div>
+
+<div id="tab-debts" class="tab-content" style="display:none"><div id="debtList"></div></div>
+<div id="tab-history" class="tab-content" style="display:none"><div id="logs"></div></div>
 
 <script>
+    // PWA Manifest Generation
+    const manifest = {
+        "name": "Smoke Hub Pro",
+        "short_name": "SmokeHub",
+        "start_url": ".",
+        "display": "standalone",
+        "background_color": "#0f172a",
+        "theme_color": "#0f172a",
+        "icons": [{ "src": "https://cdn-icons-png.flaticon.com/512/5024/5024445.png", "sizes": "512x512", "type": "image/png" }]
+    };
+    const stringManifest = JSON.stringify(manifest);
+    const blob = new Blob([stringManifest], {type: 'application/json'});
+    const manifestURL = URL.createObjectURL(blob);
+    document.querySelector('head').innerHTML += `<link rel="manifest" href="${manifestURL}">`;
+
+    // Firebase Init
     const firebaseConfig = {
       apiKey: "AIzaSyAOW2GEW1McWRAzs4RLVOGHvcoAnRhgRC4",
       authDomain: "smokehub-7a072.firebaseapp.com",
@@ -152,110 +160,172 @@
       messagingSenderId: "563107040578",
       appId: "1:563107040578:web:6379a7bc43bb7b58794cdb"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const allFlavors = [
-        "БЕЗ СМАКУ", "spermint", "double grape", "apple mixed", "berry mint", 
-        "blackurant grape", "blueberry curant", "watermelon melon", 
-        "cranberry mors", "double raspberry", "Cola Lemon", 
-        "RedBull blue raspberry", "pineaple lemonade", "multifruit", "bali triple shot", "watermelon lychee"
-    ];
+    let inventory = [];
+    const initialFlavors = {"ICE SHOT": "Аптечка синя", "spermint": "шафа чорна куртка", "double grape": "зліва ліжко дані", "apple mixed": "шафа чорна куртка", "berry mint": "справа дані ліжко", "blackurant grape": "шафа зверху даня", "blueberry curant": "справа дані ліжко", "watermelon melon": "шафа зверху дані", "cranberry mors": "шафа чорна куртка", "double raspberry": "шафа чорна куртка", "Cola Lemon": "шафа зверху олег", "RedBull blue raspberry": "зліва дані ліжко", "pineaple lemonade": "шафа чорна куртка", "multifruit": "в пакеті в шафі дані", "bali triple shot": "в пакеті в шафі дані", "watermelon lychee": "шафа чорна куртка"};
 
-    const locations = {
-        "ICE SHOT": "Аптечка синя",
-        "spermint": "шафа чорна куртка", "double grape": "зліва ліжко дані", "apple mixed": "шафа чорна куртка",
-        "berry mint": "справа дані ліжко", "blackurant grape": "шафа зверху даня", "blueberry curant": "справа дані ліжко",
-        "watermelon melon": "шафа зверху дані", "cranberry mors": "шафа чорна куртка", "double raspberry": "шафа чорна куртка",
-        "Cola Lemon": "шафа зверху олег", "RedBull blue raspberry": "зліва дані ліжко", 
-        "pineaple lemonade": "шафа чорна куртка", "multifruit": "в пакеті в шафі дані", "bali triple shot": "в пакеті в шафі дані", "watermelon lychee": "шафа чорна куртка"
-    };
+    async function checkInit() {
+        const snap = await db.collection("inventory").limit(1).get();
+        if(snap.empty) {
+            for(let name in initialFlavors) {
+                await db.collection("inventory").add({ name, loc: initialFlavors[name], qty: 10 });
+            }
+        }
+    }
+
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + tabId).style.display = 'block';
+        if(window.event) window.event.currentTarget.classList.add('active');
+    }
+
+    async function addFlavorToInventory() {
+        const name = document.getElementById('newFlavorName').value;
+        const loc = document.getElementById('newLoc').value;
+        const qty = parseInt(document.getElementById('newQty').value) || 0;
+        const id = document.getElementById('editId').value;
+        if(!name) return;
+        id ? await db.collection("inventory").doc(id).update({name, loc, qty}) : await db.collection("inventory").add({name, loc, qty});
+        cancelEdit();
+    }
+
+    function editFlavor(id, name, loc, qty) {
+        document.getElementById('editId').value = id;
+        document.getElementById('newFlavorName').value = name;
+        document.getElementById('newLoc').value = loc;
+        document.getElementById('newQty').value = qty;
+        document.getElementById('saveFlavorBtn').innerText = "ОНОВИТИ";
+        document.getElementById('cancelEditBtn').style.display = "block";
+        showTab('admin');
+    }
+
+    function cancelEdit() {
+        document.getElementById('editId').value = "";
+        document.getElementById('newFlavorName').value = "";
+        document.getElementById('newLoc').value = "";
+        document.getElementById('newQty').value = 10;
+        document.getElementById('saveFlavorBtn').innerText = "ЗБЕРЕГТИ";
+        document.getElementById('cancelEditBtn').style.display = "none";
+    }
 
     function updateFlavorList() {
-        const catalog = document.getElementById('catalog').value;
-        const flavorSelect = document.getElementById('flavor');
-        const volBox = document.getElementById('volBox');
-        flavorSelect.innerHTML = '<option value="none" selected disabled>Вибери смак...</option>';
-        if (catalog === "заливка") {
-            allFlavors.forEach(f => flavorSelect.innerHTML += `<option value="${f}">${f}</option>`);
-            volBox.style.display = "block";
+        const cat = document.getElementById('catalog').value;
+        const query = document.getElementById('flavorSearch').value.toLowerCase();
+        const fs = document.getElementById('flavor');
+        fs.innerHTML = '<option value="" disabled selected>Оберіть смак</option>';
+        let filtered = inventory.filter(f => f.name.toLowerCase().includes(query));
+        
+        if(cat === 'продаж') {
+            fs.innerHTML += `<option value="ICE SHOT">ICE SHOT 🧊</option>`;
+            filtered.forEach(f => {
+                fs.innerHTML += `<option value="${f.name}">${f.name} (30ml) [${f.qty}шт]</option>`;
+            });
+            document.getElementById('vol-box').style.display = 'none';
         } else {
-            flavorSelect.innerHTML += `<option value="ICE SHOT">ICE SHOT 🧊</option>`;
-            allFlavors.forEach(f => { if (f !== "БЕЗ СМАКУ") flavorSelect.innerHTML += `<option value="${f} (30ml)">${f} (30ml)</option>`; });
-            volBox.style.display = "none";
+            filtered.forEach(f => {
+                fs.innerHTML += `<option value="${f.name}">${f.name}</option>`;
+            });
+            document.getElementById('vol-box').style.display = 'block';
         }
         calc();
     }
 
-    function handleFlavorChange() {
-        const f = document.getElementById('flavor').value;
-        const box = document.getElementById('location-info');
-        const cleanName = f ? f.replace(" (30ml)", "") : "";
-        if(locations[cleanName]) { 
-            box.style.display="block"; 
-            document.getElementById('loc-text').innerText = locations[cleanName]; 
-        } else { box.style.display="none"; }
+    function handleFlavor() {
+        const sel = document.getElementById('flavor').value;
+        const item = inventory.find(i => i.name === sel);
+        const box = document.getElementById('location-box');
+        if(item) {
+            box.style.display = 'block';
+            document.getElementById('loc-text').innerText = item.loc || "Не вказано";
+        } else if(sel === "ICE SHOT") {
+            box.style.display = 'block'; document.getElementById('loc-text').innerText = "Аптечка синя";
+        } else box.style.display = 'none';
         calc();
     }
 
-    function toggleDebtInput() { document.getElementById('debtorBox').style.display = (document.getElementById('status').value === 'debt') ? 'block' : 'none'; }
-
     function calc() {
         const cat = document.getElementById('catalog').value, p = document.getElementById('pay').value, s = document.getElementById('size').value, f = document.getElementById('flavor').value, manual = document.getElementById('manualPrice').value;
-        let currency = (p === "Монобанк") ? "грн" : "зл", finalPrice = 0;
-        if (manual > 0) finalPrice = manual;
-        else if (cat === "продаж") finalPrice = (f === "ICE SHOT") ? (p === "Монобанк" ? 180 : 15) : (p === "Монобанк" ? 650 : 60);
-        else finalPrice = (p === "Монобанк") ? (s === "2" ? 70 : 100) : (s === "2" ? 6 : 9);
-        document.getElementById('total').innerText = `${finalPrice} ${currency}`;
+        let cur = (p === "Монобанк") ? "грн" : "зл", price = 0;
+        if (manual > 0) price = manual;
+        else if (cat === "продаж") price = (f === "ICE SHOT") ? (p === "Монобанк" ? 180 : 15) : (p === "Монобанк" ? 650 : 60);
+        else price = (p === "Монобанк") ? (s === "2" ? 70 : 100) : (s === "2" ? 6 : 9);
+        document.getElementById('total').innerText = `${price} ${cur}`;
     }
+
+    function toggleDebt() { document.getElementById('debtor-row').style.display = (document.getElementById('status').value === 'debt') ? 'block' : 'none'; }
 
     async function saveOrder() {
-        const f = document.getElementById('flavor').value;
-        if(!f || f === "none") return alert("Вибери смак!");
-        const stat = document.getElementById('status').value, dbtr = document.getElementById('debtorName').value;
-        if(stat === 'debt' && !dbtr) return alert("Впиши ім'я боржника!");
-        const priceText = document.getElementById('total').innerText;
-        try {
-            await db.collection("orders").add({
-                catalog: document.getElementById('catalog').value,
-                pay: document.getElementById('pay').value,
-                size: (document.getElementById('catalog').value === "продаж") ? (f === "ICE SHOT" ? "Shot" : "30ml") : document.getElementById('size').value + "ml",
-                flavor: f, priceVal: parseInt(priceText), currency: (priceText.includes("грн") ? "UAH" : "PLN"),
-                fullPrice: priceText, status: stat, debtor: dbtr || "", date: new Date().getTime()
-            });
-            document.getElementById('manualPrice').value = "";
-            alert("Збережено! ✅");
-        } catch (e) { alert("Помилка: " + e.message); }
+        const fName = document.getElementById('flavor').value;
+        const cat = document.getElementById('catalog').value;
+        if(!fName) return alert("Оберіть товар!");
+        
+        const item = inventory.find(i => i.name === fName);
+        if(cat === 'продаж' && item && item.id) {
+            await db.collection("inventory").doc(item.id).update({ qty: firebase.firestore.FieldValue.increment(-1) });
+        }
+
+        const priceStr = document.getElementById('total').innerText;
+        await db.collection("orders").add({
+            catalog: cat, flavor: fName + (cat === 'продаж' ? " (30ml)" : ""), 
+            pay: document.getElementById('pay').value,
+            priceVal: parseInt(priceStr), currency: priceStr.includes("грн") ? "UAH" : "PLN",
+            fullPrice: priceStr, status: document.getElementById('status').value, 
+            debtor: document.getElementById('debtorName').value || "", date: new Date().getTime()
+        });
+        
+        alert("Записано! ✅");
+        document.getElementById('manualPrice').value = "";
+        document.getElementById('flavorSearch').value = "";
     }
 
-    function syncData() {
-        db.collection("orders").orderBy("date", "desc").onSnapshot(snap => {
-            const logs = document.getElementById('logs'), debtList = document.getElementById('debtList'), topBlock = document.getElementById('topFlavors');
-            let pln = 0, uah = 0, stats = {};
-            logs.innerHTML = ""; debtList.innerHTML = "";
+    function sync() {
+        checkInit();
+        db.collection("inventory").orderBy("name").onSnapshot(snap => {
+            inventory = [];
+            const list = document.getElementById('inventoryList');
+            list.innerHTML = "";
             snap.forEach(doc => {
-                const item = doc.data(), id = doc.id, d = new Date(item.date);
-                const dateStr = d.getDate().toString().padStart(2, '0') + '.' + (d.getMonth() + 1).toString().padStart(2, '0');
-                if (item.status === 'paid') {
+                const i = doc.data();
+                inventory.push({id: doc.id, ...i});
+                list.innerHTML += `<div class="list-item">
+                    <div class="item-main"><b>${i.name} <span class="qty-badge">${i.qty} шт</span></b><span>📍 ${i.loc}</span></div>
+                    <div style="display:flex; gap:10px;">
+                        <button style="background:none; border:1px solid var(--accent-secondary); color:white; border-radius:8px; padding:6px;" onclick="editFlavor('${doc.id}', '${i.name}', '${i.loc}', ${i.qty})">✏️</button>
+                        <button style="background:none; border:none; color:var(--danger); font-size:18px;" onclick="if(confirm('Видалити смак?')) db.collection('inventory').doc('${doc.id}').delete()">🗑️</button>
+                    </div>
+                </div>`;
+            });
+            updateFlavorList();
+        });
+
+        db.collection("orders").orderBy("date", "desc").onSnapshot(snap => {
+            const logs = document.getElementById('logs'), debts = document.getElementById('debtList');
+            let pln = 0, uah = 0;
+            logs.innerHTML = ""; debts.innerHTML = "";
+            snap.forEach(doc => {
+                const item = doc.data(), id = doc.id;
+                if(item.status === 'paid') {
                     if(item.currency === "PLN") pln += item.priceVal; else uah += item.priceVal;
-                    if(item.flavor && item.flavor !== "БЕЗ СМАКУ") stats[item.flavor] = (stats[item.flavor] || 0) + 1;
-                    logs.innerHTML += `<div class="order-row"><div class="order-info"><b>${item.flavor}</b><span>${item.size} • ${item.pay} • <i style="color:#00f2ff">${dateStr}</i></span></div><div class="order-right"><div class="order-price">${item.fullPrice}</div><button class="action-btn" onclick="if(confirm('Видалити?')) db.collection('orders').doc('${id}').delete()">🗑️</button></div></div>`;
+                    logs.innerHTML += `<div class="list-item">
+                        <div class="item-main"><b>${item.flavor}</b><span>${item.pay}</span></div>
+                        <div style="text-align:right"><b>${item.fullPrice}</b><div style="margin-top:5px" onclick="if(confirm('Видалити запис?')) db.collection('orders').doc('${id}').delete()">🗑️</div></div>
+                    </div>`;
                 } else {
-                    debtList.innerHTML += `<div class="order-row debt"><div class="order-info"><b>${item.debtor}</b><span>${item.flavor} • <i style="color:#ff9800">${dateStr}</i></span></div><div class="order-right"><div class="order-price">${item.fullPrice}</div><button class="pay-debt-btn" onclick="db.collection('orders').doc('${id}').update({status:'paid'})">ОПЛАТИВ</button></div></div>`;
+                    debts.innerHTML += `<div class="list-item" style="border-left-color:var(--warning)">
+                        <div class="item-main"><b>${item.debtor}</b><span>${item.flavor}</span></div>
+                        <div style="text-align:right"><b>${item.fullPrice}</b><button style="display:block; margin-top:5px; background:var(--success); border:none; color:white; border-radius:6px; padding:4px 8px; font-size:10px;" onclick="db.collection('orders').doc('${id}').update({status:'paid'})">ОПЛАТИВ</button></div>
+                    </div>`;
                 }
             });
-            document.getElementById('totalPLN').innerText = pln;
-            document.getElementById('totalUAH').innerText = uah;
-            const sorted = Object.entries(stats).sort((a, b) => b[1] - a[1]).slice(0, 3);
-            topBlock.innerHTML = sorted.length ? "" : "---";
-            sorted.forEach((item, i) => { topBlock.innerHTML += `<div style="display:flex; justify-content:space-between; font-size:13px; color:#ffd700;"><span>${i+1}. ${item[0]}</span><b>${item[1]} шт.</b></div>`; });
+            document.getElementById('totalPLN').innerText = pln + " ZŁ";
+            document.getElementById('totalUAH').innerText = uah + " ₴";
         });
     }
 
-    syncData();
-    updateFlavorList();
+    sync();
 </script>
-
 </body>
 </html>
