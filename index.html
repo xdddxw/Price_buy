@@ -381,14 +381,6 @@ html.hide-sold-active:not(.force-admin) .product-card.out-of-stock {
     display: none !important;
 }
 
-/* Для адміна — видно, але приглушено */
-html.force-admin.hide-sold-active .product-card.out-of-stock {
-    display: flex !important;
-    opacity: 0.25;
-    filter: grayscale(1);
-}
-
-
     /* Для тебе (адміна): робимо товар прозорим, щоб ти міг його бачити і повернути в продаж */
     html.force-admin.hide-sold-active .product-card.out-of-stock {
         display: flex !important;
@@ -746,11 +738,7 @@ if (pageTitle) {
 
                 // Завжди оновлюємо клас
                 card.classList.toggle('out-of-stock', !inStock);
-                
-                card.classList.toggle('out-of-stock', !inStock);
 
-
-                
                 // Відображення стікерів при завантаженні
                 // Знайти цей шматок всередині onValue(ref(db, 'catalog'))
                 const badgeDiv = card.querySelector('.badge');
@@ -872,10 +860,16 @@ onValue(ref(db, 'settings/hideSold'), (snap) => {
 
 // Логіка натискання на кнопку в адмінці
 document.getElementById('toggle-hide-sold').onclick = () => {
-    if (isAdmin()) {
-        set(ref(db, 'settings/hideSold'), !currentHideSoldStatus);
-    }
+    if (!isAdmin()) return;
+    set(ref(db, 'settings/hideSold'), !currentHideSoldStatus);
+
+    // миттєвий UX
+    document.documentElement.classList.toggle(
+        'hide-sold-active',
+        !currentHideSoldStatus
+    );
 };
+;
 
    // --- PWA ---
     let deferredPrompt;
@@ -1184,6 +1178,7 @@ updateTgLink();
 </script>
 </body>
 </html>
+
 
 
 
