@@ -393,6 +393,118 @@ html.hide-sold-active:not(.force-admin) .product-card.out-of-stock {
         background: var(--accent-pink) !important;
         box-shadow: 0 0 15px var(--accent-pink);
     }
+    
+    /* ОНОВЛЕНА АДМІНКА */
+.dev-panel {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 85%;
+    max-width: 350px;
+    height: 100vh;
+    background: rgba(15, 5, 25, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 25px 20px;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 2000;
+    border-left: 1px solid rgba(255, 0, 85, 0.3);
+    box-shadow: -20px 0 40px rgba(0,0,0,0.7);
+    overflow-y: auto;
+}
+
+.dev-panel.active { right: 0; }
+
+.admin-section-title {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--accent-pink);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 25px 0 15px 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-section-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,0,85,0.3), transparent);
+}
+
+.admin-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.admin-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ccc;
+    padding: 14px 10px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.admin-btn span { font-size: 18px; }
+
+.admin-btn.active-mode {
+    background: rgba(255, 0, 85, 0.15);
+    border-color: var(--accent-pink);
+    color: white;
+    box-shadow: 0 0 15px rgba(255, 0, 85, 0.2);
+}
+
+.cashback-control {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 198, 255, 0.2);
+}
+
+.admin-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 12px;
+    border-radius: 12px;
+    color: white;
+    margin-bottom: 10px;
+    font-size: 13px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.admin-input:focus { border-color: var(--accent-blue); }
+
+.save-all-btn {
+    grid-column: span 2;
+    background: linear-gradient(135deg, #ff0055, #ff3366);
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 15px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-top: 10px;
+    box-shadow: 0 10px 20px rgba(255, 0, 85, 0.3);
+}
+
+.stats-box {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 15px;
+    padding: 12px;
+    font-family: monospace;
+}
     </style>
 </head>
 <body>
@@ -574,41 +686,56 @@ html.hide-sold-active:not(.force-admin) .product-card.out-of-stock {
 </nav>
 
 <div id="dev-menu" class="dev-panel">
-    <h3 style="margin-bottom:15px; color:var(--accent-blue); font-size: 14px;">CONTROL PANEL</h3>
-    <button class="admin-btn" id="edit-price">💰 ЦІНИ (OFF)</button>
-    <button class="admin-btn" id="edit-desc">📝 НАЗВИ (OFF)</button>
-    <button class="admin-btn" id="edit-stock">📦 СКЛАД (OFF)</button>
-    <button class="admin-btn" id="toggle-hide-sold">🚫 ПРИХОВАТИ SOLD (OFF)</button>
-    <button class="admin-btn" id="toggle-payment">💳 ОПЛАТА (ON)</button>
-    <button class="admin-btn" id="edit-badge">🏷️ СТІКЕРИ (OFF)</button>
-    <select id="badge-selector" class="admin-btn" style="background: #222; color: #fff;">
-        <option value="">Без стікера</option>
-        <option value="hit">🔥 ХІТ</option>
-        <option value="promo">🏷️ АКЦІЯ</option>
-        <option value="new">🆕 НОВИНКА</option>
-    </select>
-
-    <button class="admin-btn" id="toggle-maint">🛠 ТЕХ. РОБОТИ</button>
-    <button class="admin-btn" id="toggle-banner">🖼️ БАНЕР (OFF)</button>
-    <button class="admin-btn" style="background:var(--accent-pink); margin-top:10px;" id="save-all">💾 ЗБЕРЕГТИ ВСЕ</button>
-    
-    <div class="stats-box">
-        <div style="font-size:11px; font-weight:800; color:var(--accent-blue); margin-bottom:10px; display:flex; justify-content:space-between;">
-            <span>📊 ВІДВІДУВАЧІ</span>
-            <span id="total-v">0</span>
-        </div>
-        <div id="visitors-list" style="max-height: 200px; overflow-y: auto;">Завантаження...</div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin:0; color:white; font-size: 18px; font-weight: 900;">HUB <span style="color:var(--accent-pink)">CONTROL</span></h3>
+        <button onclick="document.getElementById('dev-menu').classList.remove('active')" style="background:none; border:none; color:white; font-size:24px;">×</button>
     </div>
 
+    <div class="admin-section-title">📦 Товари та ціни</div>
+    <div class="admin-grid">
+        <button class="admin-btn" id="edit-price"><span>💰</span>Ціни</button>
+        <button class="admin-btn" id="edit-desc"><span>📝</span>Назви</button>
+        <button class="admin-btn" id="edit-stock"><span>📦</span>Склад</button>
+        <button class="admin-btn" id="edit-badge"><span>🏷️</span>Стікери</button>
+        <select id="badge-selector" class="admin-input" style="grid-column: span 2; margin-top:5px;">
+            <option value="">Без стікера</option>
+            <option value="hit">🔥 ХІТ</option>
+            <option value="promo">🏷️ АКЦІЯ</option>
+            <option value="new">🆕 НОВИНКА</option>
+        </select>
+        <button class="save-all-btn" id="save-all">💾 ЗБЕРЕГТИ ЗМІНИ</button>
+    </div>
 
-<hr style="border: 0.5px solid rgba(255,255,255,0.1); margin: 15px 0;">
-    <h3 style="color:var(--accent-blue); font-size: 12px; margin-bottom:10px;">💰 КЕРУВАННЯ КЕШБЕКОМ</h3>
-    <input type="text" id="target-user-id" placeholder="ID Користувача" class="admin-btn" style="background:#222; text-align:left;">
-   <input type="number" id="cashback-amount" placeholder="Сума..." class="admin-btn" style="background:#222; text-align:left;">
-    <button class="admin-btn" id="give-cashback" style="background:var(--accent-blue); color:black;">НАРАХУВАТИ</button>
-    <button class="admin-btn" id="remove-cashback" style="background:#444; margin-top:5px;">СПИСАТИ (ВІДНЯТИ)</button>
-    
-    <button class="admin-btn" style="background:#000; margin-top:20px;" onclick="localStorage.clear(); location.reload();">🚪 ВИЙТИ</button>
+    <div class="admin-section-title">⚙️ Налаштування системи</div>
+    <div class="admin-grid">
+        <button class="admin-btn" id="toggle-hide-sold"><span>🚫</span>Сховати Sold</button>
+        <button class="admin-btn" id="toggle-payment"><span>💳</span>Оплата</button>
+        <button class="admin-btn" id="toggle-banner"><span>🖼️</span>Банер</button>
+        <button class="admin-btn" id="toggle-maint"><span>🛠</span>Тех.роботи</button>
+    </div>
+
+    <div class="admin-section-title">💰 Керування Кешбеком</div>
+    <div class="cashback-control">
+        <input type="text" id="target-user-id" placeholder="ID Користувача (User_1234)" class="admin-input">
+        <input type="number" id="cashback-amount" placeholder="Сума (UAH)" class="admin-input">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <button class="admin-btn" id="give-cashback" style="background:rgba(0,198,255,0.1); border-color:var(--accent-blue);"><span>➕</span>Додати</button>
+            <button class="admin-btn" id="remove-cashback"><span>➖</span>Списати</button>
+        </div>
+    </div>
+
+    <div class="admin-section-title">📊 Останні візити</div>
+    <div class="stats-box">
+        <div style="font-size:11px; margin-bottom:10px; display:flex; justify-content:space-between; color:var(--accent-blue);">
+            <span>Всього сьогодні:</span>
+            <span id="total-v">0</span>
+        </div>
+        <div id="visitors-list" style="max-height: 150px; overflow-y: auto; font-size: 10px;"></div>
+    </div>
+
+    <button class="admin-btn" style="width:100%; margin-top:30px; background:none; border-color:rgba(255,255,255,0.1);" onclick="localStorage.clear(); location.reload();">
+        🚪 ВИЙТИ З АКАУНТУ
+    </button>
 </div>
 
 <div id="install-banner">
