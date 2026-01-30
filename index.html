@@ -394,25 +394,37 @@ html.hide-sold-active:not(.force-admin) .product-card.out-of-stock {
         box-shadow: 0 0 15px var(--accent-pink);
     }
     
-    /* ОНОВЛЕНА АДМІНКА */
+    /* ОНОВЛЕНА АДМІНКА З ВРАХУВАННЯМ SAFE AREA */
 .dev-panel {
     position: fixed;
-    top: 0;
+    /* Додаємо відступ зверху, щоб не заходило на годинник/камеру */
+    top: env(safe-area-inset-top, 0px); 
     right: -100%;
     width: 85%;
     max-width: 350px;
-    height: 100vh;
-    background: rgba(15, 5, 25, 0.95);
+    /* Висота тепер розраховується: 100% мінус відступ зверху */
+    height: calc(100vh - env(safe-area-inset-top, 0px));
+    background: rgba(15, 5, 25, 0.98); /* Трохи щільніший фон */
     backdrop-filter: blur(20px);
-    padding: 25px 20px;
+    padding: 20px;
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 2000;
     border-left: 1px solid rgba(255, 0, 85, 0.3);
     box-shadow: -20px 0 40px rgba(0,0,0,0.7);
     overflow-y: auto;
+    /* Щоб контент знизу не перекривався нижньою полоскою в iOS */
+    padding-bottom: calc(30px + env(safe-area-inset-bottom)); 
+    box-sizing: border-box;
 }
 
-.dev-panel.active { right: 0; }
+.dev-panel.active { 
+    right: 0; 
+}
+
+/* Додатково: зробимо кнопку закриття зручнішою для натискання */
+.dev-panel h3 {
+    margin-top: 10px;
+}
 
 .admin-section-title {
     font-size: 10px;
@@ -1305,6 +1317,7 @@ updateTgLink();
 </script>
 </body>
 </html>
+
 
 
 
