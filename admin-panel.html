@@ -36,52 +36,135 @@
             font-family: 'SF Pro Display', -apple-system, system-ui, sans-serif;
             background-color: var(--bg-main);
             color: #f8fafc;
-            padding: 10px 16px 100px;
+            /* Відступи для безпечних зон iPhone (notch) */
+            padding: calc(10px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom));
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
 
-        /* Dashboard & Layout */
-        .dashboard-header { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; padding-top: 10px; }
+        /* Dashboard Header */
+        .dashboard-header { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            margin-bottom: 20px;
+        }
+
         .balance-card {
             background: linear-gradient(135deg, var(--card-surface), #334155);
-            padding: 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);
+            padding: 14px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.05);
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         .balance-card span { font-size: 10px; color: var(--text-p); text-transform: uppercase; letter-spacing: 0.5px; }
         .balance-card div { font-size: 20px; font-weight: 700; margin-top: 4px; }
 
+        /* Navigation Tabs - Sticky з урахуванням Notch */
         .nav-tabs { 
-            display: flex; background: var(--card-surface); padding: 4px; border-radius: 14px; 
-            margin-bottom: 20px; overflow-x: auto; gap: 4px; position: sticky; top: 10px; z-index: 100;
+            display: flex; 
+            background: var(--card-surface); 
+            padding: 4px; 
+            border-radius: 14px; 
+            margin-bottom: 20px; 
+            gap: 4px; 
+            position: sticky; 
+            top: env(safe-area-inset-top); 
+            z-index: 1000;
+            box-shadow: 0 10px 15px -10px rgba(0,0,0,0.5);
         }
-        .tab-btn { flex: 1; padding: 10px 4px; border: none; background: transparent; color: var(--text-p); font-weight: 600; font-size: 11px; border-radius: 10px; white-space: nowrap; }
-        .tab-btn.active { background: var(--accent-primary); color: white; box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4); }
+
+        .tab-btn { 
+            flex: 1; 
+            padding: 12px 4px; 
+            border: none; 
+            background: transparent; 
+            color: var(--text-p); 
+            font-weight: 600; 
+            font-size: 11px; 
+            border-radius: 10px; 
+            white-space: nowrap; 
+            transition: 0.2s;
+        }
+
+        .tab-btn.active { 
+            background: var(--accent-primary); 
+            color: white; 
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4); 
+        }
 
         /* Forms */
-        .main-form, .admin-panel { background: var(--card-surface); border-radius: 24px; padding: 18px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.03); }
-        .form-row { margin-bottom: 12px; }
-        label { display: block; font-size: 10px; color: var(--accent-secondary); margin-bottom: 5px; font-weight: bold; text-transform: uppercase; }
+        .main-form, .admin-panel { 
+            background: var(--card-surface); 
+            border-radius: 24px; 
+            padding: 18px; 
+            margin-bottom: 16px; 
+            border: 1px solid rgba(255,255,255,0.03); 
+        }
+
+        .form-row { margin-bottom: 16px; }
+        label { display: block; font-size: 10px; color: var(--accent-secondary); margin-bottom: 6px; font-weight: bold; text-transform: uppercase; }
 
         select, input {
-            width: 100%; height: 48px; background: #0f172a; border: 1px solid #334155;
-            border-radius: 12px; padding: 0 14px; color: white; font-size: 16px; box-sizing: border-box; outline: none;
+            width: 100%; 
+            height: 52px; 
+            background: #0f172a; 
+            border: 1px solid #334155;
+            border-radius: 14px; 
+            padding: 0 14px; 
+            color: white; 
+            font-size: 16px; 
+            box-sizing: border-box; 
+            outline: none;
             -webkit-appearance: none;
         }
 
-        .price-tag { text-align: center; font-size: 36px; font-weight: 800; margin: 15px 0; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        .btn-submit { width: 100%; height: 55px; background: linear-gradient(135deg, var(--accent-primary), #7c3aed); border: none; border-radius: 16px; color: white; font-weight: 700; font-size: 16px; cursor: pointer; }
-        
+        input::placeholder { color: #475569; }
+
+        .price-tag { text-align: center; font-size: 38px; font-weight: 800; margin: 20px 0; color: #fff; }
+
+        .btn-submit { 
+            width: 100%; 
+            height: 60px; 
+            background: linear-gradient(135deg, var(--accent-primary), #7c3aed); 
+            border: none; 
+            border-radius: 18px; 
+            color: white; 
+            font-weight: 700; 
+            font-size: 17px; 
+            cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-submit:active { transform: scale(0.98); opacity: 0.9; }
+
         /* Lists */
         .list-item {
-            background: var(--card-surface); padding: 14px; border-radius: 18px; margin-bottom: 10px;
-            display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--accent-secondary);
+            background: var(--card-surface); 
+            padding: 16px; 
+            border-radius: 20px; 
+            margin-bottom: 12px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-left: 5px solid var(--accent-secondary);
         }
-        .item-main b { display: block; font-size: 14px; margin-bottom: 2px; }
-        .item-main span { font-size: 11px; color: var(--text-p); }
-        .qty-badge { background: #0f172a; padding: 2px 6px; border-radius: 6px; font-size: 10px; color: var(--accent-secondary); margin-left: 5px; }
-        
-        #location-box { background: rgba(6, 182, 212, 0.1); padding: 12px; border-radius: 12px; margin-bottom: 15px; display: none; font-size: 13px; border: 1px dashed var(--accent-secondary); }
+        .item-main b { display: block; font-size: 15px; margin-bottom: 4px; }
+        .item-main span { font-size: 12px; color: var(--text-p); }
+        .qty-badge { background: #0f172a; padding: 2px 8px; border-radius: 8px; font-size: 11px; color: var(--accent-secondary); margin-left: 5px; }
+
+        #location-box { 
+            background: rgba(6, 182, 212, 0.1); 
+            padding: 14px; 
+            border-radius: 14px; 
+            margin-bottom: 15px; 
+            display: none; 
+            font-size: 14px; 
+            border: 1px dashed var(--accent-secondary); 
+            color: #e2e8f0;
+        }
     </style>
 </head>
 <body>
@@ -113,7 +196,7 @@
         <div class="form-row" id="vol-box"><label>ОБ'ЄМ</label><select id="size" onchange="calc()"><option value="2">2 ml</option><option value="3">3 ml</option></select></div>
         <div class="form-row"><label>МЕТОД ОПЛАТИ</label><select id="pay" onchange="calc()"><option value="Готівка">Готівка PLN</option><option value="Карта">Карта PLN</option><option value="Монобанк">Mono UAH</option></select></div>
         <div class="form-row"><label>СТАТУС</label><select id="status" onchange="toggleDebt()"><option value="paid">✅ Оплачено</option><option value="debt">🚩 Борг</option></select></div>
-        <div id="debtor-row" class="form-row" style="display:none"><label>ХТО БЕРЕ?</label><input type="text" id="debtorName" placeholder="Ім'я"></div>
+        <div id="debtor-row" class="form-row" style="display:none"><label>ХТО БЕРЕ?</label><input type="text" id="debtorName" placeholder="Ім'я боржника"></div>
         <div class="form-row"><label>ВЛАСНА ЦІНА</label><input type="number" id="manualPrice" oninput="calc()" placeholder="Введіть якщо інша"></div>
         <div class="price-tag" id="total">0</div>
         <button class="btn-submit" onclick="saveOrder()">ПІДТВЕРДИТИ</button>
@@ -123,8 +206,8 @@
 <div id="tab-admin" class="tab-content" style="display:none">
     <div class="admin-panel">
         <input type="hidden" id="editId">
-        <div class="form-row"><label>НАЗВА СМАКУ</label><input type="text" id="newFlavorName"></div>
-        <div class="form-row"><label>ЛОКАЦІЯ</label><input type="text" id="newLoc"></div>
+        <div class="form-row"><label>НАЗВА СМАКУ</label><input type="text" id="newFlavorName" placeholder="Назва"></div>
+        <div class="form-row"><label>ЛОКАЦІЯ</label><input type="text" id="newLoc" placeholder="Де лежить"></div>
         <div class="form-row"><label>КІЛЬКІСТЬ (ДЛЯ ТОВАРУ)</label><input type="number" id="newQty" value="10"></div>
         <button class="btn-submit" id="saveFlavorBtn" onclick="addFlavorToInventory()">ЗБЕРЕГТИ</button>
         <button class="btn-submit" id="cancelEditBtn" style="display:none; background:#475569; margin-top:8px;" onclick="cancelEdit()">СКАСУВАТИ</button>
@@ -136,7 +219,7 @@
 <div id="tab-history" class="tab-content" style="display:none"><div id="logs"></div></div>
 
 <script>
-    // PWA Manifest Generation
+    // Manifest & Firebase Config (залишаємо як було)
     const manifest = {
         "name": "Smoke Hub Pro",
         "short_name": "SmokeHub",
@@ -151,7 +234,6 @@
     const manifestURL = URL.createObjectURL(blob);
     document.querySelector('head').innerHTML += `<link rel="manifest" href="${manifestURL}">`;
 
-    // Firebase Init
     const firebaseConfig = {
       apiKey: "AIzaSyAOW2GEW1McWRAzs4RLVOGHvcoAnRhgRC4",
       authDomain: "smokehub-7a072.firebaseapp.com",
