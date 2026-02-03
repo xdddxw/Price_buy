@@ -702,13 +702,28 @@ html.hide-sold-active:not(.force-admin) .product-card.out-of-stock {
         <h3 style="margin:0; color:white; font-size: 18px; font-weight: 900;">HUB <span style="color:var(--accent-pink)">CONTROL</span></h3>
         <button onclick="document.getElementById('dev-menu').classList.remove('active')" style="background:none; border:none; color:white; font-size:24px;">×</button>
     </div>
-
+<div class="admin-section-title">🆕 Додати новий товар</div>
+    <div class="cashback-control" style="border-color: var(--accent-pink); margin-bottom: 20px;">
+        <select id="new-prod-cat" class="admin-input">
+            <option value="zalivka">💧 Заливка</option>
+            <option value="prodazh">📦 Продаж</option>
+            <option value="aktsii">⚡ Інше</option>
+        </select>
+        <input type="text" id="new-prod-name" placeholder="Назва" class="admin-input">
+        <input type="text" id="new-prod-price" placeholder="Ціна (напр. 60 zł/700 грн)" class="admin-input">
+        <input type="text" id="new-prod-img" placeholder="URL фото (пряме посилання)" class="admin-input">
+        <button class="admin-btn" id="add-product-btn" style="width:100%; background:rgba(255,0,85,0.1);">
+            <span>➕</span> ДОДАТИ В КАТАЛОГ
+        </button>
+    </div>
     <div class="admin-section-title">📦 Товари та ціни</div>
     <div class="admin-grid">
         <button class="admin-btn" id="edit-price"><span>💰</span>Ціни</button>
         <button class="admin-btn" id="edit-desc"><span>📝</span>Назви</button>
         <button class="admin-btn" id="edit-stock"><span>📦</span>Склад</button>
         <button class="admin-btn" id="edit-badge"><span>🏷️</span>Стікери</button>
+        <button class="admin-btn" id="edit-img-mode"><span>📸</span>Змінити фото</button>
+        <button class="admin-btn" id="edit-delete" style="border-color: #ff0000;"><span>🗑️</span>Видалити</button>
         <select id="badge-selector" class="admin-input" style="grid-column: span 2; margin-top:5px;">
             <option value="">Без стікера</option>
             <option value="hit">🔥 ХІТ</option>
@@ -1314,10 +1329,114 @@ const updateTgLink = () => {
 
 // Викликаємо функцію відразу
 updateTgLink();
+
+// --- 1. ЗАВАНТАЖЕННЯ ТОВАРІВ ПО КАТЕГОРІЯХ ---
+onValue(ref(db, 'catalog'), (snap) => {
+    const data = snap.val();
+    if (!data) return;
+
+    ['zalivka', 'prodazh', 'aktsii'].forEach(cat => {
+        const grid = document.querySelector(`#cat-${cat} .product-grid`);
+        if (!grid) return;
+
+        grid.innerHTML = ''; // Очищуємо старі товари
+        
+        const catData = data[cat];
+        if (catData && catData.descs) {
+            catData.descs.forEach((name, i) => {
+                const card = document.createElement('div');
+                card.className = `product-card ${catData.stock?.[i] === false ? 'out-of-stock' : ''}`;
+                
+                const bType = catData.badges?.[i];
+                if (bType) card.setAttribute('data-badge', bType);
+                card.setAttribute('data-out-of-stock-text', translations[currentLang].sold);
+
+                const badgeHtml = bType ? `<div class="badge badge-${bType}">${translations[currentLang]['badge_' + bType] || ""}</div>` : '<div class="badge"></div>';
+
+                card.innerHTML = `
+                    <div class="product-img">
+                        ${badgeHtml}
+                        <img src="${catData.imgs?.[i] || 'images/logo.png'}">
+                    </div>
+                    <h3 class="product-desc">${name}</h3>
+                    <div class="price">${catData.prices?.[i] || ""}</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+    });
+});
+
+// --- 2. ДОДАВАННЯ НОВОГО ТОВАРУ ---
+document.getElementById('add-product-btn').onclick = async () => {
+    const cat = document.getElementById('new-prod-cat').value;
+    const name = document.getElementById('new-prod-name').value.trim();
+    const price = document.getElementById('new-prod-price').value.trim();
+    const img = document.getElementById('new-prod-img').value.trim();
+
+    if (!name || !price) { alert("Назва та ціна обов'язкові!"); return; }
+
+    const catalogRef = ref(db, `catalog/${cat}`);
+    const snapshot = await get(catalogRef);
+    let catData = snapshot.val() || { descs: [], prices: [], stock: [], badges: [], imgs: [] };
+
+    // Додаємо в масиви
+    catData.descs.push(name);
+    catData.prices.push(price);
+    catData.imgs = catData.imgs || [];
+    catData.imgs.push(img || 'images/logo.png');
+    catData.stock = catData.stock || [];
+    catData.stock.push(true);
+    catData.badges = catData.badges || [];
+    catData.badges.push("");
+
+    set(catalogRef, catData).then(() => {
+        alert("Товар додано!");
+        document.getElementById('new-prod-name').value = "";
+        document.getElementById('new-prod-price').value = "";
+        document.getElementById('new-prod-img').value = "";
+    });
+};
+
+// --- 3. ОБРОБНИК РЕЖИМІВ (ВИДАЛЕННЯ ТА ФОТО) ---
+document.getElementById('edit-img-mode').onclick = (e) => { mode = mode === 'img' ? null : 'img'; updateModeBtns(e.target); };
+document.getElementById('edit-delete').onclick = (e) => { mode = mode === 'delete' ? null : 'delete'; updateModeBtns(e.target); };
+
+document.addEventListener('click', (e) => {
+    const card = e.target.closest('.product-card');
+    if(!card || !isAdmin()) return;
+
+    if(mode === 'delete') {
+        if(confirm("Видалити цей товар?")) {
+            card.remove(); // Видаляємо візуально, збережеться після натискання Save All
+        }
+    }
+
+    if(mode === 'img') {
+        const newUrl = prompt("Вставте URL нового фото:", card.querySelector('img').src);
+        if(newUrl) card.querySelector('img').src = newUrl;
+    }
+});
+
+// --- 4. ЗБЕРЕГТИ ВСІ ЗМІНИ ---
+document.getElementById('save-all').onclick = () => {
+    const fullData = {};
+    ['zalivka', 'prodazh', 'aktsii'].forEach(cat => {
+        const p = [], d = [], s = [], b = [], im = [];
+        document.querySelectorAll(`#cat-${cat} .product-card`).forEach(card => {
+            d.push(card.querySelector('.product-desc').innerText);
+            p.push(card.querySelector('.price').innerText);
+            s.push(!card.classList.contains('out-of-stock'));
+            b.push(card.getAttribute('data-badge') || "");
+            im.push(card.querySelector('img').src);
+        });
+        fullData[cat] = { descs: d, prices: p, stock: s, badges: b, imgs: im };
+    });
+    set(ref(db, 'catalog'), fullData).then(() => alert("Каталог оновлено!"));
+};
 </script>
 </body>
 </html>
-
 
 
 
