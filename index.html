@@ -708,6 +708,7 @@ html.hide-sold-active:not(.force-admin) .product-card.out-of-stock {
         <button class="admin-btn" id="edit-price"><span>💰</span>Ціни</button>
         <button class="admin-btn" id="edit-desc"><span>📝</span>Назви</button>
         <button class="admin-btn" id="edit-stock"><span>📦</span>Склад</button>
+        <button class="admin-btn" id="edit-image"><span>🖼️</span>Фото</button>
         <button class="admin-btn" id="edit-badge"><span>🏷️</span>Стікери</button>
         <select id="badge-selector" class="admin-input" style="grid-column: span 2; margin-top:5px;">
             <option value="">Без стікера</option>
@@ -873,6 +874,13 @@ if (pageTitle) {
                 if(!card.querySelector('.price')) return;
                 if(data.prices?.[i]) card.querySelector('.price').innerText = data.prices[i];
                 if(data.descs?.[i]) card.querySelector('.product-desc').innerText = data.descs[i];
+                if(data.images?.[i]) {
+                    const imgEl = card.querySelector('.product-img img');
+                    if (imgEl) {
+                        imgEl.src = data.images[i];
+                        card.setAttribute('data-image', data.images[i]);
+                    }
+                }
                 const inStock = data.stock?.[i] !== false;
 
                 // Завжди оновлюємо клас
@@ -902,6 +910,7 @@ if (pageTitle) {
     document.getElementById('edit-desc').onclick = (e) => { mode = mode === 'desc' ? null : 'desc'; document.querySelectorAll('.product-desc').forEach(el => el.contentEditable = (mode === 'desc')); updateModeBtns(e.target); };
     document.getElementById('edit-stock').onclick = (e) => { mode = mode === 'stock' ? null : 'stock'; updateModeBtns(e.target); };
     document.getElementById('edit-badge').onclick = (e) => { mode = mode === 'badge' ? null : 'badge'; updateModeBtns(e.target); };
+    document.getElementById('edit-image').onclick = (e) => { mode = mode === 'image' ? null : 'image'; updateModeBtns(e.target); };
 
     function updateModeBtns(activeBtn) {
         document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode'));
@@ -933,18 +942,30 @@ if (pageTitle) {
             badgeDiv.innerText = '';
         }
     }
+
+    if (mode === 'image') {
+        const imgEl = card.querySelector('.product-img img');
+        if (!imgEl) return;
+        const currentSrc = imgEl.getAttribute('src') || '';
+        const nextSrc = prompt('Введіть посилання на фото:', currentSrc);
+        if (nextSrc && nextSrc.trim()) {
+            imgEl.src = nextSrc.trim();
+            card.setAttribute('data-image', nextSrc.trim());
+        }
+    }
 });
 
     document.getElementById('save-all').onclick = () => {
-        const p = [], d = [], s = [], b = [];
+        const p = [], d = [], s = [], b = [], i = [];
         document.querySelectorAll('.product-card').forEach(card => {
             if(!card.querySelector('.price')) return;
             p.push(card.querySelector('.price').innerText);
             d.push(card.querySelector('.product-desc').innerText);
             s.push(!card.classList.contains('out-of-stock'));
             b.push(card.getAttribute('data-badge') || "");
+            i.push(card.getAttribute('data-image') || card.querySelector('.product-img img')?.getAttribute('src') || "");
         });
-        set(ref(db, 'catalog'), { prices: p, descs: d, stock: s, badges: b }).then(() => alert("Збережено!"));
+        set(ref(db, 'catalog'), { prices: p, descs: d, stock: s, badges: b, images: i }).then(() => alert("Збережено!"));
     };
 
     // АДМІНКА
