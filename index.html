@@ -636,7 +636,7 @@ html.hide-sold-active:not(.force-admin) .product-card.out-of-stock {
     // Ця функція спрацює миттєво при кліку, Safari її не заблокує
     function sendIdToTg(event) {
         const id = localStorage.getItem('hub_user_id');
-        const text = encodeURIComponent("Привіт! Мій ID: " + id + ". Закріпіть його за мною!");
+        const text = encodeURIComponent("Привіт! Мій ID: " + id + ".");
         event.currentTarget.href = "https://t.me/liquid_br?text=" + text;
     }
 </script>
@@ -752,6 +752,18 @@ html.hide-sold-active:not(.force-admin) .product-card.out-of-stock {
         </div>
         <div id="visitors-list" style="max-height: 150px; overflow-y: auto; font-size: 10px;"></div>
     </div>
+
+    <div class="admin-section-title">👥 Користувачі та Баланси</div>
+<div class="stats-box" style="padding: 10px;">
+    <div id="all-users-list" style="max-height: 180px; overflow-y: auto; padding-right: 5px;">
+        </div>
+</div>
+
+<div class="admin-section-title">🕒 Історія операцій</div>
+<div class="stats-box" style="padding: 10px; background: rgba(0,0,0,0.2);">
+    <div id="transactions-list" style="max-height: 180px; overflow-y: auto; padding-right: 5px;">
+        </div>
+</div>
 
     <button class="admin-btn" style="width:100%; margin-top:30px; background:none; border-color:rgba(255,255,255,0.1);" onclick="localStorage.clear(); location.reload();">
         🚪 ВИЙТИ З АКАУНТУ
@@ -1273,7 +1285,6 @@ const updateBalance = async (isAdding) => {
     const tInput = document.getElementById('target-user-id');
     const aInput = document.getElementById('cashback-amount');
     
-    // Перевіряємо чи поля існують і чи вони не порожні
     if (!tInput?.value || !aInput?.value) {
         alert("Заповніть ID користувача та суму!");
         return;
@@ -1288,11 +1299,19 @@ const updateBalance = async (isAdding) => {
             const balance = Number(current) || 0;
             return isAdding ? balance + amt : Math.max(0, balance - amt);
         });
+
+        // ЗАПИС ТРАНЗАКЦІЇ В ІСТОРІЮ
+        push(ref(db, 'transactions'), {
+            user: tId,
+            amount: isAdding ? +amt : -amt,
+            time: serverTimestamp(),
+            admin: "Admin" 
+        });
+
         alert(`✅ Виконано для ${tId}`);
-        aInput.value = ""; // Очистити суму після успіху
+        aInput.value = ""; 
     } catch (e) {
-        console.error("Firebase Error:", e);
-        alert("Помилка бази! Перевірте вкладку Rules у Firebase Console.");
+        alert("Помилка!");
     }
 };
 
@@ -1427,9 +1446,54 @@ document.getElementById('save-all').onclick = () => {
     });
     set(ref(db, 'catalog'), fullData).then(() => alert("Каталог оновлено!"));
 };
+
+if (isAdmin()) {
+    // 1. СЛУХАЄМО ВСІ ГАМАНЦІ
+    onValue(ref(db, 'wallets'), (snap) => {
+        const list = document.getElementById('all-users-list');
+        if (snap.exists()) {
+            const data = snap.val();
+            list.innerHTML = Object.entries(data)
+                .sort((a, b) => b[1] - a[1]) // Сортуємо: багаті зверху
+                .map(([id, balance]) => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <div style="cursor:pointer;" onclick="document.getElementById('target-user-id').value='${id}'">
+                        <div style="font-size:11px; color:white;">${id}</div>
+                        <div style="font-size:9px; color:var(--accent-pink); opacity:0.8;">Натисніть, щоб вибрати</div>
+                    </div>
+                    <div style="font-weight:900; color:var(--accent-blue); font-size:13px;">${balance} ₴</div>
+                </div>
+            `).join('');
+        } else {
+            list.innerHTML = '<div style="text-align:center; opacity:0.5; font-size:11px;">Користувачів поки немає</div>';
+        }
+    });
+
+    // 2. СЛУХАЄМО ІСТОРІЮ (ТРАНЗАКЦІЇ)
+    onValue(query(ref(db, 'transactions'), limitToLast(20)), (snap) => {
+        const list = document.getElementById('transactions-list');
+        if (snap.exists()) {
+            const data = snap.val();
+            list.innerHTML = Object.values(data).reverse().map(t => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="font-size:10px;">
+                        <span style="color:white; font-weight:bold;">${t.user}</span>
+                        <div style="font-size:8px; opacity:0.4;">${new Date(t.time).toLocaleString('uk-UA')}</div>
+                    </div>
+                    <div style="color:${t.amount > 0 ? '#00ff99' : '#ff0055'}; font-weight:900; font-size:11px;">
+                        ${t.amount > 0 ? '+' : ''}${t.amount} ₴
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            list.innerHTML = '<div style="text-align:center; opacity:0.5; font-size:11px;">Транзакцій немає</div>';
+        }
+    });
+}
 </script>
 </body>
 </html>
+
 
 
 
