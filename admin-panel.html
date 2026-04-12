@@ -201,28 +201,6 @@
         <div class="price-tag" id="total">0</div>
         <button class="btn-submit" onclick="saveOrder()">ПІДТВЕРДИТИ</button>
     </div>
-
-    <div class="admin-panel">
-    <h3>💸 Витрати</h3>
-    <div class="form-row">
-        <label>СУМА</label>
-        <input type="number" id="expenseAmount" placeholder="Сума">
-    </div>
-    <div class="form-row">
-        <label>ОПИС</label>
-        <input type="text" id="expenseNote" placeholder="Наприклад: закупка">
-    </div>
-    <div class="form-row">
-        <label>ВАЛЮТА</label>
-        <select id="expenseCurrency">
-            <option value="PLN">PLN</option>
-            <option value="UAH">UAH</option>
-        </select>
-    </div>
-    <button class="btn-submit" onclick="addExpense()">ДОДАТИ ВИТРАТУ</button>
-</div>
-
-<div id="expenseList"></div>
 </div>
 
 <div id="tab-admin" class="tab-content" style="display:none">
@@ -413,26 +391,14 @@
                 const item = doc.data(), id = doc.id;
                 if(item.status === 'paid') {
                     if(item.currency === "PLN") pln += item.priceVal; else uah += item.priceVal;
-                    const d = new Date(item.date);
-const dateStr = d.toLocaleString();
-
-logs.innerHTML += `<div class="list-item">
-    <div class="item-main">
-        <b>${item.flavor}</b>
-        <span>${item.pay} • ${dateStr}</span>
-    </div>
+                    logs.innerHTML += `<div class="list-item">
+                        <div class="item-main"><b>${item.flavor}</b><span>${item.pay}</span></div>
                         <div style="text-align:right"><b>${item.fullPrice}</b><div style="margin-top:5px" onclick="if(confirm('Видалити запис?')) db.collection('orders').doc('${id}').delete()">🗑️</div></div>
                     </div>`;
                 } else {
                     debts.innerHTML += `<div class="list-item" style="border-left-color:var(--warning)">
                         <div class="item-main"><b>${item.debtor}</b><span>${item.flavor}</span></div>
-                        <div style="text-align:right">
-    <b onclick="editOrder('${id}', ${item.priceVal})">${item.fullPrice}</b>
-    <div style="margin-top:5px; display:flex; gap:6px; justify-content:flex-end;">
-        <button onclick="editOrder('${id}', ${item.priceVal})">✏️</button>
-        <button onclick="if(confirm('Видалити запис?')) db.collection('orders').doc('${id}').delete()">🗑️</button>
-    </div>
-</div><button style="display:block; margin-top:5px; background:var(--success); border:none; color:white; border-radius:6px; padding:4px 8px; font-size:10px;" onclick="db.collection('orders').doc('${id}').update({status:'paid'})">ОПЛАТИВ</button></div>
+                        <div style="text-align:right"><b>${item.fullPrice}</b><button style="display:block; margin-top:5px; background:var(--success); border:none; color:white; border-radius:6px; padding:4px 8px; font-size:10px;" onclick="db.collection('orders').doc('${id}').update({status:'paid'})">ОПЛАТИВ</button></div>
                     </div>`;
                 }
             });
@@ -442,70 +408,8 @@ logs.innerHTML += `<div class="list-item">
     }
 
     sync();
-
-    db.collection("expenses").onSnapshot(snap => {
-    const list = document.getElementById('expenseList');
-    list.innerHTML = "";
-
-    let expPLN = 0, expUAH = 0;
-
-    snap.forEach(doc => {
-        const e = doc.data();
-
-        if(e.currency === "PLN") expPLN += e.amount;
-        else expUAH += e.amount;
-
-        const d = new Date(e.date).toLocaleDateString();
-
-        list.innerHTML += `
-        <div class="list-item" style="border-left-color:#ef4444">
-            <div class="item-main">
-                <b>${e.note || "Витрата"}</b>
-                <span>${d}</span>
-            </div>
-            <div>
-                <b>-${e.amount} ${e.currency === "PLN" ? "зл" : "грн"}</b>
-            </div>
-        </div>`;
-    });
-
-    // ВІДНІМАЄМО ВИТРАТИ
-    document.getElementById('totalPLN').innerText = (pln - expPLN) + " ZŁ";
-    document.getElementById('totalUAH').innerText = (uah - expUAH) + " ₴";
-});
-    
-    async function editOrder(id, oldPrice) {
-    const newPrice = prompt("Нова сума:", oldPrice);
-    if(newPrice === null) return;
-
-    const price = parseInt(newPrice);
-    if(isNaN(price)) return alert("Некоректне число");
-
-    const currency = oldPrice > 200 ? "UAH" : "PLN"; // або можна зберігати окремо
-
-    await db.collection("orders").doc(id).update({
-        priceVal: price,
-        fullPrice: price + (currency === "UAH" ? " грн" : " зл")
-    });
-}
-
-    async function addExpense() {
-    const amount = parseInt(document.getElementById('expenseAmount').value);
-    const note = document.getElementById('expenseNote').value;
-    const currency = document.getElementById('expenseCurrency').value;
-
-    if(!amount) return alert("Введи суму");
-
-    await db.collection("expenses").add({
-        amount,
-        note,
-        currency,
-        date: new Date().getTime()
-    });
-
-    document.getElementById('expenseAmount').value = "";
-    document.getElementById('expenseNote').value = "";
-}
 </script>
 </body>
 </html>
+
+додай тут щоб можна було змінювати суму виручки і щоб дата писалась до кожного проданого товару
