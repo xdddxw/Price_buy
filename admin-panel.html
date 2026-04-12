@@ -9,9 +9,6 @@
     <meta name="apple-mobile-web-app-title" content="SMOKE HUB">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0f172a">
-    <link rel="apple-touch-icon" href="images/IMG_3689.jpeg"> 
-    <link rel="icon" type="image/png" href="images/IMG_3689.jpeg">
-    
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5024/5024445.png">
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/5024/5024445.png">
 
@@ -28,6 +25,7 @@
             --accent-secondary: #06b6d4;
             --success: #10b981;
             --warning: #f59e0b;
+            --danger: #ef4444;
             --text-p: #94a3b8;
         }
 
@@ -36,7 +34,6 @@
             font-family: 'SF Pro Display', -apple-system, system-ui, sans-serif;
             background-color: var(--bg-main);
             color: #f8fafc;
-            /* Відступи для безпечних зон iPhone (notch) */
             padding: calc(10px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom));
             user-select: none;
             -webkit-tap-highlight-color: transparent;
@@ -44,7 +41,6 @@
             box-sizing: border-box;
         }
 
-        /* Dashboard Header */
         .dashboard-header { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
@@ -62,7 +58,6 @@
         .balance-card span { font-size: 10px; color: var(--text-p); text-transform: uppercase; letter-spacing: 0.5px; }
         .balance-card div { font-size: 20px; font-weight: 700; margin-top: 4px; }
 
-        /* Navigation Tabs - Sticky з урахуванням Notch */
         .nav-tabs { 
             display: flex; 
             background: var(--card-surface); 
@@ -73,17 +68,16 @@
             position: sticky; 
             top: env(safe-area-inset-top); 
             z-index: 1000;
-            box-shadow: 0 10px 15px -10px rgba(0,0,0,0.5);
         }
 
         .tab-btn { 
             flex: 1; 
-            padding: 12px 4px; 
+            padding: 12px 2px; 
             border: none; 
             background: transparent; 
             color: var(--text-p); 
             font-weight: 600; 
-            font-size: 11px; 
+            font-size: 10px; 
             border-radius: 10px; 
             white-space: nowrap; 
             transition: 0.2s;
@@ -92,11 +86,9 @@
         .tab-btn.active { 
             background: var(--accent-primary); 
             color: white; 
-            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4); 
         }
 
-        /* Forms */
-        .main-form, .admin-panel { 
+        .main-form, .admin-panel, .stats-card { 
             background: var(--card-surface); 
             border-radius: 24px; 
             padding: 18px; 
@@ -121,8 +113,6 @@
             -webkit-appearance: none;
         }
 
-        input::placeholder { color: #475569; }
-
         .price-tag { text-align: center; font-size: 38px; font-weight: 800; margin: 20px 0; color: #fff; }
 
         .btn-submit { 
@@ -135,12 +125,10 @@
             font-weight: 700; 
             font-size: 17px; 
             cursor: pointer; 
-            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
         }
 
-        .btn-submit:active { transform: scale(0.98); opacity: 0.9; }
+        .btn-submit:active { transform: scale(0.98); }
 
-        /* Lists */
         .list-item {
             background: var(--card-surface); 
             padding: 16px; 
@@ -151,9 +139,14 @@
             align-items: center; 
             border-left: 5px solid var(--accent-secondary);
         }
-        .item-main b { display: block; font-size: 15px; margin-bottom: 4px; }
-        .item-main span { font-size: 12px; color: var(--text-p); }
-        .qty-badge { background: #0f172a; padding: 2px 8px; border-radius: 8px; font-size: 11px; color: var(--accent-secondary); margin-left: 5px; }
+        .item-main b { display: block; font-size: 14px; margin-bottom: 4px; }
+        .item-main span { font-size: 11px; color: var(--text-p); }
+        .qty-badge { background: #0f172a; padding: 2px 6px; border-radius: 6px; font-size: 10px; color: var(--accent-secondary); }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .stat-item { background: #0f172a; padding: 10px; border-radius: 12px; text-align: center; }
+        .stat-val { display: block; font-size: 16px; font-weight: bold; color: var(--success); }
+        .stat-label { font-size: 9px; color: var(--text-p); text-transform: uppercase; }
 
         #location-box { 
             background: rgba(6, 182, 212, 0.1); 
@@ -163,41 +156,60 @@
             display: none; 
             font-size: 14px; 
             border: 1px dashed var(--accent-secondary); 
-            color: #e2e8f0;
         }
     </style>
 </head>
 <body>
 
 <div class="dashboard-header">
-    <div class="balance-card"><span>PLN</span><div id="totalPLN">0</div></div>
-    <div class="balance-card"><span>UAH</span><div id="totalUAH">0</div></div>
+    <div class="balance-card"><span>PLN (КАСА)</span><div id="totalPLN">0</div></div>
+    <div class="balance-card"><span>UAH (КАСА)</span><div id="totalUAH">0</div></div>
 </div>
 
 <div class="nav-tabs">
     <button class="tab-btn active" onclick="showTab('new')">КАСА</button>
-    <button class="tab-btn" onclick="showTab('debts')">БОРГИ</button>
     <button class="tab-btn" onclick="showTab('history')">АРХІВ</button>
-    <button class="tab-btn" onclick="showTab('admin')">⚙️ СКЛАД</button>
+    <button class="tab-btn" onclick="showTab('debts')">БОРГИ</button>
+    <button class="tab-btn" onclick="showTab('admin')">СКЛАД</button>
+    <button class="tab-btn" onclick="showTab('stats')">ЗВІТ</button>
 </div>
 
 <div id="tab-new" class="tab-content">
     <div class="main-form">
         <div class="form-row">
-            <label>КАТАЛОГ</label>
-            <select id="catalog" onchange="updateFlavorList()"><option value="заливка">🧪 Заливка рідини</option><option value="продаж">📦 Готовий товар</option></select>
+            <label>ТИП ОПЕРАЦІЇ</label>
+            <select id="opType" onchange="toggleOpType()">
+                <option value="sale">💰 Продаж</option>
+                <option value="expense">💸 Витрата (закупка/інше)</option>
+            </select>
         </div>
-        <div class="form-row">
-            <label>ПОШУК ТА СМАК</label>
-            <input type="text" id="flavorSearch" placeholder="🔍 Пошук смаку..." oninput="updateFlavorList()">
-            <select id="flavor" onchange="handleFlavor()" style="margin-top:8px;"></select>
+
+        <div id="sale-fields">
+            <div class="form-row">
+                <label>КАТАЛОГ</label>
+                <select id="catalog" onchange="updateFlavorList()"><option value="заливка">🧪 Заливка рідини</option><option value="продаж">📦 Готовий товар</option></select>
+            </div>
+            <div class="form-row">
+                <label>ПОШУК ТА СМАК</label>
+                <input type="text" id="flavorSearch" placeholder="🔍 Пошук..." oninput="updateFlavorList()">
+                <select id="flavor" onchange="handleFlavor()" style="margin-top:8px;"></select>
+            </div>
+            <div id="location-box">📍 <b>Де:</b> <span id="loc-text"></span></div>
+            <div class="form-row" id="vol-box"><label>ОБ'ЄМ</label><select id="size" onchange="calc()"><option value="2">2 ml</option><option value="3">3 ml</option></select></div>
         </div>
-        <div id="location-box">📍 <b>Де лежить:</b> <span id="loc-text"></span></div>
-        <div class="form-row" id="vol-box"><label>ОБ'ЄМ</label><select id="size" onchange="calc()"><option value="2">2 ml</option><option value="3">3 ml</option></select></div>
-        <div class="form-row"><label>МЕТОД ОПЛАТИ</label><select id="pay" onchange="calc()"><option value="Готівка">Готівка PLN</option><option value="Карта">Карта PLN</option><option value="Монобанк">Mono UAH</option></select></div>
-        <div class="form-row"><label>СТАТУС</label><select id="status" onchange="toggleDebt()"><option value="paid">✅ Оплачено</option><option value="debt">🚩 Борг</option></select></div>
+
+        <div id="expense-fields" style="display:none">
+            <div class="form-row">
+                <label>НАЗВА ВИТРАТИ</label>
+                <input type="text" id="expName" placeholder="Наприклад: Закупка жижі">
+            </div>
+        </div>
+
+        <div class="form-row"><label>ВАЛЮТА ТА ОПЛАТА</label><select id="pay" onchange="calc()"><option value="Готівка">Готівка PLN</option><option value="Карта">Карта PLN</option><option value="Монобанк">Mono UAH</option></select></div>
+        <div class="form-row" id="status-row"><label>СТАТУС</label><select id="status" onchange="toggleDebt()"><option value="paid">✅ Оплачено</option><option value="debt">🚩 Борг</option></select></div>
         <div id="debtor-row" class="form-row" style="display:none"><label>ХТО БЕРЕ?</label><input type="text" id="debtorName" placeholder="Ім'я боржника"></div>
-        <div class="form-row"><label>ВЛАСНА ЦІНА</label><input type="number" id="manualPrice" oninput="calc()" placeholder="Введіть якщо інша"></div>
+        <div class="form-row"><label>СУМА</label><input type="number" id="manualPrice" oninput="calc()" placeholder="Введіть суму"></div>
+        
         <div class="price-tag" id="total">0</div>
         <button class="btn-submit" onclick="saveOrder()">ПІДТВЕРДИТИ</button>
     </div>
@@ -208,32 +220,29 @@
         <input type="hidden" id="editId">
         <div class="form-row"><label>НАЗВА СМАКУ</label><input type="text" id="newFlavorName" placeholder="Назва"></div>
         <div class="form-row"><label>ЛОКАЦІЯ</label><input type="text" id="newLoc" placeholder="Де лежить"></div>
-        <div class="form-row"><label>КІЛЬКІСТЬ (ДЛЯ ТОВАРУ)</label><input type="number" id="newQty" value="10"></div>
+        <div class="form-row"><label>КІЛЬКІСТЬ</label><input type="number" id="newQty" value="10"></div>
         <button class="btn-submit" id="saveFlavorBtn" onclick="addFlavorToInventory()">ЗБЕРЕГТИ</button>
         <button class="btn-submit" id="cancelEditBtn" style="display:none; background:#475569; margin-top:8px;" onclick="cancelEdit()">СКАСУВАТИ</button>
     </div>
     <div id="inventoryList"></div>
 </div>
 
+<div id="tab-stats" class="tab-content" style="display:none">
+    <div class="stats-card">
+        <h3 style="margin-top:0; font-size:14px; color:var(--accent-secondary)">ЗВІТ ЗА 7 ДНІВ</h3>
+        <div class="stats-grid">
+            <div class="stat-item"><span class="stat-val" id="st-sales-pln">0</span><span class="stat-label">Продажі PLN</span></div>
+            <div class="stat-item"><span class="stat-val" id="st-sales-uah">0</span><span class="stat-label">Продажі UAH</span></div>
+            <div class="stat-item"><span class="stat-val" style="color:var(--danger)" id="st-exp-pln">0</span><span class="stat-label">Витрати PLN</span></div>
+            <div class="stat-item"><span class="stat-val" style="color:var(--danger)" id="st-exp-uah">0</span><span class="stat-label">Витрати UAH</span></div>
+        </div>
+    </div>
+</div>
+
 <div id="tab-debts" class="tab-content" style="display:none"><div id="debtList"></div></div>
 <div id="tab-history" class="tab-content" style="display:none"><div id="logs"></div></div>
 
 <script>
-    // Manifest & Firebase Config (залишаємо як було)
-    const manifest = {
-        "name": "Smoke Hub Pro",
-        "short_name": "SmokeHub",
-        "start_url": ".",
-        "display": "standalone",
-        "background_color": "#0f172a",
-        "theme_color": "#0f172a",
-        "icons": [{ "src": "https://cdn-icons-png.flaticon.com/512/5024/5024445.png", "sizes": "512x512", "type": "image/png" }]
-    };
-    const stringManifest = JSON.stringify(manifest);
-    const blob = new Blob([stringManifest], {type: 'application/json'});
-    const manifestURL = URL.createObjectURL(blob);
-    document.querySelector('head').innerHTML += `<link rel="manifest" href="${manifestURL}">`;
-
     const firebaseConfig = {
       apiKey: "AIzaSyAOW2GEW1McWRAzs4RLVOGHvcoAnRhgRC4",
       authDomain: "smokehub-7a072.firebaseapp.com",
@@ -246,22 +255,20 @@
     const db = firebase.firestore();
 
     let inventory = [];
-    const initialFlavors = {"ICE SHOT": "Аптечка синя", "spermint": "шафа чорна куртка", "double grape": "зліва ліжко дані", "apple mixed": "шафа чорна куртка", "berry mint": "справа дані ліжко", "blackurant grape": "шафа зверху даня", "blueberry curant": "справа дані ліжко", "watermelon melon": "шафа зверху дані", "cranberry mors": "шафа чорна куртка", "double raspberry": "шафа чорна куртка", "Cola Lemon": "шафа зверху олег", "RedBull blue raspberry": "зліва дані ліжко", "pineaple lemonade": "шафа чорна куртка", "multifruit": "в пакеті в шафі дані", "bali triple shot": "в пакеті в шафі дані", "watermelon lychee": "шафа чорна куртка"};
-
-    async function checkInit() {
-        const snap = await db.collection("inventory").limit(1).get();
-        if(snap.empty) {
-            for(let name in initialFlavors) {
-                await db.collection("inventory").add({ name, loc: initialFlavors[name], qty: 10 });
-            }
-        }
-    }
 
     function showTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('tab-' + tabId).style.display = 'block';
         if(window.event) window.event.currentTarget.classList.add('active');
+    }
+
+    function toggleOpType() {
+        const type = document.getElementById('opType').value;
+        document.getElementById('sale-fields').style.display = type === 'sale' ? 'block' : 'none';
+        document.getElementById('expense-fields').style.display = type === 'expense' ? 'block' : 'none';
+        document.getElementById('status-row').style.display = type === 'sale' ? 'block' : 'none';
+        calc();
     }
 
     async function addFlavorToInventory() {
@@ -302,14 +309,10 @@
         
         if(cat === 'продаж') {
             fs.innerHTML += `<option value="ICE SHOT">ICE SHOT 🧊</option>`;
-            filtered.forEach(f => {
-                fs.innerHTML += `<option value="${f.name}">${f.name} (30ml) [${f.qty}шт]</option>`;
-            });
+            filtered.forEach(f => { fs.innerHTML += `<option value="${f.name}">${f.name} (30ml) [${f.qty}шт]</option>`; });
             document.getElementById('vol-box').style.display = 'none';
         } else {
-            filtered.forEach(f => {
-                fs.innerHTML += `<option value="${f.name}">${f.name}</option>`;
-            });
+            filtered.forEach(f => { fs.innerHTML += `<option value="${f.name}">${f.name}</option>`; });
             document.getElementById('vol-box').style.display = 'block';
         }
         calc();
@@ -329,42 +332,55 @@
     }
 
     function calc() {
+        const type = document.getElementById('opType').value;
         const cat = document.getElementById('catalog').value, p = document.getElementById('pay').value, s = document.getElementById('size').value, f = document.getElementById('flavor').value, manual = document.getElementById('manualPrice').value;
         let cur = (p === "Монобанк") ? "грн" : "зл", price = 0;
+
         if (manual > 0) price = manual;
-        else if (cat === "продаж") price = (f === "ICE SHOT") ? (p === "Монобанк" ? 180 : 15) : (p === "Монобанк" ? 650 : 60);
-        else price = (p === "Монобанк") ? (s === "2" ? 70 : 100) : (s === "2" ? 6 : 9);
+        else if (type === 'sale') {
+            if (cat === "продаж") price = (f === "ICE SHOT") ? (p === "Монобанк" ? 180 : 15) : (p === "Монобанк" ? 650 : 60);
+            else price = (p === "Монобанк") ? (s === "2" ? 70 : 100) : (s === "2" ? 6 : 9);
+        }
         document.getElementById('total').innerText = `${price} ${cur}`;
     }
 
     function toggleDebt() { document.getElementById('debtor-row').style.display = (document.getElementById('status').value === 'debt') ? 'block' : 'none'; }
 
     async function saveOrder() {
-        const fName = document.getElementById('flavor').value;
-        const cat = document.getElementById('catalog').value;
-        if(!fName) return alert("Оберіть товар!");
-        
-        const item = inventory.find(i => i.name === fName);
-        if(cat === 'продаж' && item && item.id) {
-            await db.collection("inventory").doc(item.id).update({ qty: firebase.firestore.FieldValue.increment(-1) });
-        }
-
+        const type = document.getElementById('opType').value;
         const priceStr = document.getElementById('total').innerText;
-        await db.collection("orders").add({
-            catalog: cat, flavor: fName + (cat === 'продаж' ? " (30ml)" : ""), 
-            pay: document.getElementById('pay').value,
-            priceVal: parseInt(priceStr), currency: priceStr.includes("грн") ? "UAH" : "PLN",
-            fullPrice: priceStr, status: document.getElementById('status').value, 
-            debtor: document.getElementById('debtorName').value || "", date: new Date().getTime()
-        });
+        const pVal = parseInt(priceStr) || 0;
+        const curr = priceStr.includes("грн") ? "UAH" : "PLN";
+
+        if (type === 'sale') {
+            const fName = document.getElementById('flavor').value;
+            if(!fName) return alert("Оберіть товар!");
+            const cat = document.getElementById('catalog').value;
+            const item = inventory.find(i => i.name === fName);
+            if(cat === 'продаж' && item && item.id) {
+                await db.collection("inventory").doc(item.id).update({ qty: firebase.firestore.FieldValue.increment(-1) });
+            }
+            await db.collection("orders").add({
+                type: 'sale', catalog: cat, flavor: fName + (cat === 'продаж' ? " (30ml)" : ""), 
+                pay: document.getElementById('pay').value, priceVal: pVal, currency: curr,
+                fullPrice: priceStr, status: document.getElementById('status').value, 
+                debtor: document.getElementById('debtorName').value || "", date: new Date().getTime()
+            });
+        } else {
+            const name = document.getElementById('expName').value || "Витрата";
+            await db.collection("orders").add({
+                type: 'expense', flavor: "🔻 " + name, pay: document.getElementById('pay').value,
+                priceVal: pVal, currency: curr, fullPrice: "-" + priceStr, status: 'paid', date: new Date().getTime()
+            });
+        }
         
         alert("Записано! ✅");
         document.getElementById('manualPrice').value = "";
-        document.getElementById('flavorSearch').value = "";
+        document.getElementById('expName').value = "";
+        calc();
     }
 
     function sync() {
-        checkInit();
         db.collection("inventory").orderBy("name").onSnapshot(snap => {
             inventory = [];
             const list = document.getElementById('inventoryList');
@@ -376,7 +392,7 @@
                     <div class="item-main"><b>${i.name} <span class="qty-badge">${i.qty} шт</span></b><span>📍 ${i.loc}</span></div>
                     <div style="display:flex; gap:10px;">
                         <button style="background:none; border:1px solid var(--accent-secondary); color:white; border-radius:8px; padding:6px;" onclick="editFlavor('${doc.id}', '${i.name}', '${i.loc}', ${i.qty})">✏️</button>
-                        <button style="background:none; border:none; color:var(--danger); font-size:18px;" onclick="if(confirm('Видалити смак?')) db.collection('inventory').doc('${doc.id}').delete()">🗑️</button>
+                        <button style="background:none; border:none; color:var(--danger); font-size:18px;" onclick="if(confirm('Видалити?')) db.collection('inventory').doc('${doc.id}').delete()">🗑️</button>
                     </div>
                 </div>`;
             });
@@ -386,14 +402,29 @@
         db.collection("orders").orderBy("date", "desc").onSnapshot(snap => {
             const logs = document.getElementById('logs'), debts = document.getElementById('debtList');
             let pln = 0, uah = 0;
+            let sPln = 0, sUah = 0, ePln = 0, eUah = 0;
+            const weekAgo = new Date().getTime() - (7 * 24 * 60 * 60 * 1000);
+
             logs.innerHTML = ""; debts.innerHTML = "";
             snap.forEach(doc => {
                 const item = doc.data(), id = doc.id;
+                const isRecent = item.date > weekAgo;
+
                 if(item.status === 'paid') {
-                    if(item.currency === "PLN") pln += item.priceVal; else uah += item.priceVal;
-                    logs.innerHTML += `<div class="list-item">
+                    const isExp = item.type === 'expense';
+                    const sign = isExp ? -1 : 1;
+                    
+                    if(item.currency === "PLN") {
+                        pln += (item.priceVal * sign);
+                        if(isRecent) isExp ? ePln += item.priceVal : sPln += item.priceVal;
+                    } else {
+                        uah += (item.priceVal * sign);
+                        if(isRecent) isExp ? eUah += item.priceVal : sUah += item.priceVal;
+                    }
+
+                    logs.innerHTML += `<div class="list-item" style="${isExp ? 'border-left-color:var(--danger)' : ''}">
                         <div class="item-main"><b>${item.flavor}</b><span>${item.pay}</span></div>
-                        <div style="text-align:right"><b>${item.fullPrice}</b><div style="margin-top:5px" onclick="if(confirm('Видалити запис?')) db.collection('orders').doc('${id}').delete()">🗑️</div></div>
+                        <div style="text-align:right"><b>${item.fullPrice}</b><div style="margin-top:5px" onclick="if(confirm('Видалити?')) db.collection('orders').doc('${id}').delete()">🗑️</div></div>
                     </div>`;
                 } else {
                     debts.innerHTML += `<div class="list-item" style="border-left-color:var(--warning)">
@@ -404,6 +435,12 @@
             });
             document.getElementById('totalPLN').innerText = pln + " ZŁ";
             document.getElementById('totalUAH').innerText = uah + " ₴";
+            
+            // Update Stats
+            document.getElementById('st-sales-pln').innerText = sPln + " ZŁ";
+            document.getElementById('st-sales-uah').innerText = sUah + " ₴";
+            document.getElementById('st-exp-pln').innerText = ePln + " ZŁ";
+            document.getElementById('st-exp-uah').innerText = eUah + " ₴";
         });
     }
 
@@ -411,5 +448,3 @@
 </script>
 </body>
 </html>
-
-додай тут щоб можна було змінювати суму виручки і щоб дата писалась до кожного проданого товару
