@@ -201,6 +201,28 @@
         <div class="price-tag" id="total">0</div>
         <button class="btn-submit" onclick="saveOrder()">ПІДТВЕРДИТИ</button>
     </div>
+
+    <div class="admin-panel">
+    <h3>💸 Витрати</h3>
+    <div class="form-row">
+        <label>СУМА</label>
+        <input type="number" id="expenseAmount" placeholder="Сума">
+    </div>
+    <div class="form-row">
+        <label>ОПИС</label>
+        <input type="text" id="expenseNote" placeholder="Наприклад: закупка">
+    </div>
+    <div class="form-row">
+        <label>ВАЛЮТА</label>
+        <select id="expenseCurrency">
+            <option value="PLN">PLN</option>
+            <option value="UAH">UAH</option>
+        </select>
+    </div>
+    <button class="btn-submit" onclick="addExpense()">ДОДАТИ ВИТРАТУ</button>
+</div>
+
+<div id="expenseList"></div>
 </div>
 
 <div id="tab-admin" class="tab-content" style="display:none">
@@ -421,6 +443,37 @@ logs.innerHTML += `<div class="list-item">
 
     sync();
 
+    db.collection("expenses").onSnapshot(snap => {
+    const list = document.getElementById('expenseList');
+    list.innerHTML = "";
+
+    let expPLN = 0, expUAH = 0;
+
+    snap.forEach(doc => {
+        const e = doc.data();
+
+        if(e.currency === "PLN") expPLN += e.amount;
+        else expUAH += e.amount;
+
+        const d = new Date(e.date).toLocaleDateString();
+
+        list.innerHTML += `
+        <div class="list-item" style="border-left-color:#ef4444">
+            <div class="item-main">
+                <b>${e.note || "Витрата"}</b>
+                <span>${d}</span>
+            </div>
+            <div>
+                <b>-${e.amount} ${e.currency === "PLN" ? "зл" : "грн"}</b>
+            </div>
+        </div>`;
+    });
+
+    // ВІДНІМАЄМО ВИТРАТИ
+    document.getElementById('totalPLN').innerText = (pln - expPLN) + " ZŁ";
+    document.getElementById('totalUAH').innerText = (uah - expUAH) + " ₴";
+});
+    
     async function editOrder(id, oldPrice) {
     const newPrice = prompt("Нова сума:", oldPrice);
     if(newPrice === null) return;
@@ -434,6 +487,24 @@ logs.innerHTML += `<div class="list-item">
         priceVal: price,
         fullPrice: price + (currency === "UAH" ? " грн" : " зл")
     });
+}
+
+    async function addExpense() {
+    const amount = parseInt(document.getElementById('expenseAmount').value);
+    const note = document.getElementById('expenseNote').value;
+    const currency = document.getElementById('expenseCurrency').value;
+
+    if(!amount) return alert("Введи суму");
+
+    await db.collection("expenses").add({
+        amount,
+        note,
+        currency,
+        date: new Date().getTime()
+    });
+
+    document.getElementById('expenseAmount').value = "";
+    document.getElementById('expenseNote').value = "";
 }
 </script>
 </body>
