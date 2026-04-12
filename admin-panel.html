@@ -143,6 +143,7 @@
         .item-main span { font-size: 11px; color: var(--text-p); }
         .item-date { font-size: 10px; color: var(--accent-primary); font-weight: bold; margin-bottom: 2px; display: block; }
         .qty-badge { background: #0f172a; padding: 2px 6px; border-radius: 6px; font-size: 10px; color: var(--accent-secondary); }
+        .type-badge { font-size: 9px; padding: 2px 5px; border-radius: 4px; background: rgba(255,255,255,0.1); color: #fff; margin-right: 5px; text-transform: uppercase; }
 
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .stat-item { background: #0f172a; padding: 10px; border-radius: 12px; text-align: center; }
@@ -188,7 +189,10 @@
         <div id="sale-fields">
             <div class="form-row">
                 <label>КАТАЛОГ</label>
-                <select id="catalog" onchange="updateFlavorList()"><option value="заливка">🧪 Заливка рідини</option><option value="продаж">📦 Готовий товар</option></select>
+                <select id="catalog" onchange="updateFlavorList()">
+                    <option value="заливка">🧪 Заливка рідини</option>
+                    <option value="продаж">📦 Готовий товар</option>
+                </select>
             </div>
             <div class="form-row">
                 <label>ПОШУК ТА СМАК</label>
@@ -219,9 +223,16 @@
 <div id="tab-admin" class="tab-content" style="display:none">
     <div class="admin-panel">
         <input type="hidden" id="editId">
+        <div class="form-row">
+            <label>ТИП ТОВАРУ</label>
+            <select id="newFlavorType">
+                <option value="заливка">🧪 Заливка рідини</option>
+                <option value="продаж">📦 Готовий товар</option>
+            </select>
+        </div>
         <div class="form-row"><label>НАЗВА СМАКУ</label><input type="text" id="newFlavorName" placeholder="Назва"></div>
         <div class="form-row"><label>ЛОКАЦІЯ</label><input type="text" id="newLoc" placeholder="Де лежить"></div>
-        <div class="form-row"><label>КІЛЬКІСТЬ</label><input type="number" id="newQty" value="10"></div>
+        <div class="form-row"><label>КІЛЬКІСТЬ (ДЛЯ ТОВАРУ)</label><input type="number" id="newQty" value="10"></div>
         <button class="btn-submit" id="saveFlavorBtn" onclick="addFlavorToInventory()">ЗБЕРЕГТИ</button>
         <button class="btn-submit" id="cancelEditBtn" style="display:none; background:#475569; margin-top:8px;" onclick="cancelEdit()">СКАСУВАТИ</button>
     </div>
@@ -273,20 +284,22 @@
     }
 
     async function addFlavorToInventory() {
+        const type = document.getElementById('newFlavorType').value;
         const name = document.getElementById('newFlavorName').value;
         const loc = document.getElementById('newLoc').value;
         const qty = parseInt(document.getElementById('newQty').value) || 0;
         const id = document.getElementById('editId').value;
         if(!name) return;
-        id ? await db.collection("inventory").doc(id).update({name, loc, qty}) : await db.collection("inventory").add({name, loc, qty});
+        id ? await db.collection("inventory").doc(id).update({type, name, loc, qty}) : await db.collection("inventory").add({type, name, loc, qty});
         cancelEdit();
     }
 
-    function editFlavor(id, name, loc, qty) {
+    function editFlavor(id, name, loc, qty, type) {
         document.getElementById('editId').value = id;
         document.getElementById('newFlavorName').value = name;
         document.getElementById('newLoc').value = loc;
         document.getElementById('newQty').value = qty;
+        document.getElementById('newFlavorType').value = type || 'заливка';
         document.getElementById('saveFlavorBtn').innerText = "ОНОВИТИ";
         document.getElementById('cancelEditBtn').style.display = "block";
         showTab('admin');
@@ -306,7 +319,11 @@
         const query = document.getElementById('flavorSearch').value.toLowerCase();
         const fs = document.getElementById('flavor');
         fs.innerHTML = '<option value="" disabled selected>Оберіть смак</option>';
-        let filtered = inventory.filter(f => f.name.toLowerCase().includes(query));
+        
+        let filtered = inventory.filter(f => 
+            f.name.toLowerCase().includes(query) && 
+            (f.type === cat || (!f.type && cat === 'заливка'))
+        );
         
         if(cat === 'продаж') {
             fs.innerHTML += `<option value="ICE SHOT">ICE SHOT 🧊</option>`;
@@ -347,7 +364,6 @@
 
     function toggleDebt() { document.getElementById('debtor-row').style.display = (document.getElementById('status').value === 'debt') ? 'block' : 'none'; }
 
-    // Форматування дати: 12.04 14:30
     function formatDate(ts) {
         const d = new Date(ts);
         const day = String(d.getDate()).padStart(2, '0');
@@ -399,10 +415,14 @@
             snap.forEach(doc => {
                 const i = doc.data();
                 inventory.push({id: doc.id, ...i});
-                list.innerHTML += `<div class="list-item">
-                    <div class="item-main"><b>${i.name} <span class="qty-badge">${i.qty} шт</span></b><span>📍 ${i.loc}</span></div>
+                const isSale = i.type === 'продаж';
+                list.innerHTML += `<div class="list-item" style="border-left-color: ${isSale ? 'var(--accent-primary)' : 'var(--accent-secondary)'}">
+                    <div class="item-main">
+                        <b><span class="type-badge">${i.type || 'заливка'}</span>${i.name} <span class="qty-badge">${i.qty} шт</span></b>
+                        <span>📍 ${i.loc}</span>
+                    </div>
                     <div style="display:flex; gap:10px;">
-                        <button style="background:none; border:1px solid var(--accent-secondary); color:white; border-radius:8px; padding:6px;" onclick="editFlavor('${doc.id}', '${i.name}', '${i.loc}', ${i.qty})">✏️</button>
+                        <button style="background:none; border:1px solid var(--accent-secondary); color:white; border-radius:8px; padding:6px;" onclick="editFlavor('${doc.id}', '${i.name}', '${i.loc}', ${i.qty}, '${i.type}')">✏️</button>
                         <button style="background:none; border:none; color:var(--danger); font-size:18px;" onclick="if(confirm('Видалити?')) db.collection('inventory').doc('${doc.id}').delete()">🗑️</button>
                     </div>
                 </div>`;
