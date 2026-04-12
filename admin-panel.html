@@ -141,6 +141,7 @@
         }
         .item-main b { display: block; font-size: 14px; margin-bottom: 4px; }
         .item-main span { font-size: 11px; color: var(--text-p); }
+        .item-date { font-size: 10px; color: var(--accent-primary); font-weight: bold; margin-bottom: 2px; display: block; }
         .qty-badge { background: #0f172a; padding: 2px 6px; border-radius: 6px; font-size: 10px; color: var(--accent-secondary); }
 
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
@@ -346,6 +347,16 @@
 
     function toggleDebt() { document.getElementById('debtor-row').style.display = (document.getElementById('status').value === 'debt') ? 'block' : 'none'; }
 
+    // Форматування дати: 12.04 14:30
+    function formatDate(ts) {
+        const d = new Date(ts);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        return `${day}.${month} ${hours}:${minutes}`;
+    }
+
     async function saveOrder() {
         const type = document.getElementById('opType').value;
         const priceStr = document.getElementById('total').innerText;
@@ -409,6 +420,7 @@
             snap.forEach(doc => {
                 const item = doc.data(), id = doc.id;
                 const isRecent = item.date > weekAgo;
+                const timeLabel = formatDate(item.date);
 
                 if(item.status === 'paid') {
                     const isExp = item.type === 'expense';
@@ -423,12 +435,20 @@
                     }
 
                     logs.innerHTML += `<div class="list-item" style="${isExp ? 'border-left-color:var(--danger)' : ''}">
-                        <div class="item-main"><b>${item.flavor}</b><span>${item.pay}</span></div>
+                        <div class="item-main">
+                            <span class="item-date">${timeLabel}</span>
+                            <b>${item.flavor}</b>
+                            <span>${item.pay}</span>
+                        </div>
                         <div style="text-align:right"><b>${item.fullPrice}</b><div style="margin-top:5px" onclick="if(confirm('Видалити?')) db.collection('orders').doc('${id}').delete()">🗑️</div></div>
                     </div>`;
                 } else {
                     debts.innerHTML += `<div class="list-item" style="border-left-color:var(--warning)">
-                        <div class="item-main"><b>${item.debtor}</b><span>${item.flavor}</span></div>
+                        <div class="item-main">
+                            <span class="item-date">${timeLabel}</span>
+                            <b>${item.debtor}</b>
+                            <span>${item.flavor}</span>
+                        </div>
                         <div style="text-align:right"><b>${item.fullPrice}</b><button style="display:block; margin-top:5px; background:var(--success); border:none; color:white; border-radius:6px; padding:4px 8px; font-size:10px;" onclick="db.collection('orders').doc('${id}').update({status:'paid'})">ОПЛАТИВ</button></div>
                     </div>`;
                 }
