@@ -391,14 +391,26 @@
                 const item = doc.data(), id = doc.id;
                 if(item.status === 'paid') {
                     if(item.currency === "PLN") pln += item.priceVal; else uah += item.priceVal;
-                    logs.innerHTML += `<div class="list-item">
-                        <div class="item-main"><b>${item.flavor}</b><span>${item.pay}</span></div>
+                    const d = new Date(item.date);
+const dateStr = d.toLocaleString();
+
+logs.innerHTML += `<div class="list-item">
+    <div class="item-main">
+        <b>${item.flavor}</b>
+        <span>${item.pay} • ${dateStr}</span>
+    </div>
                         <div style="text-align:right"><b>${item.fullPrice}</b><div style="margin-top:5px" onclick="if(confirm('Видалити запис?')) db.collection('orders').doc('${id}').delete()">🗑️</div></div>
                     </div>`;
                 } else {
                     debts.innerHTML += `<div class="list-item" style="border-left-color:var(--warning)">
                         <div class="item-main"><b>${item.debtor}</b><span>${item.flavor}</span></div>
-                        <div style="text-align:right"><b>${item.fullPrice}</b><button style="display:block; margin-top:5px; background:var(--success); border:none; color:white; border-radius:6px; padding:4px 8px; font-size:10px;" onclick="db.collection('orders').doc('${id}').update({status:'paid'})">ОПЛАТИВ</button></div>
+                        <div style="text-align:right">
+    <b onclick="editOrder('${id}', ${item.priceVal})">${item.fullPrice}</b>
+    <div style="margin-top:5px; display:flex; gap:6px; justify-content:flex-end;">
+        <button onclick="editOrder('${id}', ${item.priceVal})">✏️</button>
+        <button onclick="if(confirm('Видалити запис?')) db.collection('orders').doc('${id}').delete()">🗑️</button>
+    </div>
+</div><button style="display:block; margin-top:5px; background:var(--success); border:none; color:white; border-radius:6px; padding:4px 8px; font-size:10px;" onclick="db.collection('orders').doc('${id}').update({status:'paid'})">ОПЛАТИВ</button></div>
                     </div>`;
                 }
             });
@@ -408,6 +420,21 @@
     }
 
     sync();
+
+    async function editOrder(id, oldPrice) {
+    const newPrice = prompt("Нова сума:", oldPrice);
+    if(newPrice === null) return;
+
+    const price = parseInt(newPrice);
+    if(isNaN(price)) return alert("Некоректне число");
+
+    const currency = oldPrice > 200 ? "UAH" : "PLN"; // або можна зберігати окремо
+
+    await db.collection("orders").doc(id).update({
+        priceVal: price,
+        fullPrice: price + (currency === "UAH" ? " грн" : " зл")
+    });
+}
 </script>
 </body>
 </html>
