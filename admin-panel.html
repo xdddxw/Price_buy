@@ -145,10 +145,23 @@
         .qty-badge { background: #0f172a; padding: 2px 6px; border-radius: 6px; font-size: 10px; color: var(--accent-secondary); }
         .type-badge { font-size: 9px; padding: 2px 5px; border-radius: 4px; background: rgba(255,255,255,0.1); color: #fff; margin-right: 5px; text-transform: uppercase; }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        /* Таблиця статистики */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; margin-bottom: 20px;}
         .stat-item { background: #0f172a; padding: 10px; border-radius: 12px; text-align: center; }
         .stat-val { display: block; font-size: 16px; font-weight: bold; color: var(--success); }
         .stat-label { font-size: 9px; color: var(--text-p); text-transform: uppercase; }
+
+        .day-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .day-row:last-child { border-bottom: none; }
+        .day-date { font-weight: bold; font-size: 14px; }
+        .day-totals { text-align: right; }
+        .day-totals div { font-size: 12px; font-weight: 600; }
 
         #location-box { 
             background: rgba(6, 182, 212, 0.1); 
@@ -241,13 +254,17 @@
 
 <div id="tab-stats" class="tab-content" style="display:none">
     <div class="stats-card">
-        <h3 style="margin-top:0; font-size:14px; color:var(--accent-secondary)">ЗВІТ ЗА 7 ДНІВ</h3>
+        <h3 style="margin:0 0 10px 0; font-size:14px; color:var(--accent-secondary)">ОГЛЯД ЗА 7 ДНІВ</h3>
         <div class="stats-grid">
             <div class="stat-item"><span class="stat-val" id="st-sales-pln">0</span><span class="stat-label">Продажі PLN</span></div>
             <div class="stat-item"><span class="stat-val" id="st-sales-uah">0</span><span class="stat-label">Продажі UAH</span></div>
             <div class="stat-item"><span class="stat-val" style="color:var(--danger)" id="st-exp-pln">0</span><span class="stat-label">Витрати PLN</span></div>
             <div class="stat-item"><span class="stat-val" style="color:var(--danger)" id="st-exp-uah">0</span><span class="stat-label">Витрати UAH</span></div>
         </div>
+
+        <h3 style="margin:20px 0 10px 0; font-size:14px; color:var(--accent-secondary)">ДЕННА СТАТИСТИКА (ЧИСТИЙ)</h3>
+        <div id="dailyStatsList">
+            </div>
     </div>
 </div>
 
@@ -373,6 +390,12 @@
         return `${day}.${month} ${hours}:${minutes}`;
     }
 
+    // Для групування по днях (тільки дата без часу)
+    function formatDateOnly(ts) {
+        const d = new Date(ts);
+        return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+
     async function saveOrder() {
         const type = document.getElementById('opType').value;
         const priceStr = document.getElementById('total').innerText;
@@ -432,25 +455,36 @@
 
         db.collection("orders").orderBy("date", "desc").onSnapshot(snap => {
             const logs = document.getElementById('logs'), debts = document.getElementById('debtList');
+            const dailyList = document.getElementById('dailyStatsList');
+            
             let pln = 0, uah = 0;
             let sPln = 0, sUah = 0, ePln = 0, eUah = 0;
             const weekAgo = new Date().getTime() - (7 * 24 * 60 * 60 * 1000);
+
+            let dayGroups = {}; // Для денної статистики
 
             logs.innerHTML = ""; debts.innerHTML = "";
             snap.forEach(doc => {
                 const item = doc.data(), id = doc.id;
                 const isRecent = item.date > weekAgo;
                 const timeLabel = formatDate(item.date);
+                const dateOnly = formatDateOnly(item.date);
+
+                // Ініціалізуємо групу для дня
+                if(!dayGroups[dateOnly]) dayGroups[dateOnly] = { pln: 0, uah: 0 };
 
                 if(item.status === 'paid') {
                     const isExp = item.type === 'expense';
                     const sign = isExp ? -1 : 1;
+                    const val = item.priceVal * sign;
                     
                     if(item.currency === "PLN") {
-                        pln += (item.priceVal * sign);
+                        pln += val;
+                        dayGroups[dateOnly].pln += val;
                         if(isRecent) isExp ? ePln += item.priceVal : sPln += item.priceVal;
                     } else {
-                        uah += (item.priceVal * sign);
+                        uah += val;
+                        dayGroups[dateOnly].uah += val;
                         if(isRecent) isExp ? eUah += item.priceVal : sUah += item.priceVal;
                     }
 
@@ -473,14 +507,31 @@
                     </div>`;
                 }
             });
+
+            // Виведення загальних балансів
             document.getElementById('totalPLN').innerText = pln + " ZŁ";
             document.getElementById('totalUAH').innerText = uah + " ₴";
             
-            // Update Stats
+            // Оновлення карток 7-денної статистики
             document.getElementById('st-sales-pln').innerText = sPln + " ZŁ";
             document.getElementById('st-sales-uah').innerText = sUah + " ₴";
             document.getElementById('st-exp-pln').innerText = ePln + " ZŁ";
             document.getElementById('st-exp-uah').innerText = eUah + " ₴";
+
+            // Рендер списку денної статистики
+            dailyList.innerHTML = "";
+            Object.keys(dayGroups).forEach(day => {
+                const data = dayGroups[day];
+                dailyList.innerHTML += `
+                    <div class="day-row">
+                        <div class="day-date">${day}</div>
+                        <div class="day-totals">
+                            <div style="color:${data.pln >= 0 ? 'var(--success)' : 'var(--danger)'}">${data.pln} ZŁ</div>
+                            <div style="color:${data.uah >= 0 ? 'var(--success)' : 'var(--danger)'}">${data.uah} ₴</div>
+                        </div>
+                    </div>
+                `;
+            });
         });
     }
 
