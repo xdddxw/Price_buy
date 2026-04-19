@@ -533,6 +533,22 @@ html.hide-sold-active:not(.force-admin) .product-card.out-of-stock {
         </div>
     </div>
 </div>
+<div id="category-start-modal" class="lang-modal-overlay">
+    <div class="lang-modal-content" style="max-width: 350px;">
+        <div class="lang-modal-logo">SMOKE HUB</div>
+        <h3 id="cat-modal-title">Що вас цікавить? / Co Cię interesuje?</h3>
+        <div class="lang-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <button onclick="selectInitialCategory('zalivka')" style="flex-direction: column; padding: 20px 10px;">
+                <span style="font-size: 30px;">💧</span>
+                <span data-i18n="zalivka">Заливка</span>
+            </button>
+            <button onclick="selectInitialCategory('prodazh')" style="flex-direction: column; padding: 20px 10px;">
+                <span style="font-size: 30px;">📦</span>
+                <span data-i18n="prodazh">Продаж</span>
+            </button>
+        </div>
+    </div>
+</div>
 
 <header>
     <div class="logo">SMOKE HUB</div>
@@ -1491,10 +1507,53 @@ if (isAdmin()) {
         }
     });
 }
+
+// Функція для вибору категорії при старті
+window.selectInitialCategory = (tab) => {
+    const modal = document.getElementById('category-start-modal');
+    
+    // Плавне зникнення
+    modal.style.opacity = '0';
+    modal.style.transition = '0.3s';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+        
+        // Знаходимо кнопку в нижньому меню і імітуємо клік
+        const navBtn = document.querySelector(`.nav-item[data-tab="${tab}"]`);
+        if (navBtn) navBtn.click(); 
+    }, 300);
+};
+
+// Модифікуємо вашу функцію вибору мови, щоб вона відкривала вікно категорій
+const originalSelectLang = window.selectInitialLang;
+window.selectInitialLang = (lang) => {
+    // Викликаємо оригінальну функцію перекладу
+    applyLang(lang);
+    localStorage.setItem("lang", lang);
+    
+    const langModal = document.getElementById('language-modal');
+    langModal.style.display = 'none';
+    
+    // Відкриваємо вікно вибору категорії
+    const catModal = document.getElementById('category-start-modal');
+    catModal.style.display = 'flex';
+    catModal.style.opacity = '1';
+};
+
+// Оновлюємо перевірку при завантаженні (DOMContentLoaded)
+window.addEventListener('DOMContentLoaded', () => {
+    const savedLang = localStorage.getItem("lang");
+    if (!savedLang) {
+        document.getElementById('language-modal').style.display = 'flex';
+    } else {
+        // Якщо мова вже є, просто показуємо вибір категорії
+        document.getElementById('category-start-modal').style.display = 'flex';
+    }
+});
 </script>
 </body>
 </html>
-
 
 
 
