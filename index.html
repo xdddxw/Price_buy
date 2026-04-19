@@ -1,6 +1,7 @@
     <!DOCTYPE html>
 <html lang="uk">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script>
     // 1. Отримуємо або створюємо ID миттєво
     let myId = localStorage.getItem('hub_user_id');
@@ -517,6 +518,25 @@ html.hide-sold-active:not(.force-admin) .product-card.out-of-stock {
     padding: 12px;
     font-family: monospace;
 }
+
+        /* Ефект тряски */
+@keyframes jiggle {
+    0% { transform: rotate(-1deg); }
+    50% { transform: rotate(1deg); }
+    100% { transform: rotate(-1deg); }
+}
+
+.reorder-mode .product-card {
+    animation: jiggle 0.3s infinite ease-in-out;
+    opacity: 0.8;
+    z-index: 10;
+}
+
+/* Колір картки, яку ми тримаємо пальцем */
+.sortable-ghost {
+    opacity: 0.3;
+    transform: scale(0.9);
+}
     </style>
 </head>
 <body>
@@ -732,6 +752,7 @@ html.hide-sold-active:not(.force-admin) .product-card.out-of-stock {
         <button class="admin-btn" id="edit-stock"><span>📦</span>Склад</button>
         <button class="admin-btn" id="edit-badge"><span>🏷️</span>Стікери</button>
         <button class="admin-btn" id="edit-img-mode"><span>📸</span>Змінити фото</button>
+        <button class="admin-btn" id="edit-reorder" style="border-color: var(--accent-blue)"><span>↕️</span> Порядок</button>
         <button class="admin-btn" id="edit-delete" style="border-color: #ff0000;"><span>🗑️</span>Видалити</button>
         <select id="badge-selector" class="admin-input" style="grid-column: span 2; margin-top:5px;">
             <option value="">Без стікера</option>
@@ -1551,6 +1572,45 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('category-start-modal').style.display = 'flex';
     }
 });
+
+    let sortables = []; // тут зберігаємо налаштування перетягування
+
+function toggleReorderMode(active) {
+    const grids = document.querySelectorAll('.product-grid');
+    if (active) {
+        document.body.classList.add('reorder-mode'); // вмикаємо візуальну тряску
+        grids.forEach(grid => {
+            // вмикаємо можливість сортування для кожної категорії
+            let s = new Sortable(grid, {
+                animation: 150,
+                delay: 100, // затримка, щоб випадково не потягнути при скролі
+                touchStartThreshold: 5,
+                ghostClass: 'sortable-ghost'
+            });
+            sortables.push(s);
+        });
+    } else {
+        document.body.classList.remove('reorder-mode'); // вимикаємо тряску
+        sortables.forEach(s => s.destroy()); // повністю вимикаємо сортування
+        sortables = [];
+    }
+}
+
+// Прив'язуємо функцію до кнопки "Порядок"
+document.getElementById('edit-reorder').onclick = (e) => {
+    // Якщо режим вже був 'reorder', вимикаємо його (null), інакше вмикаємо
+    mode = (mode === 'reorder' ? null : 'reorder');
+    
+    // Прибираємо підсвітку з усіх інших кнопок адмінки
+    document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode'));
+    
+    if (mode === 'reorder') {
+        e.target.classList.add('active-mode'); // підсвічуємо нашу кнопку
+        toggleReorderMode(true);
+    } else {
+        toggleReorderMode(false);
+    }
+};
 </script>
 </body>
 </html>
