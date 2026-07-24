@@ -112,7 +112,6 @@
             padding: 8px; border-radius: 12px; background-color: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.1);
         }
         
-        /* КНОПКА КОШИКА */
         .add-to-cart-btn {
             background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.2);
             color: white; border-radius: 10px; padding: 8px; margin-top: 10px;
@@ -121,7 +120,6 @@
         .add-to-cart-btn:active { transform: scale(0.95); background: rgba(0, 240, 255, 0.2); }
         .out-of-stock .add-to-cart-btn { display: none; }
 
-        /* CART UI */
         .cart-item {
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
@@ -208,8 +206,6 @@
         [contenteditable="true"] { outline: none; background: rgba(0, 240, 255, 0.1); border-radius: 8px; padding: 4px; box-shadow: inset 0 0 0 1px var(--neon-blue); }
         html.hide-sold-active:not(.force-admin) .product-card.out-of-stock { display: none !important; }
         html.force-admin.hide-sold-active .product-card.out-of-stock { display: flex !important; opacity: 0.3; }
-        @keyframes jiggle { 0% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg); } 100% { transform: rotate(-1.5deg); } }
-        .reorder-mode .product-card { animation: jiggle 0.35s infinite ease-in-out; }
     </style>
 </head>
 <body>
@@ -297,28 +293,40 @@
         <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 20px; text-transform: uppercase;" data-i18n="cart_title">🛒 Ваш кошик</h2>
         
         <div id="cart-items-container"></div>
-        
         <div id="cart-empty-msg" style="text-align:center; color:#888; padding: 40px 0;" data-i18n="empty">Кошик порожній</div>
         
         <div id="cart-summary" class="hidden">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin: 20px 0; padding: 15px; background: rgba(0, 240, 255, 0.05); border-radius: 16px; border: 1px solid rgba(0, 240, 255, 0.2);">
+            <!-- ПРОМОКОД -->
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <input type="text" id="cart-promo-input" class="checkout-input" style="margin-bottom:0;" placeholder="Введіть промокод (якщо є)" data-i18n-ph="promo">
+                <button id="apply-promo-btn" class="admin-btn" style="padding: 0 20px; font-size:16px;">✅</button>
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin: 10px 0 20px; padding: 15px; background: rgba(0, 240, 255, 0.05); border-radius: 16px; border: 1px solid rgba(0, 240, 255, 0.2);">
                 <span data-i18n="total" style="font-size: 16px; font-weight: 700;">Разом до сплати:</span>
-                <span id="cart-total-price" style="color:var(--neon-blue); font-size: 20px; font-weight: 900;">0</span>
+                <div style="text-align: right;">
+                    <span id="cart-discount-msg" style="display:none; color: var(--neon-pink); font-size: 12px; font-weight: bold; margin-bottom: 4px;"></span>
+                    <br>
+                    <span id="cart-total-price" style="color:var(--neon-blue); font-size: 20px; font-weight: 900;">0</span>
+                </div>
             </div>
             
             <input type="text" id="order-name" class="checkout-input" placeholder="Ваше ім'я" data-i18n-ph="name">
-            <input type="text" id="order-phone" class="checkout-input" placeholder="Нік в telegram" data-i18n-ph="phone">
-            
-            <!-- НОВЕ ПОЛЕ: МІСТО -->
+            <input type="text" id="order-phone" class="checkout-input" placeholder="Телефон або Telegram" data-i18n-ph="phone">
             <input type="text" id="order-city" class="checkout-input" placeholder="Місто відправки (Пошта)" data-i18n-ph="city">
             
-            <!-- ВИБІР ВАЛЮТИ ОПЛАТИ -->
             <select id="order-currency" class="checkout-input">
                 <option value="PLN">🇵🇱 Оплата в PLN (Злоті)</option>
                 <option value="UAH">🇺🇦 Оплата в UAH (Гривня)</option>
             </select>
             
             <button id="submit-order-btn" class="checkout-submit" data-i18n="order_btn">🚀 ОФОРМИТИ ЗАМОВЛЕННЯ</button>
+        </div>
+
+        <!-- КРОС-СЕЙЛ (РЕКОМЕНДОВАНЕ) -->
+        <div id="recommended-section" class="hidden" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <h3 style="font-size: 15px; color: #888; font-weight: 900; text-transform: uppercase; margin-bottom:15px; text-align: center;">⚡ З цим часто купують:</h3>
+            <div class="product-grid" id="recommended-grid"></div>
         </div>
     </div>
 </div>
@@ -340,10 +348,26 @@
         <button onclick="document.getElementById('dev-menu').classList.remove('active')" style="background:rgba(255,255,255,0.1); border:none; color:white; width: 36px; height: 36px; border-radius: 50%; font-size:18px; cursor: pointer;">×</button>
     </div>
 
-    <!-- ЗАМОВЛЕННЯ -->
+    <!-- ЗАМОВЛЕННЯ З КНОПКОЮ ВИДАЛИТИ -->
     <div class="admin-section-title">📥 ОСТАННІ ЗАМОВЛЕННЯ</div>
     <div id="admin-orders-list" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
         <div style="color: #888; font-size: 13px;">Завантаження...</div>
+    </div>
+
+    <!-- НАЛАШТУВАННЯ TELEGRAM -->
+    <div class="admin-section-title">🤖 Сповіщення в Telegram</div>
+    <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
+        <input type="text" id="admin-tg-token" class="admin-input" placeholder="Bot Token (від BotFather)">
+        <input type="text" id="admin-tg-chat" class="admin-input" placeholder="Твій Chat ID">
+        <button class="admin-btn" id="save-tg-btn" style="width:100%; background: rgba(0, 240, 255, 0.1); color: var(--neon-blue);">💾 Зберегти налаштування ТГ</button>
+    </div>
+
+    <!-- НАЛАШТУВАННЯ ПРОМОКОДУ -->
+    <div class="admin-section-title">🎟️ Промокод</div>
+    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <input type="text" id="admin-promo-code" class="admin-input" style="margin-bottom: 0;" placeholder="Код (напр. HUB10)">
+        <input type="number" id="admin-promo-percent" class="admin-input" style="margin-bottom: 0; width: 80px;" placeholder="%">
+        <button class="admin-btn" id="save-promo-btn" style="padding: 0 20px; font-size: 18px;">💾</button>
     </div>
 
     <div class="admin-section-title">🆕 Додати товар</div>
@@ -405,76 +429,55 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, onValue, set, get, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, onValue, set, get, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const app = initializeApp({ databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/" });
     const db = getDatabase(app);
     const isAdmin = () => localStorage.getItem('isHubAdmin') === 'true';
 
+    let globalCatalog = null; // Для крос-сейлу
+    let promoConfig = { code: "", percent: 0 }; // Налаштування промокоду
+    let activePromoDiscount = 0; // Застосована знижка
+    let tgConfig = { token: "", chatId: "" }; // Налаштування ТГ
+
     // --- ЛОКАЛІЗАЦІЯ ---
     const translations = {
         ua: { 
-            zalivka: "Жижа", prodazh: "Снюс", other: "Катриджі", cart: "Кошик",
-            sold: "ПРОДАНО", badge_hit: "ХІТ", badge_promo: "АКЦІЯ", badge_new: "НОВИНКА", updated: "Оновлено:",
-            cart_title: "🛒 Ваш кошик", empty: "Кошик порожній 😔", total: "Разом до сплати:", 
-            add_cart: "В кошик", name: "Ваше ім'я", phone: "Телефон або Telegram", city: "Місто відправки (Пошта)", order_btn: "🚀 ОФОРМИТИ ЗАМОВЛЕННЯ",
-            order_success: "✅ Замовлення успішно відправлено! Ми зв'яжемося з вами."
+            zalivka: "Жижа", prodazh: "Снюс", other: "Катриджі", cart: "Кошик", sold: "ПРОДАНО", badge_hit: "ХІТ", badge_promo: "АКЦІЯ", badge_new: "НОВИНКА", updated: "Оновлено:",
+            cart_title: "🛒 Ваш кошик", empty: "Кошик порожній 😔", total: "Разом до сплати:", add_cart: "В кошик", name: "Ваше ім'я", phone: "Телефон або Telegram", city: "Місто відправки (Пошта)", promo: "Введіть промокод", order_btn: "🚀 ОФОРМИТИ ЗАМОВЛЕННЯ", order_success: "✅ Замовлення відправлено! Ми зв'яжемося з вами."
         },
         pl: { 
-            zalivka: "Liquid", prodazh: "Snus", other: "Kartridże", cart: "Koszyk",
-            sold: "SPRZEDANE", badge_hit: "HIT", badge_promo: "PROMOCJA", badge_new: "NOWOŚĆ", updated: "Aktualizacja:",
-            cart_title: "🛒 Twój koszyk", empty: "Koszyk jest pusty 😔", total: "Do zapłaty:", 
-            add_cart: "Do koszyka", name: "Twoje imię", phone: "Telefon lub Telegram", city: "Miasto wysyłki (Paczkomat)", order_btn: "🚀 ZŁÓŻ ZAMÓWIENIE",
-            order_success: "✅ Zamówienie wysłane pomyślnie! Skontaktujemy się z Tobą."
+            zalivka: "Liquid", prodazh: "Snus", other: "Kartridże", cart: "Koszyk", sold: "SPRZEDANE", badge_hit: "HIT", badge_promo: "PROMOCJA", badge_new: "NOWOŚĆ", updated: "Aktualizacja:",
+            cart_title: "🛒 Twój koszyk", empty: "Koszyk jest pusty 😔", total: "Do zapłaty:", add_cart: "Do koszyka", name: "Twoje imię", phone: "Telefon / Telegram", city: "Miasto wysyłki (Paczkomat)", promo: "Kod rabatowy", order_btn: "🚀 ZŁÓŻ ZAMÓWIENIE", order_success: "✅ Zamówienie wysłane pomyślnie!"
         }
     };
 
     let currentLang = localStorage.getItem("lang") || "ua";
 
     function applyLang(lang) {
-        document.querySelectorAll("[data-i18n]").forEach(el => {
-            const key = el.dataset.i18n;
-            if (translations[lang][key]) el.innerText = translations[lang][key];
-        });
-        document.querySelectorAll("[data-i18n-ph]").forEach(el => {
-            const key = el.dataset.i18nPh;
-            if (translations[lang][key]) el.placeholder = translations[lang][key];
-        });
+        document.querySelectorAll("[data-i18n]").forEach(el => { el.innerText = translations[lang][el.dataset.i18n]; });
+        document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.placeholder = translations[lang][el.dataset.i18nPh]; });
         document.querySelectorAll('.product-card').forEach(card => {
             card.setAttribute('data-out-of-stock-text', translations[lang].sold);
-            const badgeDiv = card.querySelector('.badge');
-            const bType = card.getAttribute('data-badge');
+            const badgeDiv = card.querySelector('.badge'); const bType = card.getAttribute('data-badge');
             if (bType && translations[lang]['badge_' + bType]) badgeDiv.innerText = translations[lang]['badge_' + bType];
-            
-            const btn = card.querySelector('.add-to-cart-btn');
-            if(btn) btn.innerText = translations[lang].add_cart;
+            const btn = card.querySelector('.add-to-cart-btn'); if(btn) btn.innerText = translations[lang].add_cart;
         });
-        const langLabel = document.getElementById("lang-label");
-        const langFlag = document.getElementById("lang-flag");
+        const langLabel = document.getElementById("lang-label"); const langFlag = document.getElementById("lang-flag");
         if(langLabel) { langLabel.innerText = lang.toUpperCase(); langFlag.innerText = lang === "ua" ? "🇺🇦" : "🇵🇱"; }
-        localStorage.setItem("lang", lang); currentLang = lang;
-        renderCart(); 
+        localStorage.setItem("lang", lang); currentLang = lang; renderCart(); 
     }
 
     // --- МОДАЛКИ ---
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) {
-        const modal = document.getElementById(id);
-        modal.style.opacity = '0'; modal.querySelector('.lang-modal-content').style.transform = 'scale(0.9)';
-        setTimeout(() => { modal.classList.remove('active'); modal.style = ''; }, 300);
-    }
-    window.selectInitialLang = (lang) => { applyLang(lang); closeModal('language-modal'); setTimeout(() => openModal('category-start-modal'), 300); };
-    window.selectInitialCategory = (tab) => { closeModal('category-start-modal'); setTimeout(() => { document.querySelector(`.nav-item[data-tab="${tab}"]`)?.click(); }, 300); };
+    window.selectInitialLang = (lang) => { applyLang(lang); document.getElementById('language-modal').classList.remove('active'); setTimeout(() => document.getElementById('category-start-modal').classList.add('active'), 300); };
+    window.selectInitialCategory = (tab) => { document.getElementById('category-start-modal').classList.remove('active'); setTimeout(() => { document.querySelector(`.nav-item[data-tab="${tab}"]`)?.click(); }, 300); };
     
     window.addEventListener('DOMContentLoaded', () => {
         const savedLang = localStorage.getItem("lang");
-        if (!savedLang) setTimeout(() => openModal('language-modal'), 100);
-        else { applyLang(savedLang); setTimeout(() => openModal('category-start-modal'), 100); }
+        if (!savedLang) setTimeout(() => document.getElementById('language-modal').classList.add('active'), 100);
+        else { applyLang(savedLang); setTimeout(() => document.getElementById('category-start-modal').classList.add('active'), 100); }
     });
-
-    document.getElementById("lang-toggle-mini")?.addEventListener("click", () => {
-        currentLang = currentLang === "ua" ? "pl" : "ua"; applyLang(currentLang);
-    });
+    document.getElementById("lang-toggle-mini")?.addEventListener("click", () => { currentLang = currentLang === "ua" ? "pl" : "ua"; applyLang(currentLang); });
 
     // --- НАВІГАЦІЯ ---
     let currentBannerStatus = true;
@@ -485,13 +488,11 @@
             document.getElementById('cat-' + tab).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             btn.classList.add('active');
-            
             const banner = document.getElementById('main-banner');
             if (banner) banner.style.display = (tab === 'cart' || !currentBannerStatus) ? 'none' : 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
     });
-
     document.querySelectorAll('.sub-nav-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const parent = e.target.closest('.cat-section');
@@ -503,27 +504,18 @@
 
     // --- КОШИК (ЛОГІКА) ---
     let cart = JSON.parse(localStorage.getItem('hub_cart')) || [];
-    
-    function saveCart() {
-        localStorage.setItem('hub_cart', JSON.stringify(cart));
-        updateCartBadge();
-        renderCart();
-    }
+    function saveCart() { localStorage.setItem('hub_cart', JSON.stringify(cart)); updateCartBadge(); renderCart(); }
 
     function updateCartBadge() {
-        const badge = document.getElementById('cart-badge');
-        const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-        if(totalItems > 0) { badge.innerText = totalItems; badge.classList.remove('hidden'); }
-        else { badge.classList.add('hidden'); }
+        const badge = document.getElementById('cart-badge'); const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+        if(totalItems > 0) { badge.innerText = totalItems; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
     }
 
     function getPriceNum(priceStr, selectedCurrency) {
         if (!priceStr) return 0;
         const matches = priceStr.match(/\d+([.,]\d+)?/g);
         if (!matches) return 0;
-        if (selectedCurrency === 'UAH' && matches.length > 1) {
-            return parseFloat(matches[1].replace(',', '.'));
-        }
+        if (selectedCurrency === 'UAH' && matches.length > 1) return parseFloat(matches[1].replace(',', '.'));
         return parseFloat(matches[0].replace(',', '.'));
     }
 
@@ -532,23 +524,22 @@
         const emptyMsg = document.getElementById('cart-empty-msg');
         const summary = document.getElementById('cart-summary');
         const totalEl = document.getElementById('cart-total-price');
-        
+        const discMsg = document.getElementById('cart-discount-msg');
+        const recSection = document.getElementById('recommended-section');
         const currSelect = document.getElementById('order-currency');
         const selectedCurrency = currSelect ? currSelect.value : 'PLN';
         
         container.innerHTML = '';
         if(cart.length === 0) {
-            emptyMsg.classList.remove('hidden'); summary.classList.add('hidden');
+            emptyMsg.classList.remove('hidden'); summary.classList.add('hidden'); recSection.classList.add('hidden');
         } else {
-            emptyMsg.classList.add('hidden'); summary.classList.remove('hidden');
+            emptyMsg.classList.add('hidden'); summary.classList.remove('hidden'); recSection.classList.remove('hidden');
             let totalSum = 0;
             
             cart.forEach((item, index) => {
                 const itemPriceNum = getPriceNum(item.price, selectedCurrency);
                 totalSum += itemPriceNum * item.qty;
-
-                const div = document.createElement('div');
-                div.className = 'cart-item';
+                const div = document.createElement('div'); div.className = 'cart-item';
                 div.innerHTML = `
                     <div class="cart-item-info">
                         <div class="cart-item-title">${item.name}</div>
@@ -558,42 +549,89 @@
                         <button class="cart-btn-min" data-idx="${index}">-</button>
                         <span>${item.qty}</span>
                         <button class="cart-btn-plus" data-idx="${index}">+</button>
-                    </div>
-                `;
+                    </div>`;
                 container.appendChild(div);
             });
+
+            if (activePromoDiscount > 0) {
+                const discValue = totalSum * (activePromoDiscount / 100);
+                totalSum = totalSum - discValue;
+                discMsg.innerText = `🎁 Знижка -${activePromoDiscount}% застосована!`;
+                discMsg.style.display = 'block';
+            } else {
+                discMsg.style.display = 'none';
+            }
+            
             totalEl.innerText = `${totalSum.toFixed(2)} ${selectedCurrency}`;
+            renderRecommended();
         }
     }
 
-    const orderCurrencyEl = document.getElementById('order-currency');
-    if (orderCurrencyEl) {
-        orderCurrencyEl.addEventListener('change', renderCart);
+    function renderRecommended() {
+        const recGrid = document.getElementById('recommended-grid');
+        recGrid.innerHTML = '';
+        if (!globalCatalog || !globalCatalog['aktsii'] || !globalCatalog['aktsii'].descs) return;
+        
+        // Беремо 2 перші товари з Катриджів, які є в наявності
+        let count = 0;
+        const aktsii = globalCatalog['aktsii'];
+        for(let i=0; i < aktsii.descs.length; i++) {
+            if (aktsii.stock[i] !== false && count < 2) {
+                const name = aktsii.descs[i]; const price = aktsii.prices[i];
+                // Якщо товар вже в кошику, пропускаємо
+                if (cart.find(c => c.name === name)) continue;
+                
+                const card = document.createElement('div'); card.className = 'product-card';
+                card.innerHTML = `
+                    <div class="product-img"><img src="${aktsii.imgs[i] || 'images/logo.png'}"></div>
+                    <h3 class="product-desc" style="font-size:12px; min-height:28px;">${name}</h3>
+                    <div class="price" style="font-size:14px; padding:5px;">${price}</div>
+                    <button class="add-to-cart-btn" data-name="${name}" data-price="${price}" style="font-size:11px;">+ Додати</button>
+                `;
+                recGrid.appendChild(card);
+                count++;
+            }
+        }
     }
 
+    document.getElementById('apply-promo-btn').onclick = () => {
+        const val = document.getElementById('cart-promo-input').value.trim().toUpperCase();
+        if(promoConfig.code && val === promoConfig.code.toUpperCase()) {
+            activePromoDiscount = promoConfig.percent;
+            alert(`Промокод прийнято! Знижка ${promoConfig.percent}%`);
+        } else {
+            activePromoDiscount = 0;
+            alert(currentLang === 'ua' ? "Невірний промокод" : "Błędny kod");
+        }
+        renderCart();
+    };
+
+    const orderCurrencyEl = document.getElementById('order-currency');
+    if (orderCurrencyEl) orderCurrencyEl.addEventListener('change', renderCart);
+
     document.getElementById('cart-items-container').addEventListener('click', e => {
-        if(e.target.classList.contains('cart-btn-plus')) {
-            cart[e.target.dataset.idx].qty++; saveCart();
-        } else if(e.target.classList.contains('cart-btn-min')) {
-            const idx = e.target.dataset.idx;
-            cart[idx].qty--;
+        if(e.target.classList.contains('cart-btn-plus')) { cart[e.target.dataset.idx].qty++; saveCart(); } 
+        else if(e.target.classList.contains('cart-btn-min')) {
+            const idx = e.target.dataset.idx; cart[idx].qty--;
             if(cart[idx].qty <= 0) cart.splice(idx, 1);
             saveCart();
         }
     });
 
+    // ВІДПРАВКА ЗАМОВЛЕННЯ
     document.getElementById('submit-order-btn').onclick = async () => {
         const name = document.getElementById('order-name').value.trim();
         const phone = document.getElementById('order-phone').value.trim();
-        const city = document.getElementById('order-city').value.trim(); // Отримуємо місто
+        const city = document.getElementById('order-city').value.trim(); 
         const currency = document.getElementById('order-currency').value; 
+        const totalText = document.getElementById('cart-total-price').innerText;
         
-        if(!name || !phone || !city) return alert("Будь ласка, заповніть всі поля для відправки!");
+        if(!name || !phone || !city) return alert("Будь ласка, заповніть всі поля!");
 
         const orderData = {
             user: name, contact: phone, city: city, items: cart,
-            total: document.getElementById('cart-total-price').innerText,
-            payCurrency: currency,
+            total: totalText, payCurrency: currency,
+            promoDiscount: activePromoDiscount,
             date: new Date().toLocaleString('uk-UA'), status: 'new'
         };
 
@@ -602,11 +640,23 @@
 
         try {
             await push(ref(db, 'orders'), orderData);
+            
+            // Відправка в Telegram
+            if (tgConfig && tgConfig.token && tgConfig.chatId) {
+                const itemsText = cart.map(i => `- ${i.name} x${i.qty}`).join('\n');
+                let tgMsg = `🚨 НОВЕ ЗАМОВЛЕННЯ!\n\n👤 ${name}\n📞 ${phone}\n📍 ${city}\n\n📦 Товари:\n${itemsText}\n\n💰 Сума: ${totalText}`;
+                if(activePromoDiscount > 0) tgMsg += `\n🎁 (Застосовано знижку -${activePromoDiscount}%)`;
+                
+                fetch(`https://api.telegram.org/bot${tgConfig.token}/sendMessage`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ chat_id: tgConfig.chatId, text: tgMsg })
+                }).catch(e => console.log('TG Send Error', e));
+            }
+
             alert(translations[currentLang].order_success);
-            cart = []; saveCart();
-            document.getElementById('order-name').value = '';
-            document.getElementById('order-phone').value = '';
-            document.getElementById('order-city').value = ''; // Очищаємо поле міста
+            cart = []; activePromoDiscount = 0; document.getElementById('cart-promo-input').value = '';
+            saveCart();
+            document.getElementById('order-name').value = ''; document.getElementById('order-phone').value = ''; document.getElementById('order-city').value = '';
             document.querySelector('.nav-item[data-tab="zalivka"]').click();
         } catch (e) { alert("Помилка відправки. Спробуйте ще раз."); }
         
@@ -617,58 +667,49 @@
 
     // --- FIREBASE РЕНДЕР КАТАЛОГУ ---
     const categoriesList = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack', 'prodazh-cuba', 'prodazh-barron', 'aktsii'];
-
     onValue(ref(db, 'catalog'), (snap) => {
-        const data = snap.val(); if (!data) return;
+        globalCatalog = snap.val(); 
+        if (!globalCatalog) return;
         categoriesList.forEach(cat => {
             const grid = document.getElementById(`grid-${cat}`); if (!grid) return;
             grid.innerHTML = ''; 
-            const catData = data[cat];
+            const catData = globalCatalog[cat];
             if (catData && catData.descs) {
                 catData.descs.forEach((name, i) => {
                     const price = catData.prices?.[i] || "";
-                    const card = document.createElement('div');
-                    card.className = `product-card ${catData.stock?.[i] === false ? 'out-of-stock' : ''}`;
+                    const card = document.createElement('div'); card.className = `product-card ${catData.stock?.[i] === false ? 'out-of-stock' : ''}`;
                     const bType = catData.badges?.[i]; if (bType) card.setAttribute('data-badge', bType);
                     card.setAttribute('data-out-of-stock-text', translations[currentLang].sold);
                     const badgeHtml = bType ? `<div class="badge badge-${bType}">${translations[currentLang]['badge_' + bType] || ""}</div>` : '<div class="badge"></div>';
 
                     card.innerHTML = `
                         <div class="product-img">${badgeHtml}<img src="${catData.imgs?.[i] || 'images/logo.png'}"></div>
-                        <h3 class="product-desc">${name}</h3>
-                        <div class="price">${price}</div>
+                        <h3 class="product-desc">${name}</h3><div class="price">${price}</div>
                         <button class="add-to-cart-btn" data-name="${name}" data-price="${price}">${translations[currentLang].add_cart}</button>
                     `;
                     grid.appendChild(card);
                 });
             }
         });
+        renderRecommended(); // Оновлюємо крос-сейл якщо змінився каталог
     });
 
-    // ДОДАВАННЯ В КОШИК (Клік по кнопці)
     document.addEventListener('click', e => {
         if(e.target.classList.contains('add-to-cart-btn')) {
-            if(isAdmin() && mode !== null) return; // Блокуємо, якщо включений режим редагування
-            const name = e.target.dataset.name;
-            const price = e.target.dataset.price;
+            if(isAdmin() && mode !== null) return;
+            const name = e.target.dataset.name; const price = e.target.dataset.price;
             const existing = cart.find(i => i.name === name);
-            if(existing) existing.qty++;
-            else cart.push({ name, price, qty: 1 });
+            if(existing) existing.qty++; else cart.push({ name, price, qty: 1 });
             saveCart();
-            
-            // Анімація кнопки
             const origText = e.target.innerText;
             e.target.innerText = "✅ Додано"; e.target.style.background = "rgba(0, 255, 153, 0.2)";
             setTimeout(() => { e.target.innerText = origText; e.target.style.background = ""; }, 1000);
         }
     });
 
-    // --- АДМІНКА: РЕДАГУВАННЯ ТА ЗАМОВЛЕННЯ ---
+    // --- АДМІНКА ---
     let mode = null;
-    function updateModeBtns(activeBtn) {
-        document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode'));
-        if (mode) activeBtn.classList.add('active-mode');
-    }
+    function updateModeBtns(activeBtn) { document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode')); if (mode) activeBtn.classList.add('active-mode'); }
 
     document.getElementById('edit-price').onclick = (e) => { mode = mode === 'price' ? null : 'price'; document.querySelectorAll('.price').forEach(el => el.contentEditable = (mode === 'price')); updateModeBtns(e.target); };
     document.getElementById('edit-desc').onclick = (e) => { mode = mode === 'desc' ? null : 'desc'; document.querySelectorAll('.product-desc').forEach(el => el.contentEditable = (mode === 'desc')); updateModeBtns(e.target); };
@@ -678,34 +719,21 @@
     document.getElementById('edit-delete').onclick = (e) => { mode = mode === 'delete' ? null : 'delete'; updateModeBtns(e.target); };
 
     document.addEventListener('click', (e) => {
-        const card = e.target.closest('.product-card');
-        if(!card || !isAdmin() || !mode) return;
-        
-        if(mode === 'stock') {
-            card.classList.toggle('out-of-stock'); card.setAttribute('data-out-of-stock-text', translations[currentLang].sold);
-        }
+        const card = e.target.closest('.product-card'); if(!card || !isAdmin() || !mode) return;
+        if(mode === 'stock') { card.classList.toggle('out-of-stock'); card.setAttribute('data-out-of-stock-text', translations[currentLang].sold); }
         if(mode === 'badge') {
-            const type = document.getElementById('badge-selector').value;
-            const badgeDiv = card.querySelector('.badge'); badgeDiv.className = 'badge';
+            const type = document.getElementById('badge-selector').value; const badgeDiv = card.querySelector('.badge'); badgeDiv.className = 'badge';
             if(type) { card.setAttribute('data-badge', type); badgeDiv.classList.add('badge-' + type); badgeDiv.innerText = translations[currentLang]['badge_' + type]; } 
             else { card.removeAttribute('data-badge'); badgeDiv.innerText = ''; }
         }
-        if(mode === 'delete' && confirm("Видалити?")) card.remove();
-        if(mode === 'img') {
-            const newUrl = prompt("URL нового фото:", card.querySelector('img').src);
-            if(newUrl) card.querySelector('img').src = newUrl;
-        }
+        if(mode === 'delete' && confirm("Видалити товар з каталогу?")) card.remove();
+        if(mode === 'img') { const newUrl = prompt("URL нового фото:", card.querySelector('img').src); if(newUrl) card.querySelector('img').src = newUrl; }
     });
 
     document.getElementById('add-product-btn').onclick = async () => {
-        const cat = document.getElementById('new-prod-cat').value;
-        const name = document.getElementById('new-prod-name').value.trim();
-        const price = document.getElementById('new-prod-price').value.trim();
-        const img = document.getElementById('new-prod-img').value.trim();
+        const cat = document.getElementById('new-prod-cat').value; const name = document.getElementById('new-prod-name').value.trim(); const price = document.getElementById('new-prod-price').value.trim(); const img = document.getElementById('new-prod-img').value.trim();
         if (!name || !price) return alert("Введіть назву та ціну!");
-        
-        const catRef = ref(db, `catalog/${cat}`); const snap = await get(catRef);
-        let d = snap.val() || { descs: [], prices: [], stock: [], badges: [], imgs: [] };
+        const catRef = ref(db, `catalog/${cat}`); const snap = await get(catRef); let d = snap.val() || { descs: [], prices: [], stock: [], badges: [], imgs: [] };
         d.descs.push(name); d.prices.push(price); d.imgs = d.imgs || []; d.imgs.push(img || ''); d.stock = d.stock || []; d.stock.push(true); d.badges = d.badges || []; d.badges.push("");
         set(catRef, d).then(() => { alert("Додано!"); document.getElementById('new-prod-name').value = ''; document.getElementById('new-prod-price').value = ''; document.getElementById('new-prod-img').value = ''; });
     };
@@ -715,11 +743,8 @@
         categoriesList.forEach(cat => {
             const p = [], d = [], s = [], b = [], im = [];
             document.querySelectorAll(`#grid-${cat} .product-card`).forEach(card => {
-                d.push(card.querySelector('.product-desc').innerText);
-                p.push(card.querySelector('.price').innerText);
-                s.push(!card.classList.contains('out-of-stock'));
-                b.push(card.getAttribute('data-badge') || "");
-                im.push(card.querySelector('img').src);
+                d.push(card.querySelector('.product-desc').innerText); p.push(card.querySelector('.price').innerText);
+                s.push(!card.classList.contains('out-of-stock')); b.push(card.getAttribute('data-badge') || ""); im.push(card.querySelector('img').src);
             });
             promises.push(set(ref(db, `catalog/${cat}`), { descs: d, prices: p, stock: s, badges: b, imgs: im }));
         });
@@ -729,12 +754,8 @@
     let sortables = [];
     document.getElementById('edit-reorder').onclick = (e) => {
         mode = mode === 'reorder' ? null : 'reorder'; updateModeBtns(e.target);
-        if (mode === 'reorder') {
-            document.body.classList.add('reorder-mode');
-            document.querySelectorAll('.product-grid').forEach(g => sortables.push(new Sortable(g, { animation: 150, delay: 100 })));
-        } else {
-            document.body.classList.remove('reorder-mode'); sortables.forEach(s => s.destroy()); sortables = [];
-        }
+        if (mode === 'reorder') { document.body.classList.add('reorder-mode'); document.querySelectorAll('.product-grid').forEach(g => sortables.push(new Sortable(g, { animation: 150, delay: 100 }))); } 
+        else { document.body.classList.remove('reorder-mode'); sortables.forEach(s => s.destroy()); sortables = []; }
     };
 
     document.getElementById('admin-trigger').onclick = () => {
@@ -742,57 +763,60 @@
         else if (prompt("Пароль:") === "smokehub2026") { localStorage.setItem('isHubAdmin', 'true'); location.reload(); }
     };
 
+    // ФУНКЦІЯ ВИДАЛЕННЯ ЗАМОВЛЕННЯ
+    window.deleteOrder = (orderId) => {
+        if (isAdmin() && confirm("Точно видалити це замовлення?")) {
+            remove(ref(db, `orders/${orderId}`)).then(() => alert("Замовлення видалено!"));
+        }
+    };
+
     // Відображення списку замовлень в Адмінці
     onValue(ref(db, 'orders'), snap => {
         if(!isAdmin()) return;
-        const list = document.getElementById('admin-orders-list');
-        list.innerHTML = '';
+        const list = document.getElementById('admin-orders-list'); list.innerHTML = '';
         const data = snap.val();
         if(data) {
-            Object.values(data).reverse().forEach(o => {
+            Object.entries(data).reverse().forEach(([key, o]) => {
                 const itemsHtml = o.items.map(i => `• ${i.name} <b>x${i.qty}</b>`).join('<br>');
                 list.innerHTML += `
-                    <div style="background:rgba(255,255,255,0.05); border: 1px solid rgba(0, 240, 255, 0.2); padding:12px; border-radius:12px; font-size:13px;">
+                    <div style="background:rgba(255,255,255,0.05); border: 1px solid rgba(0, 240, 255, 0.2); padding:12px; border-radius:12px; font-size:13px; position:relative;">
+                        <button onclick="deleteOrder('${key}')" style="position:absolute; top:10px; right:10px; background: rgba(255,51,102,0.2); color: #ff3366; border: 1px solid rgba(255,51,102,0.4); padding: 4px 8px; border-radius: 8px; cursor: pointer; font-size: 11px;">🗑️ Видалити</button>
                         <div style="color: #aaa; font-size: 10px; margin-bottom: 5px;">${o.date}</div>
                         <b>👤 ${o.user}</b> <br>📞 ${o.contact}<br>📍 Місто: ${o.city || 'Не вказано'}<br>
                         <div style="margin: 8px 0; color: #ccc;">${itemsHtml}</div>
                         💰 Сума: <span style="color:var(--neon-blue); font-weight: bold;">${o.total}</span> | 💳 Оплата в: <b>${o.payCurrency || 'Не вказано'}</b>
                     </div>`;
             });
-        } else {
-            list.innerHTML = '<div style="color: #888; font-size: 13px;">Поки немає замовлень</div>';
-        }
+        } else { list.innerHTML = '<div style="color: #888; font-size: 13px;">Поки немає замовлень</div>'; }
     });
 
-    onValue(ref(db, 'settings/lastUpdate'), (snap) => {
-        const date = snap.val() || '24.07.2026';
-        const dateEl = document.getElementById('last-update-date'); if (dateEl) dateEl.innerText = date;
-        const adminInput = document.getElementById('admin-update-date'); if (adminInput) adminInput.value = date;
-    });
+    // Налаштування дати, банера, ховати sold
+    onValue(ref(db, 'settings/lastUpdate'), (snap) => { const date = snap.val() || '24.07.2026'; const dateEl = document.getElementById('last-update-date'); if (dateEl) dateEl.innerText = date; const adminInput = document.getElementById('admin-update-date'); if (adminInput) adminInput.value = date; });
+    document.getElementById('save-date-btn')?.addEventListener('click', () => { if (isAdmin()) { const newDate = document.getElementById('admin-update-date').value.trim(); if(newDate) set(ref(db, 'settings/lastUpdate'), newDate).then(() => alert('Дату оновлено!')); } });
 
-    document.getElementById('save-date-btn')?.addEventListener('click', () => {
-        if (isAdmin()) {
-            const newDate = document.getElementById('admin-update-date').value.trim();
-            if(newDate) set(ref(db, 'settings/lastUpdate'), newDate).then(() => alert('Дату оновлено!'));
-        }
-    });
-
-    onValue(ref(db, 'settings/bannerVisible'), (s) => {
-        currentBannerStatus = s.val() !== false;
-        const btn = document.getElementById('toggle-banner');
-        if(currentBannerStatus) { btn.classList.add('active-mode'); const banner = document.getElementById('main-banner'); if (banner && !document.getElementById('cat-cart').classList.contains('active')) banner.style.display = 'block'; } 
-        else { btn.classList.remove('active-mode'); const banner = document.getElementById('main-banner'); if (banner) banner.style.display = 'none'; }
-    });
+    onValue(ref(db, 'settings/bannerVisible'), (s) => { currentBannerStatus = s.val() !== false; const btn = document.getElementById('toggle-banner'); if(currentBannerStatus) { btn.classList.add('active-mode'); const banner = document.getElementById('main-banner'); if (banner && !document.getElementById('cat-cart').classList.contains('active')) banner.style.display = 'block'; } else { btn.classList.remove('active-mode'); const banner = document.getElementById('main-banner'); if (banner) banner.style.display = 'none'; } });
     document.getElementById('toggle-banner').onclick = () => { if (isAdmin()) set(ref(db, 'settings/bannerVisible'), !currentBannerStatus); };
 
     let currentHideSoldStatus = false;
-    onValue(ref(db, 'settings/hideSold'), (s) => {
-        currentHideSoldStatus = s.val() === true;
-        const btn = document.getElementById('toggle-hide-sold');
-        if(currentHideSoldStatus) { document.documentElement.classList.add('hide-sold-active'); btn.classList.add('active-mode'); } 
-        else { document.documentElement.classList.remove('hide-sold-active'); btn.classList.remove('active-mode'); }
-    });
+    onValue(ref(db, 'settings/hideSold'), (s) => { currentHideSoldStatus = s.val() === true; const btn = document.getElementById('toggle-hide-sold'); if(currentHideSoldStatus) { document.documentElement.classList.add('hide-sold-active'); btn.classList.add('active-mode'); } else { document.documentElement.classList.remove('hide-sold-active'); btn.classList.remove('active-mode'); } });
     document.getElementById('toggle-hide-sold').onclick = () => { if (isAdmin()) set(ref(db, 'settings/hideSold'), !currentHideSoldStatus); };
+
+    // --- TELEGRAM ТА ПРОМОКОД (АДМІНКА) ---
+    onValue(ref(db, 'settings/telegram'), (snap) => { 
+        tgConfig = snap.val() || {token: "", chatId: ""};
+        document.getElementById('admin-tg-token').value = tgConfig.token; document.getElementById('admin-tg-chat').value = tgConfig.chatId;
+    });
+    document.getElementById('save-tg-btn').onclick = () => {
+        if(isAdmin()) set(ref(db, 'settings/telegram'), { token: document.getElementById('admin-tg-token').value.trim(), chatId: document.getElementById('admin-tg-chat').value.trim() }).then(() => alert('Налаштування ТГ збережено!'));
+    };
+
+    onValue(ref(db, 'settings/promo'), (snap) => {
+        promoConfig = snap.val() || {code: "", percent: 0};
+        document.getElementById('admin-promo-code').value = promoConfig.code; document.getElementById('admin-promo-percent').value = promoConfig.percent;
+    });
+    document.getElementById('save-promo-btn').onclick = () => {
+        if(isAdmin()) set(ref(db, 'settings/promo'), { code: document.getElementById('admin-promo-code').value.trim(), percent: Number(document.getElementById('admin-promo-percent').value.trim()) }).then(() => alert('Промокод збережено!'));
+    };
 </script>
 </body>
 </html>
