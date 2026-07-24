@@ -132,7 +132,6 @@
         .badge-new { display: block !important; background: linear-gradient(135deg, #00ff99, #00ccff); box-shadow: 0 4px 15px rgba(0, 255, 153, 0.3); color: #000;}
         
         /* SOLD OUT EFFECT */
-        /* ВИПРАВЛЕНО: Прибрано pointer-events: none, щоб адмін міг клікати на продані товари */
         .out-of-stock { opacity: 0.8; filter: grayscale(0.5); }
         .out-of-stock .product-img::after {
             content: ''; position: absolute; inset: 0; 
@@ -213,19 +212,20 @@
         .admin-section-title::after { content: ''; height: 1px; flex: 1; background: rgba(255,255,255,0.05); }
         
         .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .admin-btn { background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); color: #ccc; padding: 16px; border-radius: 20px; font-size: 12px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 8px; font-family: var(--font-main); transition: 0.2s; }
+        .admin-btn { background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); color: #ccc; padding: 16px; border-radius: 20px; font-size: 12px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 8px; font-family: var(--font-main); transition: 0.2s; cursor: pointer; }
         .admin-btn span { font-size: 20px; }
         .admin-btn.active-mode { background: rgba(0, 240, 255, 0.1); border-color: var(--neon-blue); color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 240, 255, 0.1); }
         .admin-input { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 16px; color: white; margin-bottom: 12px; font-size: 14px; font-family: var(--font-main); font-weight: 500; outline: none; }
         .admin-input:focus { border-color: var(--neon-blue); }
         
-        .save-all-btn { grid-column: span 2; background: linear-gradient(90deg, var(--neon-blue), #0077ff); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 900; text-transform: uppercase; margin-top: 10px; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(0, 119, 255, 0.3); }
+        .save-all-btn { grid-column: span 2; background: linear-gradient(90deg, var(--neon-blue), #0077ff); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 900; text-transform: uppercase; margin-top: 10px; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(0, 119, 255, 0.3); cursor: pointer; }
 
         .hidden { display: none !important; }
         [contenteditable="true"] { outline: none; background: rgba(0, 240, 255, 0.1); border-radius: 8px; padding: 4px; box-shadow: inset 0 0 0 1px var(--neon-blue); }
 
+        /* Логіка приховування Sold */
         html.hide-sold-active:not(.force-admin) .product-card.out-of-stock { display: none !important; }
-        html.force-admin.hide-sold-active .product-card.out-of-stock { display: flex !important; opacity: 0.4; }
+        html.force-admin.hide-sold-active .product-card.out-of-stock { display: flex !important; opacity: 0.3; }
 
         @keyframes jiggle { 0% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg); } 100% { transform: rotate(-1.5deg); } }
         .reorder-mode .product-card { animation: jiggle 0.35s infinite ease-in-out; }
@@ -264,14 +264,12 @@
 </div>
 
 <header>
-    <!-- Кнопка мови (Зліва) -->
     <button id="lang-toggle-mini" class="head-btn" style="position: absolute; left: 20px; display: flex; align-items: center; gap: 6px;">
         <span id="lang-flag">🇺🇦</span> <span id="lang-label">UA</span>
     </button>
     
     <div class="logo">SMOKE HUB</div>
     
-    <!-- Кнопка адмінки (Справа) -->
     <button id="admin-trigger" class="head-btn" style="position: absolute; right: 20px; border: none; background: transparent; font-size: 22px; padding: 4px;">⚙️</button>
 </header>
    
@@ -577,14 +575,47 @@
         }
     };
 
-    // --- ВХІД / НАЛАШТУВАННЯ ---
+    // --- ВХІД В АДМІНКУ ---
     document.getElementById('admin-trigger').onclick = () => {
         if (isAdmin()) document.getElementById('dev-menu').classList.toggle('active');
         else if (prompt("Пароль:") === "smokehub2026") { localStorage.setItem('isHubAdmin', 'true'); location.reload(); }
     };
 
-    onValue(ref(db, 'settings/bannerVisible'), (s) => currentBannerStatus = s.val() !== false);
-    onValue(ref(db, 'settings/hideSold'), (s) => document.documentElement.classList.toggle('hide-sold-active', s.val() === true));
+    // --- СИСТЕМНІ НАЛАШТУВАННЯ (БАНЕР / ХОВАТИ SOLD) ---
+    onValue(ref(db, 'settings/bannerVisible'), (s) => {
+        currentBannerStatus = s.val() !== false;
+        const btn = document.getElementById('toggle-banner');
+        if(currentBannerStatus) {
+            btn.classList.add('active-mode');
+            const banner = document.getElementById('main-banner');
+            if (banner) banner.style.display = 'block';
+        } else {
+            btn.classList.remove('active-mode');
+            const banner = document.getElementById('main-banner');
+            if (banner) banner.style.display = 'none';
+        }
+    });
+
+    document.getElementById('toggle-banner').onclick = () => {
+        if (isAdmin()) set(ref(db, 'settings/bannerVisible'), !currentBannerStatus);
+    };
+
+    let currentHideSoldStatus = false;
+    onValue(ref(db, 'settings/hideSold'), (s) => {
+        currentHideSoldStatus = s.val() === true;
+        const btn = document.getElementById('toggle-hide-sold');
+        if(currentHideSoldStatus) {
+            document.documentElement.classList.add('hide-sold-active');
+            btn.classList.add('active-mode');
+        } else {
+            document.documentElement.classList.remove('hide-sold-active');
+            btn.classList.remove('active-mode');
+        }
+    });
+
+    document.getElementById('toggle-hide-sold').onclick = () => {
+        if (isAdmin()) set(ref(db, 'settings/hideSold'), !currentHideSoldStatus);
+    };
 </script>
 </body>
 </html>
