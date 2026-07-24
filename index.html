@@ -333,6 +333,24 @@
             <div class="product-grid" id="recommended-grid"></div>
         </div>
     </div>
+
+    <!-- РОЗДІЛ: ПРОФІЛЬ -->
+    <div id="cat-profile" class="cat-section hidden">
+        <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 20px; text-transform: uppercase;" data-i18n="profile">👤 Ваш профіль</h2>
+        
+        <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
+            <input type="text" id="prof-name" class="checkout-input" placeholder="Ваше ім'я" data-i18n-ph="name">
+            <input type="text" id="prof-phone" class="checkout-input" placeholder="Телефон або Telegram" data-i18n-ph="phone">
+            <input type="text" id="prof-city" class="checkout-input" placeholder="Місто відправки" data-i18n-ph="city">
+            <button id="save-prof-btn" class="checkout-submit" style="padding: 12px; margin-top: 0; font-size: 14px;" data-i18n="save_profile">💾 ЗБЕРЕГТИ ДАНІ</button>
+        </div>
+
+        <h3 style="font-size: 16px; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; color: #888;" data-i18n="my_orders">📦 Мої замовлення</h3>
+        <div id="user-orders-list" style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="color: #888; font-size: 13px; text-align:center;">Завантаження...</div>
+        </div>
+    </div>
+
 </div>
 
 <nav class="bottom-nav">
@@ -343,6 +361,7 @@
         <span>🛒</span><span data-i18n="cart">Кошик</span>
         <div class="nav-cart-badge hidden" id="cart-badge">0</div>
     </button>
+    <button class="nav-item" data-tab="profile"><span>👤</span><span data-i18n="profile">Профіль</span></button>
 </nav>
 
 <!-- НОВА КОМПАКТНА АДМІН-ПАНЕЛЬ -->
@@ -356,6 +375,7 @@
     <details class="admin-group" open>
         <summary>📥 Останні замовлення</summary>
         <div class="admin-group-content">
+            <button class="admin-btn" id="export-csv-btn" style="width:100%; background: rgba(0, 240, 255, 0.1); color: var(--neon-blue); margin-bottom: 12px; font-size: 14px;">📊 Експорт в Excel (CSV)</button>
             <div id="admin-orders-list" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
                 <div style="color: #888; font-size: 12px;">Завантаження...</div>
             </div>
@@ -467,8 +487,8 @@
     let tgConfig = { token: "", chatId: "" };
 
     const translations = {
-        ua: { zalivka: "Жижа", prodazh: "Снюс", other: "Катриджі", cart: "Кошик", sold: "ПРОДАНО", badge_hit: "ХІТ", badge_promo: "АКЦІЯ", badge_new: "НОВИНКА", updated: "Оновлено:", cart_title: "🛒 Ваш кошик", empty: "Кошик порожній 😔", total: "Разом до сплати:", add_cart: "В кошик", name: "Ваше ім'я", phone: "Телефон або Telegram", city: "Місто відправки (Пошта)", promo: "Введіть промокод", order_btn: "🚀 ОФОРМИТИ ЗАМОВЛЕННЯ", order_success: "✅ Замовлення відправлено! Ми зв'яжемося з вами." },
-        pl: { zalivka: "Liquid", prodazh: "Snus", other: "Kartridże", cart: "Koszyk", sold: "SPRZEDANE", badge_hit: "HIT", badge_promo: "PROMOCJA", badge_new: "NOWOŚĆ", updated: "Aktualizacja:", cart_title: "🛒 Twój koszyk", empty: "Koszyk jest pusty 😔", total: "Do zapłaty:", add_cart: "Do koszyka", name: "Twoje imię", phone: "Telefon / Telegram", city: "Miasto wysyłki (Paczkomat)", promo: "Kod rabatowy", order_btn: "🚀 ZŁÓŻ ZAMÓWIENIE", order_success: "✅ Zamówienie wysłane pomyślnie!" }
+        ua: { zalivka: "Жижа", prodazh: "Снюс", other: "Катриджі", cart: "Кошик", profile: "Профіль", sold: "ПРОДАНО", badge_hit: "ХІТ", badge_promo: "АКЦІЯ", badge_new: "НОВИНКА", updated: "Оновлено:", cart_title: "🛒 Ваш кошик", empty: "Кошик порожній 😔", total: "Разом до сплати:", add_cart: "В кошик", name: "Ваше ім'я", phone: "Телефон або Telegram", city: "Місто відправки", promo: "Введіть промокод", order_btn: "🚀 ОФОРМИТИ ЗАМОВЛЕННЯ", order_success: "✅ Замовлення відправлено! Ми зв'яжемося з вами.", save_profile: "💾 ЗБЕРЕГТИ ДАНІ", my_orders: "📦 Мої замовлення" },
+        pl: { zalivka: "Liquid", prodazh: "Snus", other: "Kartridże", cart: "Koszyk", profile: "Profil", sold: "SPRZEDANE", badge_hit: "HIT", badge_promo: "PROMOCJA", badge_new: "NOWOŚĆ", updated: "Aktualizacja:", cart_title: "🛒 Twój koszyk", empty: "Koszyk jest pusty 😔", total: "Do zapłaty:", add_cart: "Do koszyka", name: "Twoje imię", phone: "Telefon / Telegram", city: "Miasto wysyłki", promo: "Kod rabatowy", order_btn: "🚀 ZŁÓŻ ZAMÓWIENIE", order_success: "✅ Zamówienie wysłane pomyślnie!", save_profile: "💾 ZAPISZ DANE", my_orders: "📦 Moje zamówienia" }
     };
 
     let currentLang = localStorage.getItem("lang") || "ua";
@@ -494,7 +514,16 @@
         const savedLang = localStorage.getItem("lang");
         if (!savedLang) setTimeout(() => document.getElementById('language-modal').classList.add('active'), 100);
         else { applyLang(savedLang); setTimeout(() => document.getElementById('category-start-modal').classList.add('active'), 100); }
+        
+        // Відновлення даних профілю
+        const savedProf = JSON.parse(localStorage.getItem('hub_profile')) || {};
+        if(savedProf.name) {
+            document.getElementById('prof-name').value = savedProf.name; document.getElementById('order-name').value = savedProf.name;
+            document.getElementById('prof-phone').value = savedProf.phone || ''; document.getElementById('order-phone').value = savedProf.phone || '';
+            document.getElementById('prof-city').value = savedProf.city || ''; document.getElementById('order-city').value = savedProf.city || '';
+        }
     });
+
     document.getElementById("lang-toggle-mini")?.addEventListener("click", () => { currentLang = currentLang === "ua" ? "pl" : "ua"; applyLang(currentLang); });
 
     let currentBannerStatus = true;
@@ -506,7 +535,7 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             btn.classList.add('active');
             const banner = document.getElementById('main-banner');
-            if (banner) banner.style.display = (tab === 'cart' || !currentBannerStatus) ? 'none' : 'block';
+            if (banner) banner.style.display = (tab === 'cart' || tab === 'profile' || !currentBannerStatus) ? 'none' : 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
     });
@@ -518,6 +547,20 @@
             e.target.classList.add('active'); parent.querySelector('#grid-' + e.target.dataset.target).classList.add('active');
         });
     });
+
+    // --- ЗБЕРЕЖЕННЯ ПРОФІЛЮ ---
+    document.getElementById('save-prof-btn').onclick = () => {
+        const pData = {
+            name: document.getElementById('prof-name').value.trim(),
+            phone: document.getElementById('prof-phone').value.trim(),
+            city: document.getElementById('prof-city').value.trim()
+        };
+        localStorage.setItem('hub_profile', JSON.stringify(pData));
+        document.getElementById('order-name').value = pData.name;
+        document.getElementById('order-phone').value = pData.phone;
+        document.getElementById('order-city').value = pData.city;
+        alert(currentLang === 'ua' ? "Ваші дані збережено!" : "Dane zostały zapisane!");
+    };
 
     let cart = JSON.parse(localStorage.getItem('hub_cart')) || [];
     function saveCart() { localStorage.setItem('hub_cart', JSON.stringify(cart)); updateCartBadge(); renderCart(); }
@@ -535,15 +578,12 @@
         return parseFloat(matches[0].replace(',', '.'));
     }
 
-    // НОВА ЛОГІКА ПЕРЕВІРКИ ЖИЖІ
     function isLiquidInCart() {
         if (!globalCatalog) return false;
         const liquidCats = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack'];
         for (let item of cart) {
             for (let cat of liquidCats) {
-                if (globalCatalog[cat] && globalCatalog[cat].descs && globalCatalog[cat].descs.includes(item.name)) {
-                    return true;
-                }
+                if (globalCatalog[cat] && globalCatalog[cat].descs && globalCatalog[cat].descs.includes(item.name)) return true;
             }
         }
         return false;
@@ -589,9 +629,7 @@
                 totalSum = totalSum - discValue;
                 discMsg.innerText = `🎁 Знижка -${activePromoDiscount}% застосована!`;
                 discMsg.style.display = 'block';
-            } else {
-                discMsg.style.display = 'none';
-            }
+            } else { discMsg.style.display = 'none'; }
             
             totalEl.innerText = `${totalSum.toFixed(2)} ${selectedCurrency}`;
             renderRecommended();
@@ -601,12 +639,9 @@
     function renderRecommended() {
         const recGrid = document.getElementById('recommended-grid');
         const recSection = document.getElementById('recommended-section');
-        recGrid.innerHTML = '';
-        recSection.classList.add('hidden');
+        recGrid.innerHTML = ''; recSection.classList.add('hidden');
 
         if (!globalCatalog || !globalCatalog['aktsii'] || !globalCatalog['aktsii'].descs) return;
-
-        // Показуємо тільки якщо в кошику є жижа
         if (!isLiquidInCart()) return;
 
         let availableItems = [];
@@ -614,15 +649,11 @@
         for(let i=0; i < aktsii.descs.length; i++) {
             if (aktsii.stock[i] !== false) {
                 const name = aktsii.descs[i];
-                if (!cart.find(c => c.name === name)) {
-                    availableItems.push({ name: name, price: aktsii.prices[i], img: aktsii.imgs[i] });
-                }
+                if (!cart.find(c => c.name === name)) availableItems.push({ name: name, price: aktsii.prices[i], img: aktsii.imgs[i] });
             }
         }
 
         if (availableItems.length === 0) return;
-
-        // Випадкові 2 товари з категорії Катриджі (айс шот, катридж)
         availableItems.sort(() => 0.5 - Math.random());
         const selected = availableItems.slice(0, 2);
 
@@ -643,16 +674,9 @@
         const val = document.getElementById('cart-promo-input').value.trim().toUpperCase();
         if(promoConfig.code && val === promoConfig.code.toUpperCase()) {
             if(promoConfig.maxUses > 0 && (promoConfig.usedCount || 0) >= promoConfig.maxUses) {
-                activePromoDiscount = 0;
-                alert(currentLang === 'ua' ? "Цей промокод вже використали максимальну кількість разів 😔" : "Limit użycia tego kodu został wyczerpany 😔");
-            } else {
-                activePromoDiscount = promoConfig.percent;
-                alert(`Промокод прийнято! Знижка ${promoConfig.percent}%`);
-            }
-        } else {
-            activePromoDiscount = 0;
-            alert(currentLang === 'ua' ? "Невірний промокод" : "Błędny kod");
-        }
+                activePromoDiscount = 0; alert(currentLang === 'ua' ? "Цей промокод вже використали максимальну кількість разів 😔" : "Limit użycia tego kodu został wyczerpany 😔");
+            } else { activePromoDiscount = promoConfig.percent; alert(`Промокод прийнято! Знижка ${promoConfig.percent}%`); }
+        } else { activePromoDiscount = 0; alert(currentLang === 'ua' ? "Невірний промокод" : "Błędny kod"); }
         renderCart();
     };
 
@@ -661,11 +685,7 @@
 
     document.getElementById('cart-items-container').addEventListener('click', e => {
         if(e.target.classList.contains('cart-btn-plus')) { cart[e.target.dataset.idx].qty++; saveCart(); } 
-        else if(e.target.classList.contains('cart-btn-min')) {
-            const idx = e.target.dataset.idx; cart[idx].qty--;
-            if(cart[idx].qty <= 0) cart.splice(idx, 1);
-            saveCart();
-        }
+        else if(e.target.classList.contains('cart-btn-min')) { const idx = e.target.dataset.idx; cart[idx].qty--; if(cart[idx].qty <= 0) cart.splice(idx, 1); saveCart(); }
     });
 
     document.getElementById('submit-order-btn').onclick = async () => {
@@ -678,21 +698,17 @@
         if(!name || !phone || !city) return alert("Будь ласка, заповніть всі поля!");
 
         const orderData = {
+            userId: myId, // Зберігаємо ID клієнта
             user: name, contact: phone, city: city, items: cart,
-            total: totalText, payCurrency: currency,
-            promoDiscount: activePromoDiscount,
+            total: totalText, payCurrency: currency, promoDiscount: activePromoDiscount,
             date: new Date().toLocaleString('uk-UA'), status: 'new'
         };
 
-        const btn = document.getElementById('submit-order-btn');
-        btn.innerText = "⏳ Відправка..."; btn.disabled = true;
+        const btn = document.getElementById('submit-order-btn'); btn.innerText = "⏳ Відправка..."; btn.disabled = true;
 
         try {
             await push(ref(db, 'orders'), orderData);
-            
-            if (activePromoDiscount > 0 && promoConfig.code) {
-                await set(ref(db, 'settings/promo/usedCount'), (promoConfig.usedCount || 0) + 1);
-            }
+            if (activePromoDiscount > 0 && promoConfig.code) await set(ref(db, 'settings/promo/usedCount'), (promoConfig.usedCount || 0) + 1);
             
             if (tgConfig && tgConfig.token && tgConfig.chatId) {
                 const itemsText = cart.map(i => `- ${i.name} x${i.qty}`).join('\n');
@@ -700,16 +716,16 @@
                 if(activePromoDiscount > 0) tgMsg += `\n🎁 (Застосовано знижку -${activePromoDiscount}%)`;
                 
                 fetch(`https://api.telegram.org/bot${tgConfig.token}/sendMessage`, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ chat_id: tgConfig.chatId, text: tgMsg })
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ chat_id: tgConfig.chatId, text: tgMsg })
                 }).catch(e => console.log('TG Send Error', e));
             }
 
             alert(translations[currentLang].order_success);
             cart = []; activePromoDiscount = 0; document.getElementById('cart-promo-input').value = '';
             saveCart();
-            document.getElementById('order-name').value = ''; document.getElementById('order-phone').value = ''; document.getElementById('order-city').value = '';
-            document.querySelector('.nav-item[data-tab="zalivka"]').click();
+            // Зберігаємо дані в профіль автоматично
+            localStorage.setItem('hub_profile', JSON.stringify({ name: name, phone: phone, city: city }));
+            document.querySelector('.nav-item[data-tab="profile"]').click(); // Перенаправляємо в профіль
         } catch (e) { alert("Помилка відправки. Спробуйте ще раз."); }
         
         btn.innerText = translations[currentLang].order_btn; btn.disabled = false;
@@ -814,19 +830,41 @@
     };
 
     window.deleteOrder = (orderId) => {
-        if (isAdmin() && confirm("Точно видалити це замовлення?")) {
-            remove(ref(db, `orders/${orderId}`)).then(() => alert("Замовлення видалено!"));
-        }
+        if (isAdmin() && confirm("Точно видалити це замовлення?")) remove(ref(db, `orders/${orderId}`)).then(() => alert("Замовлення видалено!"));
     };
 
+    window.allOrdersForExport = []; // Змінна для збереження замовлень перед експортом
+
     onValue(ref(db, 'orders'), snap => {
-        if(!isAdmin()) return;
-        const list = document.getElementById('admin-orders-list'); list.innerHTML = '';
         const data = snap.val();
+        
+        // Відображення замовлень КЛІЄНТА в його профілі
+        const uList = document.getElementById('user-orders-list');
+        uList.innerHTML = '';
+        if(data) {
+            const myOrders = Object.values(data).filter(o => o.userId === myId).reverse();
+            if(myOrders.length) {
+                myOrders.forEach(o => {
+                    const itemsHtml = o.items.map(i => `• ${i.name} <b>x${i.qty}</b>`).join('<br>');
+                    uList.innerHTML += `
+                        <div style="background:rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding:12px; border-radius:12px; font-size:13px;">
+                            <div style="color: #aaa; font-size: 10px; margin-bottom: 5px;">${o.date}</div>
+                            <div style="margin: 8px 0; color: #ccc;">${itemsHtml}</div>
+                            💰 <span style="color:var(--neon-blue); font-weight: bold;">${o.total}</span> | 💳 <b>${o.payCurrency || 'Не вказано'}</b>
+                        </div>`;
+                });
+            } else { uList.innerHTML = '<div style="color: #888; font-size: 13px; text-align:center;">У вас ще немає замовлень</div>'; }
+        } else { uList.innerHTML = '<div style="color: #888; font-size: 13px; text-align:center;">У вас ще немає замовлень</div>'; }
+
+        // Відображення ВАРТОСТІ та ЕКСПОРТУ в Адмінці
+        if(!isAdmin()) return;
+        const aList = document.getElementById('admin-orders-list'); aList.innerHTML = '';
+        window.allOrdersForExport = []; 
         if(data) {
             Object.entries(data).reverse().forEach(([key, o]) => {
+                window.allOrdersForExport.push(o); // Додаємо в масив для CSV
                 const itemsHtml = o.items.map(i => `• ${i.name} <b>x${i.qty}</b>`).join('<br>');
-                list.innerHTML += `
+                aList.innerHTML += `
                     <div style="background:rgba(255,255,255,0.05); border: 1px solid rgba(0, 240, 255, 0.2); padding:10px; border-radius:12px; font-size:12px; position:relative;">
                         <button onclick="deleteOrder('${key}')" style="position:absolute; top:8px; right:8px; background: rgba(255,51,102,0.2); color: #ff3366; border: 1px solid rgba(255,51,102,0.4); padding: 4px 8px; border-radius: 8px; cursor: pointer; font-size: 10px;">🗑️</button>
                         <div style="color: #aaa; font-size: 10px; margin-bottom: 4px;">${o.date}</div>
@@ -835,13 +873,40 @@
                         💰 <span style="color:var(--neon-blue); font-weight: bold;">${o.total}</span> | 💳 <b>${o.payCurrency || 'Не вказано'}</b>
                     </div>`;
             });
-        } else { list.innerHTML = '<div style="color: #888; font-size: 12px;">Поки немає замовлень</div>'; }
+        } else { aList.innerHTML = '<div style="color: #888; font-size: 12px;">Поки немає замовлень</div>'; }
     });
+
+    // --- ЛОГІКА ЕКСПОРТУ В CSV ---
+    document.getElementById('export-csv-btn').onclick = () => {
+        if(!window.allOrdersForExport || !window.allOrdersForExport.length) return alert("Немає замовлень для експорту!");
+        
+        let csvContent = "\uFEFF"; // Спеціальний маркер (BOM), щоб Excel правильно розумів кирилицю
+        csvContent += "Дата,Клієнт,Телефон,Місто,Сума,Валюта,Знижка (%),Товари\n";
+        
+        window.allOrdersForExport.forEach(o => {
+            const itemsStr = o.items.map(i => `${i.name} (x${i.qty})`).join('; ');
+            const row = [
+                o.date, o.user, o.contact, o.city, o.total.replace(',', '.'), 
+                o.payCurrency || '', o.promoDiscount || 0, itemsStr
+            ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(","); // Беремо кожне значення в лапки, щоб коми всередині назв не ламали таблицю
+            csvContent += row + "\n";
+        });
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "smokehub_orders.csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     onValue(ref(db, 'settings/lastUpdate'), (snap) => { const date = snap.val() || '24.07.2026'; const dateEl = document.getElementById('last-update-date'); if (dateEl) dateEl.innerText = date; const adminInput = document.getElementById('admin-update-date'); if (adminInput) adminInput.value = date; });
     document.getElementById('save-date-btn')?.addEventListener('click', () => { if (isAdmin()) { const newDate = document.getElementById('admin-update-date').value.trim(); if(newDate) set(ref(db, 'settings/lastUpdate'), newDate).then(() => alert('Дату оновлено!')); } });
 
-    onValue(ref(db, 'settings/bannerVisible'), (s) => { currentBannerStatus = s.val() !== false; const btn = document.getElementById('toggle-banner'); if(currentBannerStatus) { btn.classList.add('active-mode'); const banner = document.getElementById('main-banner'); if (banner && !document.getElementById('cat-cart').classList.contains('active')) banner.style.display = 'block'; } else { btn.classList.remove('active-mode'); const banner = document.getElementById('main-banner'); if (banner) banner.style.display = 'none'; } });
+    onValue(ref(db, 'settings/bannerVisible'), (s) => { currentBannerStatus = s.val() !== false; const btn = document.getElementById('toggle-banner'); if(currentBannerStatus) { btn.classList.add('active-mode'); const banner = document.getElementById('main-banner'); if (banner && !document.getElementById('cat-cart').classList.contains('active') && !document.getElementById('cat-profile').classList.contains('active')) banner.style.display = 'block'; } else { btn.classList.remove('active-mode'); const banner = document.getElementById('main-banner'); if (banner) banner.style.display = 'none'; } });
     document.getElementById('toggle-banner').onclick = () => { if (isAdmin()) set(ref(db, 'settings/bannerVisible'), !currentBannerStatus); };
 
     onValue(ref(db, 'settings/hideSold'), (s) => { currentHideSoldStatus = s.val() === true; const btn = document.getElementById('toggle-hide-sold'); if(currentHideSoldStatus) { document.documentElement.classList.add('hide-sold-active'); btn.classList.add('active-mode'); } else { document.documentElement.classList.remove('hide-sold-active'); btn.classList.remove('active-mode'); } });
