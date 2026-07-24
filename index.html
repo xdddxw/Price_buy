@@ -2,759 +2,350 @@
 <html lang="uk">
 <head>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-  <script>
-    // 1. Отримуємо або створюємо ID миттєво
-    let myId = localStorage.getItem('hub_user_id');
-    if (!myId || myId === 'null') {
-        myId = 'User_' + Math.floor(Math.random() * 9000 + 1000);
-        localStorage.setItem('hub_user_id', myId);
-    }
+    <script>
+        let myId = localStorage.getItem('hub_user_id');
+        if (!myId || myId === 'null') {
+            myId = 'User_' + Math.floor(Math.random() * 9000 + 1000);
+            localStorage.setItem('hub_user_id', myId);
+        }
+        if (localStorage.getItem('isHubAdmin') === 'true') {
+            document.documentElement.classList.add('force-admin');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SMOKE HUB PRO</title>
 
-    // 2. Перевірка адміна
-    if (localStorage.getItem('isHubAdmin') === 'true') {
-        document.documentElement.classList.add('force-admin');
-    }
-</script>
-   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>SMOKE HUB 2026</title>
-
-<!-- Manifest -->
-<link rel="manifest" href="/manifest.json">
-
-<!-- PWA iOS -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="SMOKE HUB">
-
-<!-- Іконки для iOS -->
-<link rel="apple-touch-icon" sizes="180x180" href="/images/41B8E1E3-C318-40D2-A21F-09FE446CBC17.png">
-<link rel="apple-touch-icon" sizes="152x152" href="/images/41B8E1E3-C318-40D2-A21F-09FE446CBC17.png">
-<link rel="apple-touch-icon" sizes="120x120" href="/images/41B8E1E3-C318-40D2-A21F-09FE446CBC17.png">
-
-<!-- Theme color -->
-<meta name="theme-color" content="#0d0216">
-<meta name="msapplication-navbutton-color" content="#0d0216">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SMOKE HUB">
+    <meta name="theme-color" content="#030305">
+    
+    <!-- Преміальний шрифт Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
 
     <style>
         :root { 
-            --bg: #0d0216; --card-bg: rgba(255, 255, 255, 0.05); 
-            --accent-pink: #ff0055; --accent-blue: #00c6ff; 
-            --nav-bg: rgba(20, 5, 35, 0.98); 
-            --font-main: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            --bg-color: #050508; 
+            --glass-bg: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --neon-pink: #ff0055; 
+            --neon-blue: #00f0ff; 
+            --neon-purple: #7000ff;
+            --font-main: 'Outfit', sans-serif;
         }
-        html {
-            background: #0d0216;
-            /* Прибираємо фіксовану висоту */
-            height: auto;
-            min-height: 100%;
-        }
-
-        /* ПРИХОВУЄМО СКРОЛБАР ВСЮДИ */
+        
         * {
             scrollbar-width: none;
             -ms-overflow-style: none;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        *::-webkit-scrollbar {
-            display: none !important;
-            width: 0 !important;
-            height: 0 !important;
-        }
+        *::-webkit-scrollbar { display: none !important; }
 
         body {
-            /* Дозволяємо контенту самому визначати висоту */
-            min-height: 100vh;
-            height: auto;
             margin: 0;
-            
-            /* Оптимальний відступ: рівно стільки, щоб меню не закривало картку */
-            padding-bottom: calc(75px + env(safe-area-inset-bottom)); 
-            
-            background: radial-gradient(circle at top right, #1a0b2e, #0d0216);
+            min-height: 100vh;
+            padding-bottom: calc(110px + env(safe-area-inset-bottom)); 
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 10% 0%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 100%, rgba(255, 0, 85, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(112, 0, 255, 0.05) 0%, transparent 50%);
             background-attachment: fixed;
             font-family: var(--font-main);
-            color: white;
-            
-            /* Скрол без смужки */
-            overflow-y: auto;
-            overflow-x: hidden;
+            color: #ffffff;
             -webkit-overflow-scrolling: touch;
-            
-            /* Блокуємо білу пустоту при ривках */
-            overscroll-behavior-y: none;
-            touch-action: pan-y;
-            box-sizing: border-box;
         }
 
-        .container {
-            padding: 10px;
-            width: 100%;
-            box-sizing: border-box;
-            /* Важливо: прибираємо будь-які min-height тут */
-            min-height: auto; 
-        }
+        .container { padding: 16px; width: 100%; margin: 0 auto; max-width: 600px; }
 
-        /* --- СНІГ --- */
-        #snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; overflow: hidden; }
-        .snowflake { position: absolute; color: #fff; user-select: none; opacity: 0.8; pointer-events: none; }
-        @keyframes snowfall {
-            0% { transform: translateY(-10vh) translateX(0); }
-            25% { transform: translateY(25vh) translateX(20px); }
-            50% { transform: translateY(50vh) translateX(-20px); }
-            75% { transform: translateY(75vh) translateX(20px); }
-            100% { transform: translateY(110vh) translateX(0); }
-        }
-        
+        /* HEADER - Floating Effect */
         header { 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    /* Зменшено відступи */
-    padding: calc(8px + env(safe-area-inset-top)) 10px 8px; 
-    background: rgba(0, 0, 0, 0.3); 
-    backdrop-filter: blur(15px); 
-    position: sticky; 
-    top: 0; 
-    z-index: 100; 
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
-}
+            display: flex; justify-content: center; align-items: center; 
+            padding: calc(15px + env(safe-area-inset-top)) 20px 15px; 
+            background: linear-gradient(180deg, rgba(5,5,8,0.9) 0%, rgba(5,5,8,0) 100%);
+            position: sticky; top: 0; z-index: 100; 
+        }
         .logo { 
-    position: relative; 
-    font-weight: 900; 
-    font-size: 18px; /* Менший розмір тексту */
-    text-transform: uppercase; 
-    background: linear-gradient(90deg, #ff0055, #00f2ff, #ff0055); 
-    background-size: 200% auto; 
-    -webkit-background-clip: text; 
-    -webkit-text-fill-color: transparent; 
-    animation: gradient-move 3s linear infinite; 
-}
-
-.logo::before { 
-    content: "🎅"; 
-    position: absolute; 
-    top: -14px; /* Піднято вище */
-    left: -16px; 
-    font-size: 18px; /* Менший Санта */
-    transform: rotate(-15deg); 
-    -webkit-text-fill-color: initial; 
-}
+            font-weight: 900; font-size: 24px; letter-spacing: 2px;
+            text-transform: uppercase; 
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue), var(--neon-purple)); 
+            background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            animation: gradient-move 3s linear infinite;
+            filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.3));
+        }
         @keyframes gradient-move { to { background-position: 200% center; } }
+
+        /* HEADER BUTTONS */
+        .head-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            color: white; padding: 8px 12px; border-radius: 14px; 
+            font-size: 13px; font-weight: 700; font-family: var(--font-main);
+            backdrop-filter: blur(10px); cursor: pointer; transition: 0.2s;
+        }
+        .head-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.1); }
+
+        /* PRODUCT CARDS */
+        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        .product-card { 
+            background: linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+            border-radius: 24px; padding: 12px; text-align: center; 
+            border: 1px solid var(--glass-border); display: flex; flex-direction: column; 
+            position: relative; backdrop-filter: blur(15px); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .product-card:active { transform: scale(0.96); border-color: rgba(0, 240, 255, 0.3); }
+        .product-img { 
+            width: 100%; aspect-ratio: 1/1; border-radius: 18px; 
+            overflow: hidden; margin-bottom: 12px; position: relative; 
+            background: #0a0a0f; 
+        }
+        .product-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .product-card:hover .product-img img { transform: scale(1.05); }
         
-        .container { padding: 10px; }
-        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .product-card { background: var(--card-bg); border-radius: 18px; padding: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; transition: 0.3s; position: relative; overflow: hidden;}
-        .product-img { width: 100%; aspect-ratio: 1/1; border-radius: 12px; overflow: hidden; margin-bottom: 8px; position: relative; }
-        .product-img img { width: 100%; height: 100%; object-fit: cover; }
-        .product-desc { font-size: 11px; font-weight: 600; min-height: 28px; line-height: 1.2; margin: 4px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .price { font-weight: 800; font-size: 11px; color: var(--accent-blue); margin-top: auto; }
+        .product-desc { 
+            font-size: 14px; font-weight: 500; min-height: 36px; line-height: 1.2; 
+            margin: 0 0 10px; color: #e0e0e0; display: -webkit-box; 
+            -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; 
+        }
+        .price { 
+            font-weight: 900; font-size: 16px; margin-top: auto; 
+            background: linear-gradient(90deg, #fff, var(--neon-blue));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            padding: 8px; border-radius: 12px; background-color: rgba(0, 240, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+        }
         
-        .badge { position: absolute; top: 8px; left: 8px; padding: 4px 10px; border-radius: 10px; font-size: 10px; font-weight: 900; z-index: 5; display: none; text-transform: uppercase; backdrop-filter: blur(8px); color: white; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .badge-hit { display: block !important; background: linear-gradient(135deg, #ff0055, #ff3366); animation: glow 2s infinite alternate; }
-        .badge-promo { display: block !important; background: linear-gradient(135deg, #ffd900, #ffea00); color: black; }
-        .badge-new { display: block !important; background: linear-gradient(135deg, #00ff99, #00cc66); }
-        @keyframes glow { 0% { transform: translateY(0) rotate(-5deg); } 100% { transform: translateY(-2px) rotate(0deg); } }
+        /* BADGES */
+        .badge { 
+            position: absolute; top: 10px; left: 10px; padding: 5px 12px; 
+            border-radius: 10px; font-size: 10px; font-weight: 900; z-index: 5; 
+            display: none; text-transform: uppercase; color: white; letter-spacing: 1px; 
+            backdrop-filter: blur(5px);
+        }
+        .badge-hit { display: block !important; background: linear-gradient(135deg, var(--neon-pink), #ff5e00); box-shadow: 0 4px 15px rgba(255, 0, 85, 0.4); }
+        .badge-promo { display: block !important; background: linear-gradient(135deg, #ffd900, #ff8c00); color: #000; box-shadow: 0 4px 15px rgba(255, 217, 0, 0.3); }
+        .badge-new { display: block !important; background: linear-gradient(135deg, #00ff99, #00ccff); box-shadow: 0 4px 15px rgba(0, 255, 153, 0.3); color: #000;}
         
-        .out-of-stock { opacity: 0.4; filter: grayscale(1); }
+        /* SOLD OUT EFFECT */
+        .out-of-stock { pointer-events: none; }
+        .out-of-stock .product-img::after {
+            content: ''; position: absolute; inset: 0; 
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); z-index: 8;
+        }
         .out-of-stock::after { 
-    content: attr(data-out-of-stock-text); /* Текст береться з атрибута */
-    position: absolute; 
-    top: 50%; 
-    left: 50%; 
-    transform: translate(-50%, -50%) rotate(-15deg); 
-    background: #ff0055; 
-    padding: 5px 12px; 
-    border-radius: 8px; 
-    font-size: 10px; 
-    font-weight: 900; 
-    color: white; 
-    z-index: 10; 
-}
+            content: attr(data-out-of-stock-text); position: absolute; 
+            top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); 
+            background: rgba(255, 0, 85, 0.15); border: 1px solid var(--neon-pink);
+            padding: 8px 18px; border-radius: 14px; font-size: 13px; font-weight: 900; 
+            color: var(--neon-pink); z-index: 10; backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(255,0,85,0.4); text-transform: uppercase;
+        }
 
-        /* ІНФО СТИЛЬ */
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .info-card { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 20px; padding: 22px 10px; display: flex; flex-direction: column; align-items: center; text-decoration: none; color: rgba(255,255,255,0.95); transition: 0.2s; backdrop-filter: blur(10px); }
-        .info-icon { font-size: 28px; margin-bottom: 10px; }
-        .info-card span { font-size: 13px; font-weight: 500; }
-        .section-label { grid-column: span 2; font-size: 12px; color: rgba(255,255,255,0.4); margin: 18px 0 0 8px; }
-
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav-bg); backdrop-filter: blur(15px); display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); z-index: 1000; border-top: 1px solid rgba(255,255,255,0.1); }
-        .nav-item { background: none; border: none; color: #888; display: flex; flex-direction: column; align-items: center; font-size: 9px; gap: 4px; text-transform: uppercase; flex: 1; }
-        .nav-item.active { color: white; }
-        .nav-item span:first-child { font-size: 18px; }
-
-        .dev-panel { position: fixed; top: 60px; right: -100%; width: 300px; height: 85vh; background: #1a0b2e; padding: 20px; transition: 0.4s; z-index: 2000; border-radius: 20px 0 0 20px; overflow-y: auto; border-left: 2px solid var(--accent-pink); box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
-        .dev-panel.active { right: 0; }
-        .admin-btn { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 10px; border: none; background: #333; color: white; font-weight: bold; cursor: pointer; }
-        .active-mode { background: var(--accent-pink) !important; }
+        /* FLOATING BOTTOM NAV */
+        .bottom-nav { 
+            position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); 
+            left: 50%; transform: translateX(-50%); width: 92%; max-width: 400px;
+            background: rgba(15, 15, 20, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            display: flex; justify-content: space-around; 
+            padding: 10px; border-radius: 28px;
+            z-index: 1000; border: 1px solid rgba(255,255,255,0.1); 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.02) inset;
+        }
+        .nav-item { 
+            background: transparent; border: none; color: #666; display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; gap: 8px; font-family: var(--font-main);
+            padding: 12px 18px; border-radius: 20px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nav-item span:first-child { font-size: 20px; filter: grayscale(1); opacity: 0.5; transition: 0.3s; }
         
-        .stats-box { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 15px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .visitor-item { font-size: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #fff; line-height: 1.4; }
-        .visitor-item span { color: var(--accent-blue); font-weight: bold; }
+        .nav-item.active { 
+            background: rgba(255,255,255,0.08); color: #fff; 
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+        }
+        .nav-item.active span:first-child { filter: grayscale(0); opacity: 1; transform: scale(1.15); }
 
-        #install-banner { position: fixed; bottom: 100px; left: 15px; right: 15px; background: linear-gradient(135deg, #2a0a4d, #16052c); padding: 18px; border-radius: 22px; border: 2px solid var(--accent-blue); display: none; z-index: 10000; box-shadow: 0 15px 45px rgba(0,0,0,0.8); }
-        #close-install { position: absolute; top: 10px; right: 15px; font-size: 22px; opacity: 0.6; cursor: pointer; }
-        .install-btn { background: var(--accent-blue); color: #000; border: none; padding: 12px; border-radius: 12px; font-weight: 800; margin-top: 12px; width: 100%; }
+        /* BANNER */
+        .promo-slider { width: 100%; height: 160px; margin-bottom: 24px; border-radius: 28px; overflow: hidden; position: relative; border: 1px solid var(--glass-border); box-shadow: 0 15px 35px rgba(0,0,0,0.5); display: none; }
+        .promo-track { display: flex; height: 100%; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
+        .promo-slide { min-width: 100%; position: relative; }
+        .promo-slide img { width: 100%; height: 100%; object-fit: cover; }
+        .promo-overlay { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(5,5,8,0.8) 0%, transparent 100%); }
 
-        #maintenance-overlay { position: fixed; inset: 0; z-index: 1000000; background: radial-gradient(circle at top, #1a0b2e, #0d0216); display: none; align-items: center; justify-content: center; text-align: center; color: white; }
+        /* MODALS (ANIMATED) */
+        .lang-modal-overlay { 
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); 
+            backdrop-filter: blur(15px); z-index: 1000001; display: none; 
+            align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s;
+        }
+        .lang-modal-content { 
+            background: rgba(15, 15, 20, 0.8); border: 1px solid var(--glass-border); 
+            padding: 32px 24px; border-radius: 32px; text-align: center; width: 85%; max-width: 340px; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1); 
+            transform: scale(0.9); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .lang-modal-overlay.active { opacity: 1; display: flex; }
+        .lang-modal-overlay.active .lang-modal-content { transform: scale(1); }
+
+        .lang-options { display: grid; gap: 14px; }
+        .lang-options button { 
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); 
+            color: white; border: 1px solid var(--glass-border); padding: 18px; 
+            border-radius: 20px; font-size: 16px; font-weight: 700; font-family: var(--font-main);
+            display: flex; align-items: center; justify-content: center; gap: 12px; transition: 0.2s; 
+        }
+        .lang-options button:active { background: rgba(255,255,255,0.1); transform: scale(0.95); border-color: rgba(255,255,255,0.2); }
+
+        /* ADMIN PANEL */
+        .dev-panel { 
+            position: fixed; top: 0; right: -100%; width: 100%; max-width: 400px; height: 100vh; 
+            background: rgba(10, 10, 14, 0.95); backdrop-filter: blur(25px); padding: calc(24px + env(safe-area-inset-top)) 24px 100px; 
+            transition: right 0.5s cubic-bezier(0.16, 1, 0.3, 1); z-index: 2000; 
+            border-left: 1px solid rgba(255, 255, 255, 0.05); overflow-y: auto; box-shadow: -20px 0 50px rgba(0,0,0,0.8);
+        }
+        .dev-panel.active { right: 0; }
+        .admin-section-title { font-size: 11px; font-weight: 900; color: #666; text-transform: uppercase; letter-spacing: 2px; margin: 24px 0 16px; display: flex; align-items: center; gap: 10px; }
+        .admin-section-title::after { content: ''; height: 1px; flex: 1; background: rgba(255,255,255,0.05); }
+        
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .admin-btn { background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); color: #ccc; padding: 16px; border-radius: 20px; font-size: 12px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 8px; font-family: var(--font-main); transition: 0.2s; }
+        .admin-btn span { font-size: 20px; }
+        .admin-btn.active-mode { background: rgba(0, 240, 255, 0.1); border-color: var(--neon-blue); color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 240, 255, 0.1); }
+        .admin-input { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 16px; color: white; margin-bottom: 12px; font-size: 14px; font-family: var(--font-main); font-weight: 500; outline: none; }
+        .admin-input:focus { border-color: var(--neon-blue); }
+        
+        .save-all-btn { grid-column: span 2; background: linear-gradient(90deg, var(--neon-blue), #0077ff); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 900; text-transform: uppercase; margin-top: 10px; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(0, 119, 255, 0.3); }
+
         .hidden { display: none !important; }
-        [contenteditable="true"] { outline: 2px dashed var(--accent-pink); background: rgba(233, 30, 99, 0.1); border-radius: 4px; }
+        [contenteditable="true"] { outline: none; background: rgba(0, 240, 255, 0.1); border-radius: 8px; padding: 4px; box-shadow: inset 0 0 0 1px var(--neon-blue); }
 
-        /* Рекламний банер */
-.promo-slider {
-    width: 100%;
-    max-width: 100vw; /* Щоб банер ніколи не був ширшим за екран */
-    height: 125px;
-    margin-bottom: 15px;
-    border-radius: 20px;
-    overflow: hidden; /* Критично важливо: ховає слайди, що стоять збоку */
-    position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    display: none; 
-    box-sizing: border-box; /* Враховує бордер всередині ширини 100% */
-}
-.promo-track {
-    display: flex;
-    height: 100%;
-    transition: transform 0.6s ease-in-out;
-}
-.promo-slide {
-    min-width: 100%;
-    position: relative;
-}
-.promo-slide img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.promo-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, transparent 70%);
-}
-.promo-content {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 2;
-}
-.promo-content h2 { margin: 0; font-size: 18px; color: #fff; }
-.promo-content p { margin: 4px 0 0; font-size: 14px; color: var(--accent-blue); font-weight: bold; }
+        html.hide-sold-active:not(.force-admin) .product-card.out-of-stock { display: none !important; }
+        html.force-admin.hide-sold-active .product-card.out-of-stock { display: flex !important; opacity: 0.3; }
 
-/* Модальне вікно вибору мови */
-.lang-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(13, 2, 22, 0.9); /* Темний напівпрозорий фон */
-    backdrop-filter: blur(10px);
-    z-index: 1000001; /* Вище за всі елементи */
-    display: none; /* Спочатку приховано */
-    align-items: center;
-    justify-content: center;
-}
-
-.lang-modal-content {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 30px;
-    border-radius: 25px;
-    text-align: center;
-    width: 85%;
-    max-width: 320px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-}
-
-.lang-modal-logo {
-    font-weight: 900;
-    font-size: 24px;
-    background: linear-gradient(90deg, #ff0055, #00c6ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 20px;
-}
-
-.lang-options {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.lang-options button {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 15px;
-    border-radius: 15px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.lang-options button:active {
-    transform: scale(0.95);
-    background: var(--accent-pink);
-}
-
-/* Анімації */
-@keyframes modalFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes modalSlideUp {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-.lang-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(13, 2, 22, 0.92);
-    backdrop-filter: blur(12px);
-    z-index: 1000001;
-    display: none; /* Керується через JS */
-    align-items: center;
-    justify-content: center;
-    animation: modalFadeIn 0.4s ease;
-}
-
-.lang-modal-content {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 30px;
-    border-radius: 28px;
-    text-align: center;
-    width: 85%;
-    max-width: 320px;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
-    animation: modalSlideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.lang-modal-logo {
-    font-weight: 900;
-    font-size: 24px;
-    background: linear-gradient(90deg, #ff0055, #00c6ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 10px;
-}
-
-.lang-modal-content h3 {
-    font-size: 14px;
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 25px;
-    font-weight: 400;
-}
-
-.lang-options {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.lang-options button {
-    background: rgba(255, 255, 255, 0.07);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 16px;
-    border-radius: 18px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-.lang-options button:active {
-    transform: scale(0.96);
-    background: var(--accent-pink);
-    border-color: var(--accent-pink);
-}
-    
-    /* Для звичайних користувачів: видаляємо товар з коду, якщо режим увімкнено */
-    /* Для звичайних користувачів — SOLD ПОВНІСТЮ ЗНИКАЄ */
-html.hide-sold-active:not(.force-admin) .product-card.out-of-stock {
-    display: none !important;
-}
-
-    /* Для тебе (адміна): робимо товар прозорим, щоб ти міг його бачити і повернути в продаж */
-    html.force-admin.hide-sold-active .product-card.out-of-stock {
-        display: flex !important;
-        opacity: 0.25;
-        filter: grayscale(1);
-    }
-
-    /* Підсвітка активних кнопок в адмінці */
-    .admin-btn.active-mode {
-        background: var(--accent-pink) !important;
-        box-shadow: 0 0 15px var(--accent-pink);
-    }
-    
-    /* ОНОВЛЕНА АДМІНКА З ВРАХУВАННЯМ SAFE AREA */
-.dev-panel {
-    position: fixed;
-    /* Додаємо відступ зверху, щоб не заходило на годинник/камеру */
-    top: env(safe-area-inset-top, 0px); 
-    right: -100%;
-    width: 85%;
-    max-width: 350px;
-    /* Висота тепер розраховується: 100% мінус відступ зверху */
-    height: calc(100vh - env(safe-area-inset-top, 0px));
-    background: rgba(15, 5, 25, 0.98); /* Трохи щільніший фон */
-    backdrop-filter: blur(20px);
-    padding: 20px;
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 2000;
-    border-left: 1px solid rgba(255, 0, 85, 0.3);
-    box-shadow: -20px 0 40px rgba(0,0,0,0.7);
-    overflow-y: auto;
-    /* Щоб контент знизу не перекривався нижньою полоскою в iOS */
-    padding-bottom: calc(30px + env(safe-area-inset-bottom)); 
-    box-sizing: border-box;
-}
-
-.dev-panel.active { 
-    right: 0; 
-}
-
-/* Додатково: зробимо кнопку закриття зручнішою для натискання */
-.dev-panel h3 {
-    margin-top: 10px;
-}
-
-.admin-section-title {
-    font-size: 10px;
-    font-weight: 800;
-    color: var(--accent-pink);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin: 25px 0 15px 5px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.admin-section-title::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, rgba(255,0,85,0.3), transparent);
-}
-
-.admin-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.admin-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #ccc;
-    padding: 14px 10px;
-    border-radius: 15px;
-    font-size: 11px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-}
-
-.admin-btn span { font-size: 18px; }
-
-.admin-btn.active-mode {
-    background: rgba(255, 0, 85, 0.15);
-    border-color: var(--accent-pink);
-    color: white;
-    box-shadow: 0 0 15px rgba(255, 0, 85, 0.2);
-}
-
-.cashback-control {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 15px;
-    border-radius: 20px;
-    border: 1px solid rgba(0, 198, 255, 0.2);
-}
-
-.admin-input {
-    width: 100%;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    padding: 12px;
-    border-radius: 12px;
-    color: white;
-    margin-bottom: 10px;
-    font-size: 13px;
-    outline: none;
-    box-sizing: border-box;
-}
-
-.admin-input:focus { border-color: var(--accent-blue); }
-
-.save-all-btn {
-    grid-column: span 2;
-    background: linear-gradient(135deg, #ff0055, #ff3366);
-    color: white;
-    border: none;
-    padding: 16px;
-    border-radius: 15px;
-    font-weight: 800;
-    text-transform: uppercase;
-    margin-top: 10px;
-    box-shadow: 0 10px 20px rgba(255, 0, 85, 0.3);
-}
-
-.stats-box {
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 15px;
-    padding: 12px;
-    font-family: monospace;
-}
-
-        /* Ефект тряски */
-@keyframes jiggle {
-    0% { transform: rotate(-1deg); }
-    50% { transform: rotate(1deg); }
-    100% { transform: rotate(-1deg); }
-}
-
-.reorder-mode .product-card {
-    animation: jiggle 0.3s infinite ease-in-out;
-    opacity: 0.8;
-    z-index: 10;
-}
-
-/* Колір картки, яку ми тримаємо пальцем */
-.sortable-ghost {
-    opacity: 0.3;
-    transform: scale(0.9);
-}
+        @keyframes jiggle { 0% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg); } 100% { transform: rotate(-1.5deg); } }
+        .reorder-mode .product-card { animation: jiggle 0.35s infinite ease-in-out; }
     </style>
 </head>
 <body>
 
-<div id="snow-container"></div>
-
+<!-- Модалка вибору мови -->
 <div id="language-modal" class="lang-modal-overlay">
     <div class="lang-modal-content">
-        <div class="lang-modal-logo">SMOKE HUB</div>
-        <h3>Виберіть мову / Wybierz język</h3>
+        <div class="logo" style="font-size: 28px; margin-bottom: 15px;">SMOKE HUB</div>
+        <h3 style="font-size: 15px; color: #888; margin-bottom: 25px; font-weight: 500;">Оберіть мову / Wybierz język</h3>
         <div class="lang-options">
             <button onclick="selectInitialLang('ua')">🇺🇦 Українська</button>
             <button onclick="selectInitialLang('pl')">🇵🇱 Polski</button>
         </div>
     </div>
 </div>
+
+<!-- Модалка вибору категорії при вході -->
 <div id="category-start-modal" class="lang-modal-overlay">
-    <div class="lang-modal-content" style="max-width: 350px;">
-        <div class="lang-modal-logo">SMOKE HUB</div>
-        <h3 id="cat-modal-title">Що вас цікавить? / Co Cię interesuje?</h3>
-        <div class="lang-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <button onclick="selectInitialCategory('zalivka')" style="flex-direction: column; padding: 20px 10px;">
-                <span style="font-size: 30px;">💧</span>
-                <span data-i18n="zalivka">Заливка/Zalewka</span>
+    <div class="lang-modal-content">
+        <div class="logo" style="font-size: 28px; margin-bottom: 15px;">SMOKE HUB</div>
+        <h3 id="cat-modal-title" style="font-size: 15px; color: #888; margin-bottom: 25px; font-weight: 500;">Що вас цікавить? / Co Cię interesuje?</h3>
+        <div class="lang-options" style="grid-template-columns: 1fr 1fr; gap: 14px;">
+            <button onclick="selectInitialCategory('zalivka')" style="flex-direction: column; padding: 24px 10px;">
+                <span style="font-size: 36px; margin-bottom: 5px;">💧</span>
+                <span data-i18n="zalivka">Жижа</span>
             </button>
-            <button onclick="selectInitialCategory('prodazh')" style="flex-direction: column; padding: 20px 10px;">
-                <span style="font-size: 30px;">📦</span>
-                <span data-i18n="prodazh">Покупка/Zakup</span>
+            <button onclick="selectInitialCategory('prodazh')" style="flex-direction: column; padding: 24px 10px;">
+                <span style="font-size: 36px; margin-bottom: 5px;">🟢</span>
+                <span data-i18n="prodazh">Снюс</span>
             </button>
         </div>
     </div>
 </div>
 
 <header>
-    <div class="logo">SMOKE HUB</div>
-</header>
-
+    <!-- Кнопка мови (Зліва) -->
+    <button id="lang-toggle-mini" class="head-btn" style="position: absolute; left: 20px; display: flex; align-items: center; gap: 6px;">
+        <span id="lang-flag">🇺🇦</span> <span id="lang-label">UA</span>
+    </button>
     
+    <div class="logo">SMOKE HUB</div>
+    
+    <!-- Кнопка адмінки (Справа) -->
+    <button id="admin-trigger" class="head-btn" style="position: absolute; right: 20px; border: none; background: transparent; font-size: 22px; padding: 4px;">⚙️</button>
+</header>
+   
+<div class="container" id="main-container">
     <div class="promo-slider" id="main-banner">
-    <div class="promo-track" id="promoTrack">
-        <div class="promo-slide">
-            <img src="images/banner.gif" alt="promo">
-            <div class="promo-overlay"></div>
-            <div class="promo-content">
-                <h2></h2>
-                <p></p>
+        <div class="promo-track" id="promoTrack">
+            <div class="promo-slide">
+                <img src="images/banner.gif" alt="promo" onerror="this.style.display='none'">
+                <div class="promo-overlay"></div>
             </div>
         </div>
-        </div>
     </div>
-</div>
 
-    
-<div class="container" id="main-container">
-    <!--<h1 id="page-title" style="text-align: center; font-size: 16px; text-transform: uppercase; letter-spacing: 2px;">Заливка</h1>-->
-
+    <!-- КАТЕГОРІЯ 1: ЖИЖА -->
     <div id="cat-zalivka" class="cat-section">
-        <div class="product-grid">
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/spermint.jpg"></div><h3 class="product-desc">Spermint</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/Double-grape.jpg"></div><h3 class="product-desc">Double-grape</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/IMG_4028.jpeg"></div><h3 class="product-desc">Berry-mint</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/apple-mixed.jpg"></div><h3 class="product-desc">Apple Mixed</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blackcurrant-grape.jpg"></div><h3 class="product-desc">Blackcurrant Grape</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blueberry-currant.jpg"></div><h3 class="product-desc">Blueberry Currant</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermalon-melon.jpg"></div><h3 class="product-desc">Watermelon Melon</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cranberry-mors.jpg"></div><h3 class="product-desc">Cranberry Mors</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/double-raspberry.jpg"></div><h3 class="product-desc">Double Raspberry</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cola-lemon.jpg"></div><h3 class="product-desc">Cola Lemon</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/RedBull-blueraspberry.jpg"></div><h3 class="product-desc">RedBull Blue Raspberry</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/pineapple-lemonade.jpg"></div><h3 class="product-desc">Pineapple Lemonade</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/multifruit.jpg"></div><h3 class="product-desc">Multifruit</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/bali-triple-shot.jpg"></div><h3 class="product-desc">Bali Triple Shot</h3><div class="price">6 zł/70 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermelon-lychee.jpg"></div><h3 class="product-desc">Bali Triple Shot</h3><div class="price">6 zł/70 грн</div></div>
-        </div>
+        <div class="product-grid"></div>
     </div>
 
+    <!-- КАТЕГОРІЯ 2: СНЮС -->
     <div id="cat-prodazh" class="cat-section hidden">
-        <div class="product-grid">
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/spermint.jpg"></div><h3 class="product-desc">Spermint 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/Double-grape.jpg"></div><h3 class="product-desc">Double-grape 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/IMG_4028.jpeg"></div><h3 class="product-desc">Berry-mint 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/apple-mixed.jpg"></div><h3 class="product-desc">Apple Mixed 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blackcurrant-grape.jpg"></div><h3 class="product-desc">Blackcurrant Grape 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/blueberry-currant.jpg"></div><h3 class="product-desc">Blueberry Currant 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermalon-melon.jpg"></div><h3 class="product-desc">Watermelon Melon 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cranberry-mors.jpg"></div><h3 class="product-desc">Cranberry Mors 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/double-raspberry.jpg"></div><h3 class="product-desc">Double Raspberry 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/cola-lemon.jpg"></div><h3 class="product-desc">Cola Lemon 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/RedBull-blueraspberry.jpg"></div><h3 class="product-desc">RedBull Blue Raspberry 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/pineapple-lemonade.jpg"></div><h3 class="product-desc">Pineapple Lemonade 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/multifruit.jpg"></div><h3 class="product-desc">Multifruit 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/bali-triple-shot.jpg"></div><h3 class="product-desc">Bali Triple Shot 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/chaser-ultra-granat.jpg"></div><h3 class="product-desc">Granat 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/chaser-7years-pamberry.jpg"></div><h3 class="product-desc">Pamberry 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/watermelon-lychee.jpg"></div><h3 class="product-desc">Pamberry 30 ml</h3><div class="price">60 zł/700 грн</div></div>
-        </div>
+        <div class="product-grid"></div>
     </div>
 
+    <!-- КАТЕГОРІЯ 3: КАТРИДЖІ -->
     <div id="cat-aktsii" class="cat-section hidden">
-        <div class="product-grid">
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/ice-shot.jpg"></div><h3 class="product-desc">Ice-shot</h3><div class="price">10 zł/110 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/xros-catridge-2ml.jpg"></div><h3 class="product-desc">Катридж xros 2 мл</h3><div class="price">30 zł/350 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/ursa-lostvape.png"></div><h3 class="product-desc">Катридж lost-vape 2.5ml</h3><div class="price">30 zł/350 грн</div></div>
-            <div class="product-card"><div class="product-img"><div class="badge"></div><img src="images/catridge-xros-3ml.png"></div><h3 class="product-desc">Катридж xros 3 мл</h3><div class="price">30 zł/350 грн</div></div>
-        </div>
-    </div>
-
-    <div id="cat-info" class="cat-section hidden">
-    <div class="info-grid">
-
-        <div class="info-card" id="cashback-section" style="grid-column: span 2; background: linear-gradient(135deg, rgba(0, 198, 255, 0.1), rgba(0, 0, 0, 0.4)); border: 1px solid var(--accent-blue); padding: 20px 15px; text-align: center;">
-    <div style="font-size: 10px; opacity: 0.7; text-transform: uppercase;">Мій бонусний баланс</div>
-    
-    <div style="font-size: 32px; font-weight: 900; color: var(--accent-blue); margin: 5px 0;">
-        <span id="user-balance">0</span> <small style="font-size: 14px;">UAH</small>
-    </div>
-    
-    <div style="font-size: 10px; opacity: 0.5; margin-bottom: 15px;">Ваш ID: 
-        <span id="display-my-id" style="color:white; font-weight: bold;">
-            <script>document.write(localStorage.getItem('hub_user_id') || '...');</script>
-        </span>
-    </div>
-    
-   <a id="send-id-btn" 
-   href="#" 
-   target="_blank" 
-   style="background: var(--accent-blue); color: #000; text-decoration: none; padding: 14px; border-radius: 12px; font-size: 11px; font-weight: 800; display: block; text-align: center;">
-   📲 ПІДТВЕРДИТИ МІЙ ID (TELEGRAM)
-</a>
-</div>
-
-<script>
-    // Ця функція спрацює миттєво при кліку, Safari її не заблокує
-    function sendIdToTg(event) {
-        const id = localStorage.getItem('hub_user_id');
-        const text = encodeURIComponent("Привіт! Мій ID: " + id + ".");
-        event.currentTarget.href = "https://t.me/liquid_br?text=" + text;
-    }
-</script>
-        
-        <div class="section-label">Сервіси</div>
-        <a href="payment.html" class="info-card" id="payment-card"><div class="info-icon">💳</div><span data-i18n="payment">Оплата</span></a>
-        <a href="reviews.html" class="info-card"><div class="info-icon">⭐</div><span data-i18n="reviews">Відгуки</span></a>
-        <!--<a href="kwiz.html" class="info-card"><div class="info-icon">🍷</div><span data-i18n="flavors">Смаки</span></a>-->
-        <div class="info-card" id="admin-trigger"><div class="info-icon">🔐</div><span data-i18n="admin">Кабінет власника</span></div>
-        
-        <div class="section-label" style="display: flex; justify-content: space-between; align-items: center; grid-column: span 2; margin-top: 25px;">
-            <span>Соціальні мережі</span>
-            
-            <button id="lang-toggle-mini" style="
-                background: rgba(255,255,255,0.1);
-                border: 1px solid rgba(255,255,255,0.2);
-                color: white;
-                padding: 4px 12px;
-                border-radius: 20px;
-                font-size: 10px;
-                font-weight: 800;
-                display: flex;
-                align-items: center;
-                gap: 5px;
-                cursor: pointer;
-            ">
-                <span id="lang-flag">🇺🇦</span> <span id="lang-label">UA</span>
-            </button>
-        </div>
-
-        <a href="https://t.me/+a0dUnfeiyoViNDRh" target="_blank" class="info-card" style="grid-column: span 2;">
-            <div class="info-icon">✈️</div>
-            <span>Telegram Канал</span>
-        </a>
+        <div class="product-grid"></div>
     </div>
 </div>
-</div>
 
+<!-- FLOATING DOCK NAV -->
 <nav class="bottom-nav">
     <button class="nav-item active" data-tab="zalivka">
-    <span>💧</span><span data-i18n="zalivka">Заливка</span>
-</button>
-<button class="nav-item" data-tab="prodazh">
-    <span>📦</span><span data-i18n="prodazh">Продаж</span>
-</button>
-<button class="nav-item" data-tab="aktsii">
-    <span>⚡</span><span data-i18n="other">Інше</span>
-</button>
-<button class="nav-item" data-tab="info">
-    <span>ℹ️</span><span data-i18n="info">Інфо</span>
-</button>
+        <span>💧</span><span data-i18n="zalivka">Жижа</span>
+    </button>
+    <button class="nav-item" data-tab="prodazh">
+        <span>🟢</span><span data-i18n="prodazh">Снюс</span>
+    </button>
+    <button class="nav-item" data-tab="aktsii">
+        <span>⚡</span><span data-i18n="other">Катриджі</span>
+    </button>
 </nav>
 
+<!-- ADMIN PANEL -->
 <div id="dev-menu" class="dev-panel">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h3 style="margin:0; color:white; font-size: 18px; font-weight: 900;">HUB <span style="color:var(--accent-pink)">CONTROL</span></h3>
-        <button onclick="document.getElementById('dev-menu').classList.remove('active')" style="background:none; border:none; color:white; font-size:24px;">×</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div class="logo" style="font-size: 22px;">HUB CONTROL</div>
+        <button onclick="document.getElementById('dev-menu').classList.remove('active')" style="background:rgba(255,255,255,0.1); border:none; color:white; width: 36px; height: 36px; border-radius: 50%; font-size:18px; cursor: pointer; backdrop-filter: blur(10px);">×</button>
     </div>
-<div class="admin-section-title">🆕 Додати новий товар</div>
-    <div class="cashback-control" style="border-color: var(--accent-pink); margin-bottom: 20px;">
+
+    <div class="admin-section-title">🆕 Додати товар</div>
+    <div style="background: rgba(255,255,255,0.02); padding: 18px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05);">
         <select id="new-prod-cat" class="admin-input">
-            <option value="zalivka">💧 Заливка</option>
-            <option value="prodazh">📦 Продаж</option>
-            <option value="aktsii">⚡ Інше</option>
+            <option value="zalivka">💧 Жижа</option>
+            <option value="prodazh">🟢 Снюс</option>
+            <option value="aktsii">⚡ Катриджі</option>
         </select>
         <input type="text" id="new-prod-name" placeholder="Назва" class="admin-input">
-        <input type="text" id="new-prod-price" placeholder="Ціна (напр. 60 zł/700 грн)" class="admin-input">
-        <input type="text" id="new-prod-img" placeholder="URL фото (пряме посилання)" class="admin-input">
-        <button class="admin-btn" id="add-product-btn" style="width:100%; background:rgba(255,0,85,0.1);">
-            <span>➕</span> ДОДАТИ В КАТАЛОГ
+        <input type="text" id="new-prod-price" placeholder="Ціна (напр. 60 zł)" class="admin-input">
+        <input type="text" id="new-prod-img" placeholder="URL фото" class="admin-input">
+        <button class="admin-btn" id="add-product-btn" style="width:100%; background: linear-gradient(90deg, var(--neon-pink), #ff5e00); color:#fff; border:none; flex-direction:row; justify-content:center; margin-top:10px;">
+            <span style="font-size: 16px;">➕</span> ДОДАТИ ТОВАР
         </button>
     </div>
-    <div class="admin-section-title">📦 Товари та ціни</div>
+
+    <div class="admin-section-title">📦 Управління вітриною</div>
     <div class="admin-grid">
         <button class="admin-btn" id="edit-price"><span>💰</span>Ціни</button>
         <button class="admin-btn" id="edit-desc"><span>📝</span>Назви</button>
-        <button class="admin-btn" id="edit-stock"><span>📦</span>Склад</button>
+        <button class="admin-btn" id="edit-stock"><span>📦</span>Наявність</button>
         <button class="admin-btn" id="edit-badge"><span>🏷️</span>Стікери</button>
-        <button class="admin-btn" id="edit-img-mode"><span>📸</span>Змінити фото</button>
-        <button class="admin-btn" id="edit-reorder" style="border-color: var(--accent-blue)"><span>↕️</span> Порядок</button>
-        <button class="admin-btn" id="edit-delete" style="border-color: #ff0000;"><span>🗑️</span>Видалити</button>
-        <select id="badge-selector" class="admin-input" style="grid-column: span 2; margin-top:5px;">
+        <button class="admin-btn" id="edit-img-mode"><span>📸</span>Фото</button>
+        <button class="admin-btn" id="edit-reorder"><span>↕️</span>Порядок</button>
+        <button class="admin-btn" id="edit-delete" style="color: #ff3366; border-color: rgba(255, 51, 102, 0.3);"><span>🗑️</span>Видалити</button>
+        
+        <select id="badge-selector" class="admin-input" style="grid-column: span 2; margin: 8px 0 0;">
             <option value="">Без стікера</option>
             <option value="hit">🔥 ХІТ</option>
             <option value="promo">🏷️ АКЦІЯ</option>
@@ -763,901 +354,236 @@ html.hide-sold-active:not(.force-admin) .product-card.out-of-stock {
         <button class="save-all-btn" id="save-all">💾 ЗБЕРЕГТИ ЗМІНИ</button>
     </div>
 
-    <div class="admin-section-title">⚙️ Налаштування системи</div>
+    <div class="admin-section-title">⚙️ Система</div>
     <div class="admin-grid">
-        <button class="admin-btn" id="toggle-hide-sold"><span>🚫</span>Сховати Sold</button>
-        <button class="admin-btn" id="toggle-payment"><span>💳</span>Оплата</button>
+        <button class="admin-btn" id="toggle-hide-sold"><span>🚫</span>Ховати Sold</button>
         <button class="admin-btn" id="toggle-banner"><span>🖼️</span>Банер</button>
-        <button class="admin-btn" id="toggle-maint"><span>🛠</span>Тех.роботи</button>
     </div>
 
-    <div class="admin-section-title">💰 Керування Кешбеком</div>
-    <div class="cashback-control">
-        <input type="text" id="target-user-id" placeholder="ID Користувача (User_1234)" class="admin-input">
-        <input type="number" id="cashback-amount" placeholder="Сума (UAH)" class="admin-input">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <button class="admin-btn" id="give-cashback" style="background:rgba(0,198,255,0.1); border-color:var(--accent-blue);"><span>➕</span>Додати</button>
-            <button class="admin-btn" id="remove-cashback"><span>➖</span>Списати</button>
-        </div>
-    </div>
-
-    <div class="admin-section-title">📊 Останні візити</div>
-    <div class="stats-box">
-        <div style="font-size:11px; margin-bottom:10px; display:flex; justify-content:space-between; color:var(--accent-blue);">
-            <span>Всього сьогодні:</span>
-            <span id="total-v">0</span>
-        </div>
-        <div id="visitors-list" style="max-height: 150px; overflow-y: auto; font-size: 10px;"></div>
-    </div>
-
-    <div class="admin-section-title">👥 Користувачі та Баланси</div>
-<div class="stats-box" style="padding: 10px;">
-    <div id="all-users-list" style="max-height: 180px; overflow-y: auto; padding-right: 5px;">
-        </div>
-</div>
-
-<div class="admin-section-title">🕒 Історія операцій</div>
-<div class="stats-box" style="padding: 10px; background: rgba(0,0,0,0.2);">
-    <div id="transactions-list" style="max-height: 180px; overflow-y: auto; padding-right: 5px;">
-        </div>
-</div>
-
-    <button class="admin-btn" style="width:100%; margin-top:30px; background:none; border-color:rgba(255,255,255,0.1);" onclick="localStorage.clear(); location.reload();">
-        🚪 ВИЙТИ З АКАУНТУ
+    <button class="admin-btn" style="width:100%; margin-top:40px; background:transparent; border-color:rgba(255,255,255,0.1); color: #888;" onclick="localStorage.clear(); location.reload();">
+        🚪 Вийти з адмінки
     </button>
 </div>
 
-<div id="install-banner">
-    <div id="close-install">×</div>
-    <div style="font-weight: 800; font-size: 15px;">ВСТАНОВИТИ SMOKE HUB?</div>
-    <button class="install-btn" id="install-button">ВСТАНОВИТИ</button>
-</div>
-
-<div id="maintenance-overlay">
-    <img src="images/logo.png" style="width:80px; border-radius:20px; margin-bottom:20px;">
-    <h2>ОНОВЛЕННЯ</h2>
-</div>
-
 <script type="module">
-    // 1. ПЕРШИМ ДІЛОМ ІМПОРТУЄМО ВСІ ФУНКЦІЇ (Додали 'get')
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, onValue, set, push, serverTimestamp, query, limitToLast, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-    import { runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-let currentHideSoldStatus = false;
-    // 2. ІНІЦІАЛІЗАЦІЯ БАЗИ (Це залишається як було)
+    import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
     const app = initializeApp({ databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/" });
     const db = getDatabase(app);
     const isAdmin = () => localStorage.getItem('isHubAdmin') === 'true';
 
-    // ЛОГУВАННЯ ВІЗИТУ
-    async function logVisit() {
-        if (isAdmin()) return;
-        let ip = "unknown";
-        try {
-            const res = await fetch('https://api.ipify.org?format=json');
-            const d = await res.json(); ip = d.ip;
-        } catch(e) {}
-        const ua = navigator.userAgent;
-        let device = "PC";
-        if (/iPhone/.test(ua)) device = "iPhone"; else if (/Android/.test(ua)) device = "Android";
-        push(ref(db, 'visits'), { user: localStorage.getItem('hub_user_id'), ip: ip, device: device, time: serverTimestamp() });
-    }
-    logVisit();
+    // --- ЛОКАЛІЗАЦІЯ ---
+    const translations = {
+        ua: { zalivka: "Жижа", prodazh: "Снюс", other: "Катриджі", sold: "ПРОДАНО", badge_hit: "ХІТ", badge_promo: "АКЦІЯ", badge_new: "НОВИНКА" },
+        pl: { zalivka: "Liquid", prodazh: "Snus", other: "Kartridże", sold: "SPRZEDANE", badge_hit: "HIT", badge_promo: "PROMOCJA", badge_new: "NOWOŚĆ" }
+    };
 
-    // СТАТИСТИКА
-    if (isAdmin()) {
-        onValue(query(ref(db, 'visits'), limitToLast(15)), (snap) => {
-            const list = document.getElementById('visitors-list');
-            if (snap.exists()) {
-                const data = snap.val();
-                document.getElementById('total-v').innerText = Object.keys(data).length;
-                list.innerHTML = Object.values(data).reverse().map(v => `
-                    <div class="visitor-item">
-                        <span>${v.user}</span> • ${v.device}<br>${v.ip} • ${new Date(v.time).toLocaleTimeString()}
-                    </div>
-                `).join('');
+    let currentLang = localStorage.getItem("lang") || "ua";
+
+    function applyLang(lang) {
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+            const key = el.dataset.i18n;
+            if (translations[lang][key]) el.innerText = translations[lang][key];
+        });
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.setAttribute('data-out-of-stock-text', translations[lang].sold);
+            const badgeDiv = card.querySelector('.badge');
+            const bType = card.getAttribute('data-badge');
+            if (bType && translations[lang]['badge_' + bType]) {
+                badgeDiv.innerText = translations[lang]['badge_' + bType];
             }
         });
+        const langLabel = document.getElementById("lang-label");
+        const langFlag = document.getElementById("lang-flag");
+        if(langLabel) {
+            langLabel.innerText = lang.toUpperCase();
+            langFlag.innerText = lang === "ua" ? "🇺🇦" : "🇵🇱";
+        }
+        localStorage.setItem("lang", lang);
+        currentLang = lang;
     }
 
-    // СНІГ
-    /*const snowContainer = document.getElementById('snow-container');
-    for(let i=0; i<25; i++) {
-        let snowflake = document.createElement('div');
-        snowflake.className = 'snowflake';
-        snowflake.innerHTML = '❄';
-        snowflake.style.left = Math.random() * 100 + 'vw';
-        snowflake.style.animation = `snowfall ${Math.random() * 4 + 6}s linear infinite`;
-        snowflake.style.animationDelay = Math.random() * 5 + 's';
-        snowContainer.appendChild(
+    // --- МОДАЛКИ (З анімацією) ---
+    function openModal(id) {
+        const modal = document.getElementById(id);
+        modal.classList.add('active');
+    }
+    function closeModal(id) {
+        const modal = document.getElementById(id);
+        modal.style.opacity = '0';
+        modal.querySelector('.lang-modal-content').style.transform = 'scale(0.9)';
+        setTimeout(() => { modal.classList.remove('active'); modal.style = ''; }, 300);
+    }
 
+    window.selectInitialLang = (lang) => {
+        applyLang(lang);
+        closeModal('language-modal');
+        setTimeout(() => openModal('category-start-modal'), 300);
+    };
+
+    window.selectInitialCategory = (tab) => {
+        closeModal('category-start-modal');
+        setTimeout(() => {
+            const navBtn = document.querySelector(`.nav-item[data-tab="${tab}"]`);
+            if (navBtn) navBtn.click(); 
+        }, 300);
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedLang = localStorage.getItem("lang");
+        if (!savedLang) setTimeout(() => openModal('language-modal'), 100);
+        else {
+            applyLang(savedLang);
+            setTimeout(() => openModal('category-start-modal'), 100);
         }
-        */
-        // Примусова фіксація горизонтальної прокрутки
-            window.addEventListener('scroll', () => {
-                if (window.scrollX !== 0) {
-                    window.scrollTo(0, window.scrollY);
-                }
-            }, { passive: true });
-            
-                document.addEventListener('touchmove', function(e) {
-                if (window.scrollY <= 0 && e.touches[0].pageY > e.touches[0].clientY) {
-        // Якщо ми в самому верху і тягнемо вниз — блокуємо
-                }
-            }, { passive: false });
-    
-    // ТАБИ (Банер працює на всіх вкладках, крім ІНФО)
+    });
+
+    document.getElementById("lang-toggle-mini")?.addEventListener("click", () => {
+        currentLang = currentLang === "ua" ? "pl" : "ua";
+        applyLang(currentLang);
+    });
+
+    // --- НАВІГАЦІЯ ---
+    let currentBannerStatus = true;
     document.querySelectorAll('.nav-item').forEach(btn => {
         btn.onclick = () => {
             const tab = btn.dataset.tab;
-            
-            // 1. Ховаємо всі секції
             document.querySelectorAll('.cat-section').forEach(s => s.classList.add('hidden'));
-            
-            // 2. Показуємо обрану секцію
             document.getElementById('cat-' + tab).classList.remove('hidden');
-            
-            // 3. ЛОГІКА БАНЕРА
-            const banner = document.getElementById('main-banner');
-            if (banner) {
-                // Якщо це вкладка 'info' — ховаємо банер. 
-                // Якщо будь-яка інша — показуємо (якщо він увімкнений в адмінці).
-                if (tab === 'info' || currentBannerStatus === false) {
-                    banner.style.display = 'none';
-                } else {
-                    banner.style.display = 'block';
-                }
-            }
-
-            // 4. Оновлюємо кнопки та заголовок (твій стандартний код)
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             btn.classList.add('active');
-            const pageTitle = document.getElementById('page-title');
-if (pageTitle) {
-    pageTitle.innerText = btn.innerText.split('\n').pop().toUpperCase();
-}
-
-
-            window.scrollTo(0,0);
+            
+            const banner = document.getElementById('main-banner');
+            if (banner) banner.style.display = (!currentBannerStatus) ? 'none' : 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
     });
 
-    // Firebase Sync
+    // --- FIREBASE РЕНДЕР КАТАЛОГУ ---
     onValue(ref(db, 'catalog'), (snap) => {
         const data = snap.val();
-        if(data) {
-            const cards = document.querySelectorAll('.product-card');
-            cards.forEach((card, i) => {
-                if(!card.querySelector('.price')) return;
-                if(data.prices?.[i]) card.querySelector('.price').innerText = data.prices[i];
-                if(data.descs?.[i]) card.querySelector('.product-desc').innerText = data.descs[i];
-                const inStock = data.stock?.[i] !== false;
+        if (!data) return;
 
-                // Завжди оновлюємо клас
-                card.classList.toggle('out-of-stock', !inStock);
+        ['zalivka', 'prodazh', 'aktsii'].forEach(cat => {
+            const grid = document.querySelector(`#cat-${cat} .product-grid`);
+            if (!grid) return;
+            grid.innerHTML = ''; 
+            
+            const catData = data[cat];
+            if (catData && catData.descs) {
+                catData.descs.forEach((name, i) => {
+                    const card = document.createElement('div');
+                    card.className = `product-card ${catData.stock?.[i] === false ? 'out-of-stock' : ''}`;
+                    const bType = catData.badges?.[i];
+                    if (bType) card.setAttribute('data-badge', bType);
+                    card.setAttribute('data-out-of-stock-text', translations[currentLang].sold);
+                    const badgeHtml = bType ? `<div class="badge badge-${bType}">${translations[currentLang]['badge_' + bType] || ""}</div>` : '<div class="badge"></div>';
 
-                // Відображення стікерів при завантаженні
-                // Знайти цей шматок всередині onValue(ref(db, 'catalog'))
-                const badgeDiv = card.querySelector('.badge');
-                if(data.badges?.[i]) {
-                    const bType = data.badges[i];
-                    card.setAttribute('data-badge', bType);
-                    badgeDiv.className = 'badge badge-' + bType;
-                    // ЗАМІСТЬ ЖОРСТКОГО ТЕКСТУ:
-                    badgeDiv.innerText = translations[currentLang]['badge_' + bType] || "";
-                } else {
-                    card.removeAttribute('data-badge'); // очистити атрибут, якщо стікера немає
-                    badgeDiv.className = 'badge';
-                    badgeDiv.innerText = '';
-                }
-            });
-        }
+                    card.innerHTML = `
+                        <div class="product-img">${badgeHtml}<img src="${catData.imgs?.[i] || 'images/logo.png'}"></div>
+                        <h3 class="product-desc">${name}</h3>
+                        <div class="price">${catData.prices?.[i] || ""}</div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        });
     });
 
-    // РЕДАГУВАННЯ
+    // --- АДМІНКА: РЕДАГУВАННЯ ---
     let mode = null;
-    document.getElementById('edit-price').onclick = (e) => { mode = mode === 'price' ? null : 'price'; document.querySelectorAll('.price').forEach(el => el.contentEditable = (mode === 'price')); updateModeBtns(e.target); };
-    document.getElementById('edit-desc').onclick = (e) => { mode = mode === 'desc' ? null : 'desc'; document.querySelectorAll('.product-desc').forEach(el => el.contentEditable = (mode === 'desc')); updateModeBtns(e.target); };
-    document.getElementById('edit-stock').onclick = (e) => { mode = mode === 'stock' ? null : 'stock'; updateModeBtns(e.target); };
-    document.getElementById('edit-badge').onclick = (e) => { mode = mode === 'badge' ? null : 'badge'; updateModeBtns(e.target); };
-
     function updateModeBtns(activeBtn) {
         document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode'));
         if (mode) activeBtn.classList.add('active-mode');
     }
 
-    document.addEventListener('click', (e) => {
-    const card = e.target.closest('.product-card');
-    if(!card || !isAdmin()) return;
+    document.getElementById('edit-price').onclick = (e) => { mode = mode === 'price' ? null : 'price'; document.querySelectorAll('.price').forEach(el => el.contentEditable = (mode === 'price')); updateModeBtns(e.target); };
+    document.getElementById('edit-desc').onclick = (e) => { mode = mode === 'desc' ? null : 'desc'; document.querySelectorAll('.product-desc').forEach(el => el.contentEditable = (mode === 'desc')); updateModeBtns(e.target); };
+    document.getElementById('edit-stock').onclick = (e) => { mode = mode === 'stock' ? null : 'stock'; updateModeBtns(e.target); };
+    document.getElementById('edit-badge').onclick = (e) => { mode = mode === 'badge' ? null : 'badge'; updateModeBtns(e.target); };
+    document.getElementById('edit-img-mode').onclick = (e) => { mode = mode === 'img' ? null : 'img'; updateModeBtns(e.target); };
+    document.getElementById('edit-delete').onclick = (e) => { mode = mode === 'delete' ? null : 'delete'; updateModeBtns(e.target); };
 
-    if(mode === 'stock') {
-        // Тепер при кліку в режимі складу товар стає "Продано" або навпаки
-        card.classList.toggle('out-of-stock');
+    document.addEventListener('click', (e) => {
+        const card = e.target.closest('.product-card');
+        if(!card || !isAdmin()) return;
         
-        // Обов'язково додаємо атрибут тексту, щоб він з'явився при перекладі
-        card.setAttribute('data-out-of-stock-text', translations[currentLang].sold);
-    }
-    
-    if(mode === 'badge') {
-        const type = document.getElementById('badge-selector').value;
-        const badgeDiv = card.querySelector('.badge');
-        badgeDiv.className = 'badge';
-        if(type) {
-            card.setAttribute('data-badge', type);
-            badgeDiv.classList.add('badge-' + type);
-            badgeDiv.innerText = translations[currentLang]['badge_' + type];
-        } else {
-            card.removeAttribute('data-badge');
-            badgeDiv.innerText = '';
+        if(mode === 'stock') {
+            card.classList.toggle('out-of-stock');
+            card.setAttribute('data-out-of-stock-text', translations[currentLang].sold);
         }
-    }
-});
+        if(mode === 'badge') {
+            const type = document.getElementById('badge-selector').value;
+            const badgeDiv = card.querySelector('.badge');
+            badgeDiv.className = 'badge';
+            if(type) {
+                card.setAttribute('data-badge', type);
+                badgeDiv.classList.add('badge-' + type);
+                badgeDiv.innerText = translations[currentLang]['badge_' + type];
+            } else {
+                card.removeAttribute('data-badge');
+                badgeDiv.innerText = '';
+            }
+        }
+        if(mode === 'delete' && confirm("Видалити?")) card.remove();
+        if(mode === 'img') {
+            const newUrl = prompt("URL нового фото:", card.querySelector('img').src);
+            if(newUrl) card.querySelector('img').src = newUrl;
+        }
+    });
+
+    document.getElementById('add-product-btn').onclick = async () => {
+        const cat = document.getElementById('new-prod-cat').value;
+        const name = document.getElementById('new-prod-name').value.trim();
+        const price = document.getElementById('new-prod-price').value.trim();
+        const img = document.getElementById('new-prod-img').value.trim();
+        if (!name || !price) return alert("Введіть назву та ціну!");
+        
+        const catRef = ref(db, `catalog/${cat}`);
+        const snap = await get(catRef);
+        let d = snap.val() || { descs: [], prices: [], stock: [], badges: [], imgs: [] };
+        d.descs.push(name); d.prices.push(price); d.imgs = d.imgs || []; d.imgs.push(img || ''); d.stock = d.stock || []; d.stock.push(true); d.badges = d.badges || []; d.badges.push("");
+        set(catRef, d).then(() => { alert("Успіх!"); });
+    };
 
     document.getElementById('save-all').onclick = () => {
-        const p = [], d = [], s = [], b = [];
-        document.querySelectorAll('.product-card').forEach(card => {
-            if(!card.querySelector('.price')) return;
-            p.push(card.querySelector('.price').innerText);
-            d.push(card.querySelector('.product-desc').innerText);
-            s.push(!card.classList.contains('out-of-stock'));
-            b.push(card.getAttribute('data-badge') || "");
+        const fullData = {};
+        ['zalivka', 'prodazh', 'aktsii'].forEach(cat => {
+            const p = [], d = [], s = [], b = [], im = [];
+            document.querySelectorAll(`#cat-${cat} .product-card`).forEach(card => {
+                d.push(card.querySelector('.product-desc').innerText);
+                p.push(card.querySelector('.price').innerText);
+                s.push(!card.classList.contains('out-of-stock'));
+                b.push(card.getAttribute('data-badge') || "");
+                im.push(card.querySelector('img').src);
+            });
+            fullData[cat] = { descs: d, prices: p, stock: s, badges: b, imgs: im };
         });
-        set(ref(db, 'catalog'), { prices: p, descs: d, stock: s, badges: b }).then(() => alert("Збережено!"));
+        set(ref(db, 'catalog'), fullData).then(() => alert("Збережено!"));
     };
 
-    // АДМІНКА
-    const login = () => {
+    let sortables = [];
+    document.getElementById('edit-reorder').onclick = (e) => {
+        mode = mode === 'reorder' ? null : 'reorder';
+        updateModeBtns(e.target);
+        if (mode === 'reorder') {
+            document.body.classList.add('reorder-mode');
+            document.querySelectorAll('.product-grid').forEach(g => sortables.push(new Sortable(g, { animation: 150, delay: 100 })));
+        } else {
+            document.body.classList.remove('reorder-mode');
+            sortables.forEach(s => s.destroy()); sortables = [];
+        }
+    };
+
+    // --- ВХІД / НАЛАШТУВАННЯ ---
+    document.getElementById('admin-trigger').onclick = () => {
         if (isAdmin()) document.getElementById('dev-menu').classList.toggle('active');
-        else if (prompt("КЛЮЧ:") === "smokehub2026") { localStorage.setItem('isHubAdmin', 'true'); location.reload(); }
+        else if (prompt("Пароль:") === "smokehub2026") { localStorage.setItem('isHubAdmin', 'true'); location.reload(); }
     };
-    document.getElementById('admin-trigger').onclick = login;
-    const secret = document.createElement('div');
-    secret.style.cssText = "position:fixed; top:0; right:0; width:60px; height:60px; z-index:99999;";
-    document.body.appendChild(secret); secret.onclick = login;
 
-    // --- ЛОГІКА ТЕХ РОБОТИ ---
-    let currentMaintStatus = false;
-    onValue(ref(db, 'settings/maintenance'), (snap) => {
-        currentMaintStatus = snap.val() === true;
-        const overlay = document.getElementById('maintenance-overlay');
-        const btn = document.getElementById('toggle-maint');
-        if (currentMaintStatus) {
-            if (!isAdmin()) overlay.style.display = 'flex';
-            btn.innerText = "🛠 ТЕХ. РОБОТИ (ON)";
-            btn.classList.add('active-mode');
-        } else {
-            overlay.style.display = 'none';
-            btn.innerText = "🛠 ТЕХ. РОБОТИ (OFF)";
-            btn.classList.remove('active-mode');
-        }
-    });
-    document.getElementById('toggle-maint').onclick = () => {
-        set(ref(db, 'settings/maintenance'), !currentMaintStatus);
-    };
-    
-// Слухаємо статус приховування з бази
-onValue(ref(db, 'settings/hideSold'), (snap) => {
-    currentHideSoldStatus = snap.val() === true;
-    const btn = document.getElementById('toggle-hide-sold');
-    
-    if (currentHideSoldStatus) {
-        document.documentElement.classList.add('hide-sold-active');
-        if(btn) {
-            btn.innerText = "🚫 ПРИХОВАТИ SOLD (ON)";
-            btn.classList.add('active-mode');
-        }
-    } else {
-        document.documentElement.classList.remove('hide-sold-active');
-        if(btn) {
-            btn.innerText = "🚫 ПРИХОВАТИ SOLD (OFF)";
-            btn.classList.remove('active-mode');
-        }
-    }
-});
-
-// Логіка натискання на кнопку в адмінці
-document.getElementById('toggle-hide-sold').onclick = () => {
-    if (!isAdmin()) return;
-    set(ref(db, 'settings/hideSold'), !currentHideSoldStatus);
-
-    // миттєвий UX
-    document.documentElement.classList.toggle(
-        'hide-sold-active',
-        !currentHideSoldStatus
-    );
-};
-;
-
-   // --- PWA ---
-    let deferredPrompt;
-    const banner = document.getElementById('install-banner');
-    const installBtn = document.getElementById('install-button');
-    const closeBnr = document.getElementById('close-install');
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        setTimeout(() => { if (!sessionStorage.getItem('pwaClosed')) banner.style.display = 'block'; }, 3000);
-    });
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    if (isIOS && !window.navigator.standalone) {
-        setTimeout(() => {
-            if (!sessionStorage.getItem('pwaClosed')) {
-                const bnrText = document.querySelector('#install-banner div:nth-child(2)');
-                if(bnrText) bnrText.innerText = "Натисніть 'Поділитися' та 'Додати на початковий екран' 📲";
-                installBtn.style.display = 'none';
-                banner.style.display = 'block';
-            }
-        }, 4000);
-    }
-    installBtn.onclick = async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') banner.style.display = 'none';
-            deferredPrompt = null;
-        }
-    };
-    closeBnr.onclick = () => { banner.style.display = 'none'; sessionStorage.setItem('pwaClosed', 'true'); };
-
-    // --- КЕРУВАННЯ БАНЕРОМ ---
-let currentBannerStatus = true;
-const bannerElement = document.getElementById('main-banner');
-const bannerBtn = document.getElementById('toggle-banner');
-
-// Слухаємо базу даних Firebase (Оновлено для всіх вкладок)
-onValue(ref(db, 'settings/bannerVisible'), (snap) => {
-    currentBannerStatus = snap.val() !== false; 
-    const activeTab = document.querySelector('.nav-item.active').dataset.tab;
-    const bannerBtn = document.getElementById('toggle-banner');
-    const bannerElement = document.getElementById('main-banner');
-
-    if (currentBannerStatus) {
-        bannerBtn.innerText = "🖼️ БАНЕР (ON)";
-        bannerBtn.classList.add('active-mode');
-        // Показуємо банер скрізь, КРІМ вкладки "info"
-        if (activeTab !== 'info') {
-            bannerElement.style.display = 'block';
-        } else {
-            bannerElement.style.display = 'none';
-        }
-    } else {
-        bannerElement.style.display = 'none';
-        bannerBtn.innerText = "🖼️ БАНЕР (OFF)";
-        bannerBtn.classList.remove('active-mode');
-    }
-});
-
-// 2. Клік в адмінці для вмикання/вимикання
-bannerBtn.onclick = () => {
-    if (!isAdmin()) return;
-    set(ref(db, 'settings/bannerVisible'), !currentBannerStatus);
-};
-
-// 3. Автоматичне гортання слайдів
-let pIndex = 0;
-const pTrack = document.getElementById('promoTrack');
-const pSlides = document.querySelectorAll('.promo-slide');
-if (pTrack && pSlides.length > 0) {
-    setInterval(() => {
-        pIndex = (pIndex + 1) % pSlides.length;
-        pTrack.style.transform = `translateX(-${pIndex * 100}%)`;
-    }, 5000);
-}
-
-
-    // --- ХОВАННЯ / ПОКАЗ ПУНКТУ "ОПЛАТА" ---
-let paymentVisible = true;
-
-onValue(ref(db, 'settings/paymentVisible'), (snap) => {
-    paymentVisible = snap.val() !== false;
-
-    const card = document.getElementById('payment-card');
-    const btn  = document.getElementById('toggle-payment');
-
-    if (!card) return;
-
-    card.style.display = paymentVisible ? 'flex' : 'none';
-
-    if (btn) {
-        btn.innerText = paymentVisible ? '💳 ОПЛАТА (ON)' : '💳 ОПЛАТА (OFF)';
-        btn.classList.toggle('active-mode', paymentVisible);
-    }
-});
-
-document.getElementById('toggle-payment').onclick = () => {
-    if (!isAdmin()) return;
-    set(ref(db, 'settings/paymentVisible'), !paymentVisible);
-};
-
-// --- ОНОВЛЕНА ЛОГІКА МОВИ ТА МОДАЛЬНОГО ВІКНА ---
-
-// 1. Перевірка, чи мова вже була вибрана раніше
-window.addEventListener('DOMContentLoaded', () => {
-    const savedLang = localStorage.getItem("lang");
-    const modal = document.getElementById('language-modal');
-    
-    if (!savedLang) {
-        modal.style.display = 'flex'; // Показуємо вікно, якщо вибору немає
-    } else {
-        currentLang = savedLang;
-        applyLang(currentLang);
-    }
-});
-
-// 2. Функція вибору мови з вікна
-window.selectInitialLang = (lang) => {
-    currentLang = lang;
-    localStorage.setItem("lang", lang);
-    applyLang(lang);
-    document.getElementById('language-modal').style.display = 'none';
-};
-
-// Ваш існуючий об'єкт translations (залишається без змін)
-const translations = {
-    ua: {
-        zalivka: "Заливка",
-        prodazh: "Продаж",
-        other: "Інше",
-        info: "Інфо",
-        payment: "Оплата",
-        reviews: "Відгуки",
-        flavors: "Смаки",
-        admin: "Кабінет власника",
-        sold: "ПРОДАНО",
-        badge_hit: "ХІТ",
-        badge_promo: "АКЦІЯ",
-        badge_new: "НОВИНКА"
-    },
-    pl: {
-        zalivka: "Zalewki",
-        prodazh: "Sprzedaż",
-        other: "Inne",
-        info: "Info",
-        payment: "Płatność",
-        reviews: "Opinie",
-        flavors: "Smaki",
-        admin: "Panel właściciela",
-        sold: "SPRZEDANE",
-        badge_hit: "HIT",
-        badge_promo: "PROMOCJA",
-        badge_new: "NOWOŚĆ"
-    }
-};
-
-let currentLang = localStorage.getItem("lang") || "ua";
-
-function updateBadgeTexts(lang) {
-    document.querySelectorAll('.product-card').forEach(card => {
-        const badgeDiv = card.querySelector('.badge');
-        const bType = card.getAttribute('data-badge');
-        if (bType && translations[lang]['badge_' + bType]) {
-            badgeDiv.innerText = translations[lang]['badge_' + bType];
-        }
-    });
-}
-
-function applyLang(lang) {
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-        const key = el.dataset.i18n;
-        if (translations[lang][key]) {
-            el.innerText = translations[lang][key];
-        }
-    });
-
-    document.querySelectorAll('.product-card').forEach(card => {
-        card.setAttribute('data-out-of-stock-text', translations[lang].sold);
-    });
-    
-    updateBadgeTexts(lang); 
-
-    // Оновлення міні-кнопки
-    const langLabel = document.getElementById("lang-label");
-    const langFlag = document.getElementById("lang-flag");
-    if(langLabel) {
-        langLabel.innerText = lang.toUpperCase();
-        langFlag.innerText = lang === "ua" ? "🇺🇦" : "🇵🇱";
-    }
-    
-    localStorage.setItem("lang", lang);
-    currentLang = lang;
-}
-
-// Клік по міні-кнопці
-const miniLangBtn = document.getElementById("lang-toggle-mini");
-if (miniLangBtn) {
-    miniLangBtn.onclick = () => {
-        currentLang = currentLang === "ua" ? "pl" : "ua";
-        applyLang(currentLang);
-    };
-}
-
-// Новий обробник кліку для картки в Інфо
-const newLangBtn = document.getElementById("lang-toggle-new");
-if (newLangBtn) {
-    newLangBtn.onclick = () => {
-        currentLang = currentLang === "ua" ? "pl" : "ua";
-        applyLang(currentLang);
-    };
-}
-
-// Безпечна зміна мови (з перевіркою на існування кнопки)
-const langToggleBtn = document.getElementById("lang-toggle");
-if (langToggleBtn) {
-    langToggleBtn.onclick = () => {
-        currentLang = currentLang === "ua" ? "pl" : "ua";
-        applyLang(currentLang);
-    };
-}
-// Перевірка та показ модального вікна
-window.addEventListener('DOMContentLoaded', () => {
-    const savedLang = localStorage.getItem("lang");
-    const modal = document.getElementById('language-modal');
-    
-    if (!savedLang) {
-        // Невелика затримка для ефекту "Wow"
-        setTimeout(() => {
-            modal.style.display = 'flex';
-        }, 600); 
-    } else {
-        applyLang(savedLang);
-    }
-});
-
-// Функція вибору мови
-window.selectInitialLang = (lang) => {
-    const modal = document.getElementById('language-modal');
-    
-    // Плавне зникнення перед закриттям
-    modal.style.opacity = '0';
-    modal.style.transition = '0.3s';
-    
-    setTimeout(() => {
-        modal.style.display = 'none';
-        applyLang(lang);
-    }, 300);
-};
-
-  // --- БЕЗПЕЧНЕ НАРАХУВАННЯ КЕШБЕКУ ---
-
-const updateBalance = async (isAdding) => {
-    const tInput = document.getElementById('target-user-id');
-    const aInput = document.getElementById('cashback-amount');
-    
-    if (!tInput?.value || !aInput?.value) {
-        alert("Заповніть ID користувача та суму!");
-        return;
-    }
-
-    const tId = tInput.value.trim();
-    const amt = parseFloat(aInput.value);
-
-    try {
-        const walletRef = ref(db, `wallets/${tId}`);
-        await runTransaction(walletRef, (current) => {
-            const balance = Number(current) || 0;
-            return isAdding ? balance + amt : Math.max(0, balance - amt);
-        });
-
-        // ЗАПИС ТРАНЗАКЦІЇ В ІСТОРІЮ
-        push(ref(db, 'transactions'), {
-            user: tId,
-            amount: isAdding ? +amt : -amt,
-            time: serverTimestamp(),
-            admin: "Admin" 
-        });
-
-        alert(`✅ Виконано для ${tId}`);
-        aInput.value = ""; 
-    } catch (e) {
-        alert("Помилка!");
-    }
-};
-
-// Безпечне призначення подій (не викликає помилку, якщо кнопки немає)
-document.getElementById('give-cashback')?.addEventListener('click', () => updateBalance(true));
-document.getElementById('remove-cashback')?.addEventListener('click', () => updateBalance(false));
-
-// Синхронізація балансу (для клієнта)
-const myIdForWallet = localStorage.getItem('hub_user_id');
-if (myIdForWallet) {
-    onValue(ref(db, 'wallets/' + myIdForWallet), (snap) => {
-        const balEl = document.getElementById('user-balance');
-        if (balEl) balEl.innerText = snap.val() || 0;
-    });
-}
-
-    // --- ЛОГІКА ТЕЛЕГРАМ-ПОСИЛАННЯ ---
-const updateTgLink = () => {
-    const tgBtn = document.getElementById('send-id-btn');
-    const currentId = localStorage.getItem('hub_user_id');
-    
-    if (tgBtn && currentId) {
-        const message = encodeURIComponent(`Привіт! Мій ID: ${currentId}. Закріпіть його за мною!`);
-        tgBtn.href = `https://t.me/liquid_br?text=${message}`;
-    }
-};
-
-// Викликаємо функцію відразу
-updateTgLink();
-
-// --- 1. ЗАВАНТАЖЕННЯ ТОВАРІВ ПО КАТЕГОРІЯХ ---
-onValue(ref(db, 'catalog'), (snap) => {
-    const data = snap.val();
-    if (!data) return;
-
-    ['zalivka', 'prodazh', 'aktsii'].forEach(cat => {
-        const grid = document.querySelector(`#cat-${cat} .product-grid`);
-        if (!grid) return;
-
-        grid.innerHTML = ''; // Очищуємо старі товари
-        
-        const catData = data[cat];
-        if (catData && catData.descs) {
-            catData.descs.forEach((name, i) => {
-                const card = document.createElement('div');
-                card.className = `product-card ${catData.stock?.[i] === false ? 'out-of-stock' : ''}`;
-                
-                const bType = catData.badges?.[i];
-                if (bType) card.setAttribute('data-badge', bType);
-                card.setAttribute('data-out-of-stock-text', translations[currentLang].sold);
-
-                const badgeHtml = bType ? `<div class="badge badge-${bType}">${translations[currentLang]['badge_' + bType] || ""}</div>` : '<div class="badge"></div>';
-
-                card.innerHTML = `
-                    <div class="product-img">
-                        ${badgeHtml}
-                        <img src="${catData.imgs?.[i] || 'images/logo.png'}">
-                    </div>
-                    <h3 class="product-desc">${name}</h3>
-                    <div class="price">${catData.prices?.[i] || ""}</div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-    });
-});
-
-// --- 2. ДОДАВАННЯ НОВОГО ТОВАРУ ---
-document.getElementById('add-product-btn').onclick = async () => {
-    const cat = document.getElementById('new-prod-cat').value;
-    const name = document.getElementById('new-prod-name').value.trim();
-    const price = document.getElementById('new-prod-price').value.trim();
-    const img = document.getElementById('new-prod-img').value.trim();
-
-    if (!name || !price) { alert("Назва та ціна обов'язкові!"); return; }
-
-    const catalogRef = ref(db, `catalog/${cat}`);
-    const snapshot = await get(catalogRef);
-    let catData = snapshot.val() || { descs: [], prices: [], stock: [], badges: [], imgs: [] };
-
-    // Додаємо в масиви
-    catData.descs.push(name);
-    catData.prices.push(price);
-    catData.imgs = catData.imgs || [];
-    catData.imgs.push(img || 'images/logo.png');
-    catData.stock = catData.stock || [];
-    catData.stock.push(true);
-    catData.badges = catData.badges || [];
-    catData.badges.push("");
-
-    set(catalogRef, catData).then(() => {
-        alert("Товар додано!");
-        document.getElementById('new-prod-name').value = "";
-        document.getElementById('new-prod-price').value = "";
-        document.getElementById('new-prod-img').value = "";
-    });
-};
-
-// --- 3. ОБРОБНИК РЕЖИМІВ (ВИДАЛЕННЯ ТА ФОТО) ---
-document.getElementById('edit-img-mode').onclick = (e) => { mode = mode === 'img' ? null : 'img'; updateModeBtns(e.target); };
-document.getElementById('edit-delete').onclick = (e) => { mode = mode === 'delete' ? null : 'delete'; updateModeBtns(e.target); };
-
-document.addEventListener('click', (e) => {
-    const card = e.target.closest('.product-card');
-    if(!card || !isAdmin()) return;
-
-    if(mode === 'delete') {
-        if(confirm("Видалити цей товар?")) {
-            card.remove(); // Видаляємо візуально, збережеться після натискання Save All
-        }
-    }
-
-    if(mode === 'img') {
-        const newUrl = prompt("Вставте URL нового фото:", card.querySelector('img').src);
-        if(newUrl) card.querySelector('img').src = newUrl;
-    }
-});
-
-// --- 4. ЗБЕРЕГТИ ВСІ ЗМІНИ ---
-document.getElementById('save-all').onclick = () => {
-    const fullData = {};
-    ['zalivka', 'prodazh', 'aktsii'].forEach(cat => {
-        const p = [], d = [], s = [], b = [], im = [];
-        document.querySelectorAll(`#cat-${cat} .product-card`).forEach(card => {
-            d.push(card.querySelector('.product-desc').innerText);
-            p.push(card.querySelector('.price').innerText);
-            s.push(!card.classList.contains('out-of-stock'));
-            b.push(card.getAttribute('data-badge') || "");
-            im.push(card.querySelector('img').src);
-        });
-        fullData[cat] = { descs: d, prices: p, stock: s, badges: b, imgs: im };
-    });
-    set(ref(db, 'catalog'), fullData).then(() => alert("Каталог оновлено!"));
-};
-
-if (isAdmin()) {
-    // 1. СЛУХАЄМО ВСІ ГАМАНЦІ
-    onValue(ref(db, 'wallets'), (snap) => {
-        const list = document.getElementById('all-users-list');
-        if (snap.exists()) {
-            const data = snap.val();
-            list.innerHTML = Object.entries(data)
-                .sort((a, b) => b[1] - a[1]) // Сортуємо: багаті зверху
-                .map(([id, balance]) => `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <div style="cursor:pointer;" onclick="document.getElementById('target-user-id').value='${id}'">
-                        <div style="font-size:11px; color:white;">${id}</div>
-                        <div style="font-size:9px; color:var(--accent-pink); opacity:0.8;">Натисніть, щоб вибрати</div>
-                    </div>
-                    <div style="font-weight:900; color:var(--accent-blue); font-size:13px;">${balance} ₴</div>
-                </div>
-            `).join('');
-        } else {
-            list.innerHTML = '<div style="text-align:center; opacity:0.5; font-size:11px;">Користувачів поки немає</div>';
-        }
-    });
-
-    // 2. СЛУХАЄМО ІСТОРІЮ (ТРАНЗАКЦІЇ)
-    onValue(query(ref(db, 'transactions'), limitToLast(20)), (snap) => {
-        const list = document.getElementById('transactions-list');
-        if (snap.exists()) {
-            const data = snap.val();
-            list.innerHTML = Object.values(data).reverse().map(t => `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
-                    <div style="font-size:10px;">
-                        <span style="color:white; font-weight:bold;">${t.user}</span>
-                        <div style="font-size:8px; opacity:0.4;">${new Date(t.time).toLocaleString('uk-UA')}</div>
-                    </div>
-                    <div style="color:${t.amount > 0 ? '#00ff99' : '#ff0055'}; font-weight:900; font-size:11px;">
-                        ${t.amount > 0 ? '+' : ''}${t.amount} ₴
-                    </div>
-                </div>
-            `).join('');
-        } else {
-            list.innerHTML = '<div style="text-align:center; opacity:0.5; font-size:11px;">Транзакцій немає</div>';
-        }
-    });
-}
-
-// Функція для вибору категорії при старті
-window.selectInitialCategory = (tab) => {
-    const modal = document.getElementById('category-start-modal');
-    
-    // Плавне зникнення
-    modal.style.opacity = '0';
-    modal.style.transition = '0.3s';
-    
-    setTimeout(() => {
-        modal.style.display = 'none';
-        
-        // Знаходимо кнопку в нижньому меню і імітуємо клік
-        const navBtn = document.querySelector(`.nav-item[data-tab="${tab}"]`);
-        if (navBtn) navBtn.click(); 
-    }, 300);
-};
-
-// Модифікуємо вашу функцію вибору мови, щоб вона відкривала вікно категорій
-const originalSelectLang = window.selectInitialLang;
-window.selectInitialLang = (lang) => {
-    // Викликаємо оригінальну функцію перекладу
-    applyLang(lang);
-    localStorage.setItem("lang", lang);
-    
-    const langModal = document.getElementById('language-modal');
-    langModal.style.display = 'none';
-    
-    // Відкриваємо вікно вибору категорії
-    const catModal = document.getElementById('category-start-modal');
-    catModal.style.display = 'flex';
-    catModal.style.opacity = '1';
-};
-
-// Оновлюємо перевірку при завантаженні (DOMContentLoaded)
-window.addEventListener('DOMContentLoaded', () => {
-    const savedLang = localStorage.getItem("lang");
-    if (!savedLang) {
-        document.getElementById('language-modal').style.display = 'flex';
-    } else {
-        // Якщо мова вже є, просто показуємо вибір категорії
-        document.getElementById('category-start-modal').style.display = 'flex';
-    }
-});
-
-    let sortables = []; // тут зберігаємо налаштування перетягування
-
-function toggleReorderMode(active) {
-    const grids = document.querySelectorAll('.product-grid');
-    if (active) {
-        document.body.classList.add('reorder-mode'); // вмикаємо візуальну тряску
-        grids.forEach(grid => {
-            // вмикаємо можливість сортування для кожної категорії
-            let s = new Sortable(grid, {
-                animation: 150,
-                delay: 100, // затримка, щоб випадково не потягнути при скролі
-                touchStartThreshold: 5,
-                ghostClass: 'sortable-ghost'
-            });
-            sortables.push(s);
-        });
-    } else {
-        document.body.classList.remove('reorder-mode'); // вимикаємо тряску
-        sortables.forEach(s => s.destroy()); // повністю вимикаємо сортування
-        sortables = [];
-    }
-}
-
-// Прив'язуємо функцію до кнопки "Порядок"
-document.getElementById('edit-reorder').onclick = (e) => {
-    // Якщо режим вже був 'reorder', вимикаємо його (null), інакше вмикаємо
-    mode = (mode === 'reorder' ? null : 'reorder');
-    
-    // Прибираємо підсвітку з усіх інших кнопок адмінки
-    document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode'));
-    
-    if (mode === 'reorder') {
-        e.target.classList.add('active-mode'); // підсвічуємо нашу кнопку
-        toggleReorderMode(true);
-    } else {
-        toggleReorderMode(false);
-    }
-};
+    onValue(ref(db, 'settings/bannerVisible'), (s) => currentBannerStatus = s.val() !== false);
+    onValue(ref(db, 'settings/hideSold'), (s) => document.documentElement.classList.toggle('hide-sold-active', s.val() === true));
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
