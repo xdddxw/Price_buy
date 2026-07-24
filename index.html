@@ -187,7 +187,7 @@
         .lang-options button { background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); color: white; border: 1px solid var(--glass-border); padding: 18px; border-radius: 20px; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px; cursor:pointer; }
         .lang-options button:active { background: rgba(255,255,255,0.1); transform: scale(0.95); }
 
-        /* НОВИЙ КОМПАКТНИЙ CSS АДМІНКИ */
+        /* КОМПАКТНИЙ CSS АДМІНКИ */
         .dev-panel { 
             position: fixed; top: 0; right: -100%; width: 100%; max-width: 380px; height: 100vh; 
             background: rgba(10, 10, 14, 0.95); backdrop-filter: blur(25px); padding: calc(15px + env(safe-area-inset-top)) 20px 100px; 
@@ -535,6 +535,20 @@
         return parseFloat(matches[0].replace(',', '.'));
     }
 
+    // НОВА ЛОГІКА ПЕРЕВІРКИ ЖИЖІ
+    function isLiquidInCart() {
+        if (!globalCatalog) return false;
+        const liquidCats = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack'];
+        for (let item of cart) {
+            for (let cat of liquidCats) {
+                if (globalCatalog[cat] && globalCatalog[cat].descs && globalCatalog[cat].descs.includes(item.name)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     function renderCart() {
         const container = document.getElementById('cart-items-container');
         const emptyMsg = document.getElementById('cart-empty-msg');
@@ -547,9 +561,10 @@
         
         container.innerHTML = '';
         if(cart.length === 0) {
-            emptyMsg.classList.remove('hidden'); summary.classList.add('hidden'); recSection.classList.add('hidden');
+            emptyMsg.classList.remove('hidden'); summary.classList.add('hidden'); 
+            recSection.classList.add('hidden');
         } else {
-            emptyMsg.classList.add('hidden'); summary.classList.remove('hidden'); recSection.classList.remove('hidden');
+            emptyMsg.classList.add('hidden'); summary.classList.remove('hidden'); 
             let totalSum = 0;
             
             cart.forEach((item, index) => {
@@ -585,27 +600,43 @@
 
     function renderRecommended() {
         const recGrid = document.getElementById('recommended-grid');
+        const recSection = document.getElementById('recommended-section');
         recGrid.innerHTML = '';
+        recSection.classList.add('hidden');
+
         if (!globalCatalog || !globalCatalog['aktsii'] || !globalCatalog['aktsii'].descs) return;
-        
-        let count = 0;
+
+        // Показуємо тільки якщо в кошику є жижа
+        if (!isLiquidInCart()) return;
+
+        let availableItems = [];
         const aktsii = globalCatalog['aktsii'];
         for(let i=0; i < aktsii.descs.length; i++) {
-            if (aktsii.stock[i] !== false && count < 2) {
-                const name = aktsii.descs[i]; const price = aktsii.prices[i];
-                if (cart.find(c => c.name === name)) continue;
-                
-                const card = document.createElement('div'); card.className = 'product-card';
-                card.innerHTML = `
-                    <div class="product-img"><img src="${aktsii.imgs[i] || 'images/logo.png'}"></div>
-                    <h3 class="product-desc" style="font-size:12px; min-height:28px;">${name}</h3>
-                    <div class="price" style="font-size:14px; padding:5px;">${price}</div>
-                    <button class="add-to-cart-btn" data-name="${name}" data-price="${price}" style="font-size:11px;">+ Додати</button>
-                `;
-                recGrid.appendChild(card);
-                count++;
+            if (aktsii.stock[i] !== false) {
+                const name = aktsii.descs[i];
+                if (!cart.find(c => c.name === name)) {
+                    availableItems.push({ name: name, price: aktsii.prices[i], img: aktsii.imgs[i] });
+                }
             }
         }
+
+        if (availableItems.length === 0) return;
+
+        // Випадкові 2 товари з категорії Катриджі (айс шот, катридж)
+        availableItems.sort(() => 0.5 - Math.random());
+        const selected = availableItems.slice(0, 2);
+
+        recSection.classList.remove('hidden');
+        selected.forEach(item => {
+            const card = document.createElement('div'); card.className = 'product-card';
+            card.innerHTML = `
+                <div class="product-img"><img src="${item.img || 'images/logo.png'}"></div>
+                <h3 class="product-desc" style="font-size:12px; min-height:28px;">${item.name}</h3>
+                <div class="price" style="font-size:14px; padding:5px;">${item.price}</div>
+                <button class="add-to-cart-btn" data-name="${item.name}" data-price="${item.price}" style="font-size:11px;">+ Додати</button>
+            `;
+            recGrid.appendChild(card);
+        });
     }
 
     document.getElementById('apply-promo-btn').onclick = () => {
