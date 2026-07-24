@@ -334,10 +334,24 @@
         </div>
     </div>
 
-    <!-- РОЗДІЛ: ПРОФІЛЬ -->
+    <!-- РОЗДІЛ: ПРОФІЛЬ ТА АВТОРИЗАЦІЯ -->
     <div id="cat-profile" class="cat-section hidden">
         <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 20px; text-transform: uppercase;" data-i18n="profile">👤 Ваш профіль</h2>
         
+        <!-- БЛОК АВТОРИЗАЦІЇ ЗА ID -->
+        <div style="background: rgba(0, 240, 255, 0.03); padding: 15px; border-radius: 16px; border: 1px solid rgba(0, 240, 255, 0.2); margin-bottom: 20px;">
+            <div style="font-size: 12px; color: var(--neon-blue); font-weight: bold; margin-bottom: 8px;" data-i18n="auth_title">🔑 Авторизація за ID:</div>
+            <div style="font-size: 11px; color: #aaa; margin-bottom: 10px;" data-i18n="auth_desc">Ваш унікальний ID акаунта:</div>
+            <div style="display:flex; gap:8px; margin-bottom:10px;">
+                <input type="text" id="my-user-id-display" class="checkout-input" style="margin-bottom:0; font-weight:bold; text-align:center;" readonly>
+                <button id="copy-id-btn" class="admin-btn" style="padding:0 15px;">📋</button>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="login-id-input" class="checkout-input" style="margin-bottom:0;" placeholder="Ввести чужий ID для входу">
+                <button id="login-id-btn" class="admin-btn" style="padding:0 15px; background: rgba(0, 240, 255, 0.1); color:var(--neon-blue);" data-i18n="login_btn">Увійти</button>
+            </div>
+        </div>
+
         <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
             <input type="text" id="prof-name" class="checkout-input" placeholder="Ваше ім'я" data-i18n-ph="name">
             <input type="text" id="prof-phone" class="checkout-input" placeholder="Телефон або Telegram" data-i18n-ph="phone">
@@ -364,7 +378,7 @@
     <button class="nav-item" data-tab="profile"><span>👤</span><span data-i18n="profile">Профіль</span></button>
 </nav>
 
-<!-- НОВА КОМПАКТНА АДМІН-ПАНЕЛЬ -->
+<!-- АДМІН-ПАНЕЛЬ -->
 <div id="dev-menu" class="dev-panel">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <div class="logo" style="font-size: 20px;">HUB CONTROL</div>
@@ -487,8 +501,8 @@
     let tgConfig = { token: "", chatId: "" };
 
     const translations = {
-        ua: { zalivka: "Жижа", prodazh: "Снюс", other: "Катриджі", cart: "Кошик", profile: "Профіль", sold: "ПРОДАНО", badge_hit: "ХІТ", badge_promo: "АКЦІЯ", badge_new: "НОВИНКА", updated: "Оновлено:", cart_title: "🛒 Ваш кошик", empty: "Кошик порожній 😔", total: "Разом до сплати:", add_cart: "В кошик", name: "Ваше ім'я", phone: "Телефон або Telegram", city: "Місто відправки", promo: "Введіть промокод", order_btn: "🚀 ОФОРМИТИ ЗАМОВЛЕННЯ", order_success: "✅ Замовлення відправлено! Ми зв'яжемося з вами.", save_profile: "💾 ЗБЕРЕГТИ ДАНІ", my_orders: "📦 Мої замовлення" },
-        pl: { zalivka: "Liquid", prodazh: "Snus", other: "Kartridże", cart: "Koszyk", profile: "Profil", sold: "SPRZEDANE", badge_hit: "HIT", badge_promo: "PROMOCJA", badge_new: "NOWOŚĆ", updated: "Aktualizacja:", cart_title: "🛒 Twój koszyk", empty: "Koszyk jest pusty 😔", total: "Do zapłaty:", add_cart: "Do koszyka", name: "Twoje imię", phone: "Telefon / Telegram", city: "Miasto wysyłki", promo: "Kod rabatowy", order_btn: "🚀 ZŁÓŻ ZAMÓWIENIE", order_success: "✅ Zamówienie wysłane pomyślnie!", save_profile: "💾 ZAPISZ DANE", my_orders: "📦 Moje zamówienia" }
+        ua: { zalivka: "Жижа", prodazh: "Снюс", other: "Катриджі", cart: "Кошик", profile: "Профіль", sold: "ПРОДАНО", badge_hit: "ХІТ", badge_promo: "АКЦІЯ", badge_new: "НОВИНКА", updated: "Оновлено:", cart_title: "🛒 Ваш кошик", empty: "Кошик порожній 😔", total: "Разом до сплати:", add_cart: "В кошик", name: "Ваше ім'я", phone: "Телефон або Telegram", city: "Місто відправки", promo: "Введіть промокод", order_btn: "🚀 ОФОРМИТИ ЗАМОВЛЕННЯ", order_success: "✅ Замовлення відправлено! Ми зв'яжемося з вами.", save_profile: "💾 ЗБЕРЕГТИ ДАНІ", my_orders: "📦 Мої замовлення", auth_title: "🔑 Авторизація за ID:", auth_desc: "Ваш унікальний ID акаунта:", login_btn: "Увійти" },
+        pl: { zalivka: "Liquid", prodazh: "Snus", other: "Kartridże", cart: "Koszyk", profile: "Profil", sold: "SPRZEDANE", badge_hit: "HIT", badge_promo: "PROMOCJA", badge_new: "NOWOŚĆ", updated: "Aktualizacja:", cart_title: "🛒 Twój koszyk", empty: "Koszyk jest pusty 😔", total: "Do zapłaty:", add_cart: "Do koszyka", name: "Twoje imię", phone: "Telefon / Telegram", city: "Miasto wysyłki", promo: "Kod rabatowy", order_btn: "🚀 ZŁÓŻ ZAMÓWIENIE", order_success: "✅ Zamówienie wysłane pomyślnie!", save_profile: "💾 ZAPISZ DANE", my_orders: "📦 Moje zamówienia", auth_title: "🔑 Autoryzacja ID:", auth_desc: "Twój unikalny ID konta:", login_btn: "Zaloguj" }
     };
 
     let currentLang = localStorage.getItem("lang") || "ua";
@@ -515,7 +529,9 @@
         if (!savedLang) setTimeout(() => document.getElementById('language-modal').classList.add('active'), 100);
         else { applyLang(savedLang); setTimeout(() => document.getElementById('category-start-modal').classList.add('active'), 100); }
         
-        // Відновлення даних профілю
+        // Відображення ID
+        document.getElementById('my-user-id-display').value = myId;
+
         const savedProf = JSON.parse(localStorage.getItem('hub_profile')) || {};
         if(savedProf.name) {
             document.getElementById('prof-name').value = savedProf.name; document.getElementById('order-name').value = savedProf.name;
@@ -525,6 +541,21 @@
     });
 
     document.getElementById("lang-toggle-mini")?.addEventListener("click", () => { currentLang = currentLang === "ua" ? "pl" : "ua"; applyLang(currentLang); });
+
+    // Кнопка копіювання ID
+    document.getElementById('copy-id-btn').onclick = () => {
+        navigator.clipboard.writeText(myId);
+        alert(currentLang === 'ua' ? "ID скопійовано!" : "ID skopiowano!");
+    };
+
+    // Кнопка входу за чужим ID
+    document.getElementById('login-id-btn').onclick = () => {
+        const enteredId = document.getElementById('login-id-input').value.trim();
+        if(!enteredId) return alert("Введіть ID!");
+        localStorage.setItem('hub_user_id', enteredId);
+        alert(currentLang === 'ua' ? "Успішно! Сторінка перезавантажиться." : "Sukces! Strona zostanie odświeżona.");
+        location.reload();
+    };
 
     let currentBannerStatus = true;
     document.querySelectorAll('.nav-item').forEach(btn => {
@@ -548,7 +579,6 @@
         });
     });
 
-    // --- ЗБЕРЕЖЕННЯ ПРОФІЛЮ ---
     document.getElementById('save-prof-btn').onclick = () => {
         const pData = {
             name: document.getElementById('prof-name').value.trim(),
@@ -570,12 +600,26 @@
         if(totalItems > 0) { badge.innerText = totalItems; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
     }
 
-    function getPriceNum(priceStr, selectedCurrency) {
+    function getBasePrice(priceStr, selectedCurrency) {
         if (!priceStr) return 0;
         const matches = priceStr.match(/\d+([.,]\d+)?/g);
         if (!matches) return 0;
         if (selectedCurrency === 'UAH' && matches.length > 1) return parseFloat(matches[1].replace(',', '.'));
         return parseFloat(matches[0].replace(',', '.'));
+    }
+
+    function getItemPrice(itemName, itemPriceStr, qty, selectedCurrency) {
+        const basePrice = getBasePrice(itemPriceStr, selectedCurrency);
+        const nameLower = itemName.toLowerCase();
+
+        if (nameLower.includes('chaser')) {
+            if (qty === 2) return selectedCurrency === 'UAH' ? 625 : 52.50;
+            if (qty >= 3) return selectedCurrency === 'UAH' ? 600 : 50.00;
+        }
+        if (nameLower.includes('elfliq')) {
+            if (qty >= 2) return selectedCurrency === 'UAH' ? 550 : 45.00;
+        }
+        return basePrice;
     }
 
     function isLiquidInCart() {
@@ -601,20 +645,25 @@
         
         container.innerHTML = '';
         if(cart.length === 0) {
-            emptyMsg.classList.remove('hidden'); summary.classList.add('hidden'); 
-            recSection.classList.add('hidden');
+            emptyMsg.classList.remove('hidden'); summary.classList.add('hidden'); recSection.classList.add('hidden');
         } else {
             emptyMsg.classList.add('hidden'); summary.classList.remove('hidden'); 
             let totalSum = 0;
             
             cart.forEach((item, index) => {
-                const itemPriceNum = getPriceNum(item.price, selectedCurrency);
-                totalSum += itemPriceNum * item.qty;
+                const finalItemPrice = getItemPrice(item.name, item.price, item.qty, selectedCurrency);
+                totalSum += finalItemPrice * item.qty;
+
+                const isDiscounted = finalItemPrice !== getBasePrice(item.price, selectedCurrency);
+                const priceTagHtml = isDiscounted 
+                    ? `<span style="color:#888; text-decoration:line-through; font-size:11px; margin-right:5px;">${item.price}</span> <span style="color:#00ff99;">${finalItemPrice.toFixed(2)} ${selectedCurrency} (Опт)</span>`
+                    : `<span>${item.price}</span>`;
+
                 const div = document.createElement('div'); div.className = 'cart-item';
                 div.innerHTML = `
                     <div class="cart-item-info">
                         <div class="cart-item-title">${item.name}</div>
-                        <div class="cart-item-price">${item.price}</div>
+                        <div class="cart-item-price">${priceTagHtml}</div>
                     </div>
                     <div class="cart-controls">
                         <button class="cart-btn-min" data-idx="${index}">-</button>
@@ -698,7 +747,7 @@
         if(!name || !phone || !city) return alert("Будь ласка, заповніть всі поля!");
 
         const orderData = {
-            userId: myId, // Зберігаємо ID клієнта
+            userId: myId,
             user: name, contact: phone, city: city, items: cart,
             total: totalText, payCurrency: currency, promoDiscount: activePromoDiscount,
             date: new Date().toLocaleString('uk-UA'), status: 'new'
@@ -723,9 +772,8 @@
             alert(translations[currentLang].order_success);
             cart = []; activePromoDiscount = 0; document.getElementById('cart-promo-input').value = '';
             saveCart();
-            // Зберігаємо дані в профіль автоматично
             localStorage.setItem('hub_profile', JSON.stringify({ name: name, phone: phone, city: city }));
-            document.querySelector('.nav-item[data-tab="profile"]').click(); // Перенаправляємо в профіль
+            document.querySelector('.nav-item[data-tab="profile"]').click();
         } catch (e) { alert("Помилка відправки. Спробуйте ще раз."); }
         
         btn.innerText = translations[currentLang].order_btn; btn.disabled = false;
@@ -833,12 +881,11 @@
         if (isAdmin() && confirm("Точно видалити це замовлення?")) remove(ref(db, `orders/${orderId}`)).then(() => alert("Замовлення видалено!"));
     };
 
-    window.allOrdersForExport = []; // Змінна для збереження замовлень перед експортом
+    window.allOrdersForExport = [];
 
     onValue(ref(db, 'orders'), snap => {
         const data = snap.val();
         
-        // Відображення замовлень КЛІЄНТА в його профілі
         const uList = document.getElementById('user-orders-list');
         uList.innerHTML = '';
         if(data) {
@@ -856,13 +903,12 @@
             } else { uList.innerHTML = '<div style="color: #888; font-size: 13px; text-align:center;">У вас ще немає замовлень</div>'; }
         } else { uList.innerHTML = '<div style="color: #888; font-size: 13px; text-align:center;">У вас ще немає замовлень</div>'; }
 
-        // Відображення ВАРТОСТІ та ЕКСПОРТУ в Адмінці
         if(!isAdmin()) return;
         const aList = document.getElementById('admin-orders-list'); aList.innerHTML = '';
         window.allOrdersForExport = []; 
         if(data) {
             Object.entries(data).reverse().forEach(([key, o]) => {
-                window.allOrdersForExport.push(o); // Додаємо в масив для CSV
+                window.allOrdersForExport.push(o);
                 const itemsHtml = o.items.map(i => `• ${i.name} <b>x${i.qty}</b>`).join('<br>');
                 aList.innerHTML += `
                     <div style="background:rgba(255,255,255,0.05); border: 1px solid rgba(0, 240, 255, 0.2); padding:10px; border-radius:12px; font-size:12px; position:relative;">
@@ -876,11 +922,10 @@
         } else { aList.innerHTML = '<div style="color: #888; font-size: 12px;">Поки немає замовлень</div>'; }
     });
 
-    // --- ЛОГІКА ЕКСПОРТУ В CSV ---
     document.getElementById('export-csv-btn').onclick = () => {
         if(!window.allOrdersForExport || !window.allOrdersForExport.length) return alert("Немає замовлень для експорту!");
         
-        let csvContent = "\uFEFF"; // Спеціальний маркер (BOM), щоб Excel правильно розумів кирилицю
+        let csvContent = "\uFEFF";
         csvContent += "Дата,Клієнт,Телефон,Місто,Сума,Валюта,Знижка (%),Товари\n";
         
         window.allOrdersForExport.forEach(o => {
@@ -888,7 +933,7 @@
             const row = [
                 o.date, o.user, o.contact, o.city, o.total.replace(',', '.'), 
                 o.payCurrency || '', o.promoDiscount || 0, itemsStr
-            ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(","); // Беремо кожне значення в лапки, щоб коми всередині назв не ламали таблицю
+            ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",");
             csvContent += row + "\n";
         });
         
