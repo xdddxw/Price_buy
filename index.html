@@ -187,20 +187,27 @@
         .lang-options button { background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); color: white; border: 1px solid var(--glass-border); padding: 18px; border-radius: 20px; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px; cursor:pointer; }
         .lang-options button:active { background: rgba(255,255,255,0.1); transform: scale(0.95); }
 
-        /* ADMIN PANEL */
+        /* НОВИЙ КОМПАКТНИЙ CSS АДМІНКИ */
         .dev-panel { 
-            position: fixed; top: 0; right: -100%; width: 100%; max-width: 400px; height: 100vh; 
-            background: rgba(10, 10, 14, 0.95); backdrop-filter: blur(25px); padding: calc(24px + env(safe-area-inset-top)) 24px 100px; 
-            transition: right 0.5s; z-index: 2000; border-left: 1px solid rgba(255, 255, 255, 0.05); overflow-y: auto; 
+            position: fixed; top: 0; right: -100%; width: 100%; max-width: 380px; height: 100vh; 
+            background: rgba(10, 10, 14, 0.95); backdrop-filter: blur(25px); padding: calc(15px + env(safe-area-inset-top)) 20px 100px; 
+            transition: right 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 2000; border-left: 1px solid rgba(255, 255, 255, 0.05); overflow-y: auto; 
         }
-        .dev-panel.active { right: 0; }
-        .admin-section-title { font-size: 11px; font-weight: 900; color: #666; text-transform: uppercase; letter-spacing: 2px; margin: 24px 0 16px; display: flex; align-items: center; gap: 10px; }
-        .admin-section-title::after { content: ''; height: 1px; flex: 1; background: rgba(255,255,255,0.05); }
-        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .admin-btn { background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); color: #ccc; padding: 16px; border-radius: 20px; font-size: 12px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+        .dev-panel.active { right: 0; box-shadow: -20px 0 50px rgba(0,0,0,0.8); }
+        
+        details.admin-group { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; margin-bottom: 12px; overflow: hidden; }
+        details.admin-group summary { padding: 14px 16px; font-size: 12px; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+        details.admin-group summary::-webkit-details-marker { display: none; }
+        details.admin-group summary::after { content: '▼'; font-size: 10px; color: #888; transition: transform 0.3s; }
+        details.admin-group[open] summary::after { transform: rotate(180deg); color: var(--neon-blue); }
+        details.admin-group[open] summary { border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 12px; }
+        .admin-group-content { padding: 0 16px 16px; }
+
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .admin-btn { background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); color: #ccc; padding: 12px; border-radius: 12px; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: 0.2s; }
         .admin-btn.active-mode { background: rgba(0, 240, 255, 0.1); border-color: var(--neon-blue); color: var(--neon-blue); }
-        .admin-input { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 16px; color: white; margin-bottom: 12px; outline: none; }
-        .save-all-btn { grid-column: span 2; background: linear-gradient(90deg, var(--neon-blue), #0077ff); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 900; margin-top: 10px; cursor: pointer; }
+        .admin-input { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 12px; color: white; margin-bottom: 8px; font-size: 13px; font-family: var(--font-main); outline: none; }
+        .save-all-btn { width: 100%; background: linear-gradient(90deg, var(--neon-blue), #0077ff); color: #fff; border: none; padding: 14px; border-radius: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 5px 15px rgba(0, 119, 255, 0.3); margin-top: 5px; }
 
         .hidden { display: none !important; }
         [contenteditable="true"] { outline: none; background: rgba(0, 240, 255, 0.1); border-radius: 8px; padding: 4px; box-shadow: inset 0 0 0 1px var(--neon-blue); }
@@ -296,7 +303,6 @@
         <div id="cart-empty-msg" style="text-align:center; color:#888; padding: 40px 0;" data-i18n="empty">Кошик порожній</div>
         
         <div id="cart-summary" class="hidden">
-            <!-- ПРОМОКОД -->
             <div style="display:flex; gap:10px; margin-bottom:15px;">
                 <input type="text" id="cart-promo-input" class="checkout-input" style="margin-bottom:0;" placeholder="Введіть промокод (якщо є)" data-i18n-ph="promo">
                 <button id="apply-promo-btn" class="admin-btn" style="padding: 0 20px; font-size:16px;">✅</button>
@@ -305,8 +311,7 @@
             <div style="display:flex; justify-content:space-between; align-items:center; margin: 10px 0 20px; padding: 15px; background: rgba(0, 240, 255, 0.05); border-radius: 16px; border: 1px solid rgba(0, 240, 255, 0.2);">
                 <span data-i18n="total" style="font-size: 16px; font-weight: 700;">Разом до сплати:</span>
                 <div style="text-align: right;">
-                    <span id="cart-discount-msg" style="display:none; color: var(--neon-pink); font-size: 12px; font-weight: bold; margin-bottom: 4px;"></span>
-                    <br>
+                    <span id="cart-discount-msg" style="display:none; color: var(--neon-pink); font-size: 12px; font-weight: bold; margin-bottom: 4px;"></span><br>
                     <span id="cart-total-price" style="color:var(--neon-blue); font-size: 20px; font-weight: 900;">0</span>
                 </div>
             </div>
@@ -323,7 +328,6 @@
             <button id="submit-order-btn" class="checkout-submit" data-i18n="order_btn">🚀 ОФОРМИТИ ЗАМОВЛЕННЯ</button>
         </div>
 
-        <!-- КРОС-СЕЙЛ (РЕКОМЕНДОВАНЕ) -->
         <div id="recommended-section" class="hidden" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
             <h3 style="font-size: 15px; color: #888; font-weight: 900; text-transform: uppercase; margin-bottom:15px; text-align: center;">⚡ З цим часто купують:</h3>
             <div class="product-grid" id="recommended-grid"></div>
@@ -341,90 +345,112 @@
     </button>
 </nav>
 
-<!-- ADMIN PANEL -->
+<!-- НОВА КОМПАКТНА АДМІН-ПАНЕЛЬ -->
 <div id="dev-menu" class="dev-panel">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <div class="logo" style="font-size: 22px;">HUB CONTROL</div>
-        <button onclick="document.getElementById('dev-menu').classList.remove('active')" style="background:rgba(255,255,255,0.1); border:none; color:white; width: 36px; height: 36px; border-radius: 50%; font-size:18px; cursor: pointer;">×</button>
+        <div class="logo" style="font-size: 20px;">HUB CONTROL</div>
+        <button onclick="document.getElementById('dev-menu').classList.remove('active')" style="background:rgba(255,255,255,0.1); border:none; color:white; width: 32px; height: 32px; border-radius: 50%; font-size:16px; cursor: pointer;">×</button>
     </div>
 
-    <!-- ЗАМОВЛЕННЯ З КНОПКОЮ ВИДАЛИТИ -->
-    <div class="admin-section-title">📥 ОСТАННІ ЗАМОВЛЕННЯ</div>
-    <div id="admin-orders-list" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
-        <div style="color: #888; font-size: 13px;">Завантаження...</div>
-    </div>
+    <!-- 1. ЗАМОВЛЕННЯ -->
+    <details class="admin-group" open>
+        <summary>📥 Останні замовлення</summary>
+        <div class="admin-group-content">
+            <div id="admin-orders-list" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+                <div style="color: #888; font-size: 12px;">Завантаження...</div>
+            </div>
+        </div>
+    </details>
 
-    <!-- НАЛАШТУВАННЯ TELEGRAM -->
-    <div class="admin-section-title">🤖 Сповіщення в Telegram</div>
-    <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
-        <input type="text" id="admin-tg-token" class="admin-input" placeholder="Bot Token (від BotFather)">
-        <input type="text" id="admin-tg-chat" class="admin-input" placeholder="Твій Chat ID">
-        <button class="admin-btn" id="save-tg-btn" style="width:100%; background: rgba(0, 240, 255, 0.1); color: var(--neon-blue);">💾 Зберегти налаштування ТГ</button>
-    </div>
+    <!-- 2. УПРАВЛІННЯ ВІТРИНОЮ -->
+    <details class="admin-group">
+        <summary>📦 Управління вітриною</summary>
+        <div class="admin-group-content">
+            <div class="admin-grid" style="margin-bottom: 12px;">
+                <button class="admin-btn" id="edit-price">💰 Ціни</button>
+                <button class="admin-btn" id="edit-desc">📝 Назви</button>
+                <button class="admin-btn" id="edit-stock">📦 Наявність</button>
+                <button class="admin-btn" id="edit-badge">🏷️ Стікери</button>
+                <button class="admin-btn" id="edit-img-mode">📸 Фото</button>
+                <button class="admin-btn" id="edit-reorder">↕️ Порядок</button>
+                <button class="admin-btn" id="edit-delete" style="color: #ff3366; border-color: rgba(255, 51, 102, 0.3); grid-column: span 2;">🗑️ Видалити кліком</button>
+            </div>
+            <select id="badge-selector" class="admin-input" style="margin-bottom: 10px;">
+                <option value="">Без стікера</option>
+                <option value="hit">🔥 ХІТ</option>
+                <option value="promo">🏷️ АКЦІЯ</option>
+                <option value="new">🆕 НОВИНКА</option>
+            </select>
+            <button class="save-all-btn" id="save-all">💾 ЗБЕРЕГТИ ЗМІНИ</button>
+        </div>
+    </details>
 
-    <!-- НАЛАШТУВАННЯ ПРОМОКОДУ -->
-    <div class="admin-section-title">🎟️ Промокод</div>
-    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <input type="text" id="admin-promo-code" class="admin-input" style="margin-bottom: 0;" placeholder="Код (напр. HUB10)">
-        <input type="number" id="admin-promo-percent" class="admin-input" style="margin-bottom: 0; width: 80px;" placeholder="%">
-        <button class="admin-btn" id="save-promo-btn" style="padding: 0 20px; font-size: 18px;">💾</button>
-    </div>
+    <!-- 3. ДОДАТИ ТОВАР -->
+    <details class="admin-group">
+        <summary>➕ Додати товар</summary>
+        <div class="admin-group-content">
+            <select id="new-prod-cat" class="admin-input">
+                <optgroup label="💧 Жижа">
+                    <option value="zalivka-elfliq">Elfliq</option>
+                    <option value="zalivka-chaserlux">Chaser Lux</option>
+                    <option value="zalivka-chaserpods">Chaser for pods</option>
+                    <option value="zalivka-chaserblack">Chaser Black</option>
+                </optgroup>
+                <optgroup label="🟢 Снюс">
+                    <option value="prodazh-cuba">Cuba</option>
+                    <option value="prodazh-barron">Barron</option>
+                </optgroup>
+                <optgroup label="⚡ Катриджі">
+                    <option value="aktsii">Катриджі</option>
+                </optgroup>
+            </select>
+            <input type="text" id="new-prod-name" placeholder="Назва" class="admin-input">
+            <input type="text" id="new-prod-price" placeholder="Ціна (напр. 60 zł)" class="admin-input">
+            <input type="text" id="new-prod-img" placeholder="URL фото" class="admin-input">
+            <button class="save-all-btn" id="add-product-btn" style="background: linear-gradient(90deg, var(--neon-pink), #ff5e00);">ДОДАТИ</button>
+        </div>
+    </details>
 
-    <div class="admin-section-title">🆕 Додати товар</div>
-    <div style="background: rgba(255,255,255,0.02); padding: 18px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05);">
-        <select id="new-prod-cat" class="admin-input">
-            <optgroup label="💧 Жижа">
-                <option value="zalivka-elfliq">Elfliq</option>
-                <option value="zalivka-chaserlux">Chaser Lux</option>
-                <option value="zalivka-chaserpods">Chaser for pods</option>
-                <option value="zalivka-chaserblack">Chaser Black</option>
-            </optgroup>
-            <optgroup label="🟢 Снюс">
-                <option value="prodazh-cuba">Cuba</option>
-                <option value="prodazh-barron">Barron</option>
-            </optgroup>
-            <optgroup label="⚡ Катриджі">
-                <option value="aktsii">Катриджі</option>
-            </optgroup>
-        </select>
-        <input type="text" id="new-prod-name" placeholder="Назва" class="admin-input">
-        <input type="text" id="new-prod-price" placeholder="Ціна (напр. 60 zł)" class="admin-input">
-        <input type="text" id="new-prod-img" placeholder="URL фото" class="admin-input">
-        <button class="admin-btn" id="add-product-btn" style="width:100%; background: linear-gradient(90deg, var(--neon-pink), #ff5e00); color:#fff; border:none; margin-top:10px;">➕ ДОДАТИ ТОВАР</button>
-    </div>
+    <!-- 4. ПРОМОКОД -->
+    <details class="admin-group">
+        <summary>🎟️ Промокод</summary>
+        <div class="admin-group-content">
+            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                <input type="text" id="admin-promo-code" class="admin-input" style="margin-bottom: 0; flex: 2;" placeholder="Код (напр. HUB10)">
+                <input type="number" id="admin-promo-percent" class="admin-input" style="margin-bottom: 0; flex: 1;" placeholder="%">
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="number" id="admin-promo-limit" class="admin-input" style="margin-bottom: 0; flex: 2;" placeholder="Ліміт (разів)">
+                <button class="admin-btn" id="save-promo-btn" style="flex: 1; padding: 0; height: 42px; font-size: 16px;">💾</button>
+            </div>
+            <div style="font-size: 11px; color: #888; margin-top: 8px;" id="promo-usage-stats">Використано: 0</div>
+        </div>
+    </details>
 
-    <div class="admin-section-title">📦 Управління вітриною</div>
-    <div class="admin-grid">
-        <button class="admin-btn" id="edit-price">💰 Ціни</button>
-        <button class="admin-btn" id="edit-desc">📝 Назви</button>
-        <button class="admin-btn" id="edit-stock">📦 Наявність</button>
-        <button class="admin-btn" id="edit-badge">🏷️ Стікери</button>
-        <button class="admin-btn" id="edit-img-mode">📸 Фото</button>
-        <button class="admin-btn" id="edit-reorder">↕️ Порядок</button>
-        <button class="admin-btn" id="edit-delete" style="color: #ff3366; border-color: rgba(255, 51, 102, 0.3);">🗑️ Видалити</button>
-        
-        <select id="badge-selector" class="admin-input" style="grid-column: span 2; margin: 8px 0 0;">
-            <option value="">Без стікера</option>
-            <option value="hit">🔥 ХІТ</option>
-            <option value="promo">🏷️ АКЦІЯ</option>
-            <option value="new">🆕 НОВИНКА</option>
-        </select>
-        <button class="save-all-btn" id="save-all">💾 ЗБЕРЕГТИ ЗМІНИ</button>
-    </div>
+    <!-- 5. СИСТЕМА ТА ТЕЛЕГРАМ -->
+    <details class="admin-group">
+        <summary>⚙️ Система та Telegram</summary>
+        <div class="admin-group-content">
+            <div style="font-size: 10px; color:#888; margin-bottom:5px; font-weight:bold;">ДАТА ОНОВЛЕННЯ</div>
+            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                <input type="text" id="admin-update-date" class="admin-input" style="margin-bottom: 0;" placeholder="Напр. 24.07.2026">
+                <button class="admin-btn" id="save-date-btn" style="padding: 0 15px; font-size: 16px;">💾</button>
+            </div>
+            
+            <div style="font-size: 10px; color:#888; margin-bottom:5px; font-weight:bold;">ВІДОБРАЖЕННЯ НА САЙТІ</div>
+            <div class="admin-grid" style="margin-bottom: 15px;">
+                <button class="admin-btn" id="toggle-hide-sold">🚫 Ховати Sold</button>
+                <button class="admin-btn" id="toggle-banner">🖼️ Банер</button>
+            </div>
 
-    <div class="admin-section-title">📅 Дата оновлення</div>
-    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-        <input type="text" id="admin-update-date" class="admin-input" style="margin-bottom: 0;" placeholder="Напр. 24.07.2026">
-        <button class="admin-btn" id="save-date-btn" style="padding: 0 20px; font-size: 18px;">💾</button>
-    </div>
+            <div style="font-size: 10px; color:#888; margin-bottom:5px; font-weight:bold;">ТЕЛЕГРАМ БОТ</div>
+            <input type="text" id="admin-tg-token" class="admin-input" placeholder="Bot Token">
+            <input type="text" id="admin-tg-chat" class="admin-input" placeholder="Chat ID">
+            <button class="admin-btn" id="save-tg-btn" style="width:100%; background: rgba(0, 240, 255, 0.1); color: var(--neon-blue);">💾 Зберегти ТГ</button>
+        </div>
+    </details>
 
-    <div class="admin-section-title">⚙️ Система</div>
-    <div class="admin-grid">
-        <button class="admin-btn" id="toggle-hide-sold">🚫 Ховати Sold</button>
-        <button class="admin-btn" id="toggle-banner">🖼️ Банер</button>
-    </div>
-
-    <button class="admin-btn" style="width:100%; margin-top:40px; background:transparent; border-color:rgba(255,255,255,0.1); color: #888;" onclick="localStorage.clear(); location.reload();">🚪 Вийти з адмінки</button>
+    <button class="admin-btn" style="width:100%; margin-top:10px; background:transparent; border-color:rgba(255,255,255,0.1); color: #888;" onclick="localStorage.clear(); location.reload();">🚪 Вийти з адмінки</button>
 </div>
 
 <script type="module">
@@ -435,21 +461,14 @@
     const db = getDatabase(app);
     const isAdmin = () => localStorage.getItem('isHubAdmin') === 'true';
 
-    let globalCatalog = null; // Для крос-сейлу
-    let promoConfig = { code: "", percent: 0 }; // Налаштування промокоду
-    let activePromoDiscount = 0; // Застосована знижка
-    let tgConfig = { token: "", chatId: "" }; // Налаштування ТГ
+    let globalCatalog = null;
+    let promoConfig = { code: "", percent: 0, maxUses: 0, usedCount: 0 }; 
+    let activePromoDiscount = 0;
+    let tgConfig = { token: "", chatId: "" };
 
-    // --- ЛОКАЛІЗАЦІЯ ---
     const translations = {
-        ua: { 
-            zalivka: "Жижа", prodazh: "Снюс", other: "Катриджі", cart: "Кошик", sold: "ПРОДАНО", badge_hit: "ХІТ", badge_promo: "АКЦІЯ", badge_new: "НОВИНКА", updated: "Оновлено:",
-            cart_title: "🛒 Ваш кошик", empty: "Кошик порожній 😔", total: "Разом до сплати:", add_cart: "В кошик", name: "Ваше ім'я", phone: "Телефон або Telegram", city: "Місто відправки (Пошта)", promo: "Введіть промокод", order_btn: "🚀 ОФОРМИТИ ЗАМОВЛЕННЯ", order_success: "✅ Замовлення відправлено! Ми зв'яжемося з вами."
-        },
-        pl: { 
-            zalivka: "Liquid", prodazh: "Snus", other: "Kartridże", cart: "Koszyk", sold: "SPRZEDANE", badge_hit: "HIT", badge_promo: "PROMOCJA", badge_new: "NOWOŚĆ", updated: "Aktualizacja:",
-            cart_title: "🛒 Twój koszyk", empty: "Koszyk jest pusty 😔", total: "Do zapłaty:", add_cart: "Do koszyka", name: "Twoje imię", phone: "Telefon / Telegram", city: "Miasto wysyłki (Paczkomat)", promo: "Kod rabatowy", order_btn: "🚀 ZŁÓŻ ZAMÓWIENIE", order_success: "✅ Zamówienie wysłane pomyślnie!"
-        }
+        ua: { zalivka: "Жижа", prodazh: "Снюс", other: "Катриджі", cart: "Кошик", sold: "ПРОДАНО", badge_hit: "ХІТ", badge_promo: "АКЦІЯ", badge_new: "НОВИНКА", updated: "Оновлено:", cart_title: "🛒 Ваш кошик", empty: "Кошик порожній 😔", total: "Разом до сплати:", add_cart: "В кошик", name: "Ваше ім'я", phone: "Телефон або Telegram", city: "Місто відправки (Пошта)", promo: "Введіть промокод", order_btn: "🚀 ОФОРМИТИ ЗАМОВЛЕННЯ", order_success: "✅ Замовлення відправлено! Ми зв'яжемося з вами." },
+        pl: { zalivka: "Liquid", prodazh: "Snus", other: "Kartridże", cart: "Koszyk", sold: "SPRZEDANE", badge_hit: "HIT", badge_promo: "PROMOCJA", badge_new: "NOWOŚĆ", updated: "Aktualizacja:", cart_title: "🛒 Twój koszyk", empty: "Koszyk jest pusty 😔", total: "Do zapłaty:", add_cart: "Do koszyka", name: "Twoje imię", phone: "Telefon / Telegram", city: "Miasto wysyłki (Paczkomat)", promo: "Kod rabatowy", order_btn: "🚀 ZŁÓŻ ZAMÓWIENIE", order_success: "✅ Zamówienie wysłane pomyślnie!" }
     };
 
     let currentLang = localStorage.getItem("lang") || "ua";
@@ -468,7 +487,6 @@
         localStorage.setItem("lang", lang); currentLang = lang; renderCart(); 
     }
 
-    // --- МОДАЛКИ ---
     window.selectInitialLang = (lang) => { applyLang(lang); document.getElementById('language-modal').classList.remove('active'); setTimeout(() => document.getElementById('category-start-modal').classList.add('active'), 300); };
     window.selectInitialCategory = (tab) => { document.getElementById('category-start-modal').classList.remove('active'); setTimeout(() => { document.querySelector(`.nav-item[data-tab="${tab}"]`)?.click(); }, 300); };
     
@@ -479,7 +497,6 @@
     });
     document.getElementById("lang-toggle-mini")?.addEventListener("click", () => { currentLang = currentLang === "ua" ? "pl" : "ua"; applyLang(currentLang); });
 
-    // --- НАВІГАЦІЯ ---
     let currentBannerStatus = true;
     document.querySelectorAll('.nav-item').forEach(btn => {
         btn.onclick = () => {
@@ -502,7 +519,6 @@
         });
     });
 
-    // --- КОШИК (ЛОГІКА) ---
     let cart = JSON.parse(localStorage.getItem('hub_cart')) || [];
     function saveCart() { localStorage.setItem('hub_cart', JSON.stringify(cart)); updateCartBadge(); renderCart(); }
 
@@ -572,13 +588,11 @@
         recGrid.innerHTML = '';
         if (!globalCatalog || !globalCatalog['aktsii'] || !globalCatalog['aktsii'].descs) return;
         
-        // Беремо 2 перші товари з Катриджів, які є в наявності
         let count = 0;
         const aktsii = globalCatalog['aktsii'];
         for(let i=0; i < aktsii.descs.length; i++) {
             if (aktsii.stock[i] !== false && count < 2) {
                 const name = aktsii.descs[i]; const price = aktsii.prices[i];
-                // Якщо товар вже в кошику, пропускаємо
                 if (cart.find(c => c.name === name)) continue;
                 
                 const card = document.createElement('div'); card.className = 'product-card';
@@ -597,8 +611,13 @@
     document.getElementById('apply-promo-btn').onclick = () => {
         const val = document.getElementById('cart-promo-input').value.trim().toUpperCase();
         if(promoConfig.code && val === promoConfig.code.toUpperCase()) {
-            activePromoDiscount = promoConfig.percent;
-            alert(`Промокод прийнято! Знижка ${promoConfig.percent}%`);
+            if(promoConfig.maxUses > 0 && (promoConfig.usedCount || 0) >= promoConfig.maxUses) {
+                activePromoDiscount = 0;
+                alert(currentLang === 'ua' ? "Цей промокод вже використали максимальну кількість разів 😔" : "Limit użycia tego kodu został wyczerpany 😔");
+            } else {
+                activePromoDiscount = promoConfig.percent;
+                alert(`Промокод прийнято! Знижка ${promoConfig.percent}%`);
+            }
         } else {
             activePromoDiscount = 0;
             alert(currentLang === 'ua' ? "Невірний промокод" : "Błędny kod");
@@ -618,7 +637,6 @@
         }
     });
 
-    // ВІДПРАВКА ЗАМОВЛЕННЯ
     document.getElementById('submit-order-btn').onclick = async () => {
         const name = document.getElementById('order-name').value.trim();
         const phone = document.getElementById('order-phone').value.trim();
@@ -641,7 +659,10 @@
         try {
             await push(ref(db, 'orders'), orderData);
             
-            // Відправка в Telegram
+            if (activePromoDiscount > 0 && promoConfig.code) {
+                await set(ref(db, 'settings/promo/usedCount'), (promoConfig.usedCount || 0) + 1);
+            }
+            
             if (tgConfig && tgConfig.token && tgConfig.chatId) {
                 const itemsText = cart.map(i => `- ${i.name} x${i.qty}`).join('\n');
                 let tgMsg = `🚨 НОВЕ ЗАМОВЛЕННЯ!\n\n👤 ${name}\n📞 ${phone}\n📍 ${city}\n\n📦 Товари:\n${itemsText}\n\n💰 Сума: ${totalText}`;
@@ -665,7 +686,6 @@
 
     updateCartBadge(); renderCart();
 
-    // --- FIREBASE РЕНДЕР КАТАЛОГУ ---
     const categoriesList = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack', 'prodazh-cuba', 'prodazh-barron', 'aktsii'];
     onValue(ref(db, 'catalog'), (snap) => {
         globalCatalog = snap.val(); 
@@ -691,7 +711,7 @@
                 });
             }
         });
-        renderRecommended(); // Оновлюємо крос-сейл якщо змінився каталог
+        renderRecommended(); 
     });
 
     document.addEventListener('click', e => {
@@ -707,7 +727,6 @@
         }
     });
 
-    // --- АДМІНКА ---
     let mode = null;
     function updateModeBtns(activeBtn) { document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode')); if (mode) activeBtn.classList.add('active-mode'); }
 
@@ -763,14 +782,12 @@
         else if (prompt("Пароль:") === "smokehub2026") { localStorage.setItem('isHubAdmin', 'true'); location.reload(); }
     };
 
-    // ФУНКЦІЯ ВИДАЛЕННЯ ЗАМОВЛЕННЯ
     window.deleteOrder = (orderId) => {
         if (isAdmin() && confirm("Точно видалити це замовлення?")) {
             remove(ref(db, `orders/${orderId}`)).then(() => alert("Замовлення видалено!"));
         }
     };
 
-    // Відображення списку замовлень в Адмінці
     onValue(ref(db, 'orders'), snap => {
         if(!isAdmin()) return;
         const list = document.getElementById('admin-orders-list'); list.innerHTML = '';
@@ -779,43 +796,55 @@
             Object.entries(data).reverse().forEach(([key, o]) => {
                 const itemsHtml = o.items.map(i => `• ${i.name} <b>x${i.qty}</b>`).join('<br>');
                 list.innerHTML += `
-                    <div style="background:rgba(255,255,255,0.05); border: 1px solid rgba(0, 240, 255, 0.2); padding:12px; border-radius:12px; font-size:13px; position:relative;">
-                        <button onclick="deleteOrder('${key}')" style="position:absolute; top:10px; right:10px; background: rgba(255,51,102,0.2); color: #ff3366; border: 1px solid rgba(255,51,102,0.4); padding: 4px 8px; border-radius: 8px; cursor: pointer; font-size: 11px;">🗑️ Видалити</button>
-                        <div style="color: #aaa; font-size: 10px; margin-bottom: 5px;">${o.date}</div>
-                        <b>👤 ${o.user}</b> <br>📞 ${o.contact}<br>📍 Місто: ${o.city || 'Не вказано'}<br>
-                        <div style="margin: 8px 0; color: #ccc;">${itemsHtml}</div>
-                        💰 Сума: <span style="color:var(--neon-blue); font-weight: bold;">${o.total}</span> | 💳 Оплата в: <b>${o.payCurrency || 'Не вказано'}</b>
+                    <div style="background:rgba(255,255,255,0.05); border: 1px solid rgba(0, 240, 255, 0.2); padding:10px; border-radius:12px; font-size:12px; position:relative;">
+                        <button onclick="deleteOrder('${key}')" style="position:absolute; top:8px; right:8px; background: rgba(255,51,102,0.2); color: #ff3366; border: 1px solid rgba(255,51,102,0.4); padding: 4px 8px; border-radius: 8px; cursor: pointer; font-size: 10px;">🗑️</button>
+                        <div style="color: #aaa; font-size: 10px; margin-bottom: 4px;">${o.date}</div>
+                        <b>👤 ${o.user}</b> <br>📞 ${o.contact}<br>📍 ${o.city || 'Не вказано'}<br>
+                        <div style="margin: 6px 0; color: #ccc;">${itemsHtml}</div>
+                        💰 <span style="color:var(--neon-blue); font-weight: bold;">${o.total}</span> | 💳 <b>${o.payCurrency || 'Не вказано'}</b>
                     </div>`;
             });
-        } else { list.innerHTML = '<div style="color: #888; font-size: 13px;">Поки немає замовлень</div>'; }
+        } else { list.innerHTML = '<div style="color: #888; font-size: 12px;">Поки немає замовлень</div>'; }
     });
 
-    // Налаштування дати, банера, ховати sold
     onValue(ref(db, 'settings/lastUpdate'), (snap) => { const date = snap.val() || '24.07.2026'; const dateEl = document.getElementById('last-update-date'); if (dateEl) dateEl.innerText = date; const adminInput = document.getElementById('admin-update-date'); if (adminInput) adminInput.value = date; });
     document.getElementById('save-date-btn')?.addEventListener('click', () => { if (isAdmin()) { const newDate = document.getElementById('admin-update-date').value.trim(); if(newDate) set(ref(db, 'settings/lastUpdate'), newDate).then(() => alert('Дату оновлено!')); } });
 
     onValue(ref(db, 'settings/bannerVisible'), (s) => { currentBannerStatus = s.val() !== false; const btn = document.getElementById('toggle-banner'); if(currentBannerStatus) { btn.classList.add('active-mode'); const banner = document.getElementById('main-banner'); if (banner && !document.getElementById('cat-cart').classList.contains('active')) banner.style.display = 'block'; } else { btn.classList.remove('active-mode'); const banner = document.getElementById('main-banner'); if (banner) banner.style.display = 'none'; } });
     document.getElementById('toggle-banner').onclick = () => { if (isAdmin()) set(ref(db, 'settings/bannerVisible'), !currentBannerStatus); };
 
-    let currentHideSoldStatus = false;
     onValue(ref(db, 'settings/hideSold'), (s) => { currentHideSoldStatus = s.val() === true; const btn = document.getElementById('toggle-hide-sold'); if(currentHideSoldStatus) { document.documentElement.classList.add('hide-sold-active'); btn.classList.add('active-mode'); } else { document.documentElement.classList.remove('hide-sold-active'); btn.classList.remove('active-mode'); } });
     document.getElementById('toggle-hide-sold').onclick = () => { if (isAdmin()) set(ref(db, 'settings/hideSold'), !currentHideSoldStatus); };
 
-    // --- TELEGRAM ТА ПРОМОКОД (АДМІНКА) ---
     onValue(ref(db, 'settings/telegram'), (snap) => { 
         tgConfig = snap.val() || {token: "", chatId: ""};
         document.getElementById('admin-tg-token').value = tgConfig.token; document.getElementById('admin-tg-chat').value = tgConfig.chatId;
     });
     document.getElementById('save-tg-btn').onclick = () => {
-        if(isAdmin()) set(ref(db, 'settings/telegram'), { token: document.getElementById('admin-tg-token').value.trim(), chatId: document.getElementById('admin-tg-chat').value.trim() }).then(() => alert('Налаштування ТГ збережено!'));
+        if(isAdmin()) set(ref(db, 'settings/telegram'), { token: document.getElementById('admin-tg-token').value.trim(), chatId: document.getElementById('admin-tg-chat').value.trim() }).then(() => alert('ТГ збережено!'));
     };
 
     onValue(ref(db, 'settings/promo'), (snap) => {
-        promoConfig = snap.val() || {code: "", percent: 0};
-        document.getElementById('admin-promo-code').value = promoConfig.code; document.getElementById('admin-promo-percent').value = promoConfig.percent;
+        promoConfig = snap.val() || {code: "", percent: 0, maxUses: 0, usedCount: 0};
+        document.getElementById('admin-promo-code').value = promoConfig.code; 
+        document.getElementById('admin-promo-percent').value = promoConfig.percent || '';
+        document.getElementById('admin-promo-limit').value = promoConfig.maxUses || '';
+        
+        let statsText = `Використано: ${promoConfig.usedCount || 0}`;
+        if (promoConfig.maxUses > 0) statsText += ` / ${promoConfig.maxUses}`;
+        else statsText += ' (Безліміт)';
+        document.getElementById('promo-usage-stats').innerText = statsText;
     });
+    
     document.getElementById('save-promo-btn').onclick = () => {
-        if(isAdmin()) set(ref(db, 'settings/promo'), { code: document.getElementById('admin-promo-code').value.trim(), percent: Number(document.getElementById('admin-promo-percent').value.trim()) }).then(() => alert('Промокод збережено!'));
+        if(isAdmin()) {
+            const newCode = document.getElementById('admin-promo-code').value.trim();
+            const newPercent = Number(document.getElementById('admin-promo-percent').value.trim());
+            const newLimit = Number(document.getElementById('admin-promo-limit').value.trim());
+            let used = (newCode.toUpperCase() === (promoConfig.code || "").toUpperCase()) ? (promoConfig.usedCount || 0) : 0;
+
+            set(ref(db, 'settings/promo'), { code: newCode, percent: newPercent, maxUses: newLimit, usedCount: used }).then(() => alert('Промокод збережено!'));
+        }
     };
 </script>
 </body>
