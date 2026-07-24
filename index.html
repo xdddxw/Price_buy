@@ -309,6 +309,9 @@
             <input type="text" id="order-name" class="checkout-input" placeholder="Ваше ім'я" data-i18n-ph="name">
             <input type="text" id="order-phone" class="checkout-input" placeholder="Телефон або Telegram" data-i18n-ph="phone">
             
+            <!-- НОВЕ ПОЛЕ: МІСТО -->
+            <input type="text" id="order-city" class="checkout-input" placeholder="Місто відправки (Пошта)" data-i18n-ph="city">
+            
             <!-- ВИБІР ВАЛЮТИ ОПЛАТИ -->
             <select id="order-currency" class="checkout-input">
                 <option value="PLN">🇵🇱 Оплата в PLN (Злоті)</option>
@@ -414,14 +417,14 @@
             zalivka: "Жижа", prodazh: "Снюс", other: "Катриджі", cart: "Кошик",
             sold: "ПРОДАНО", badge_hit: "ХІТ", badge_promo: "АКЦІЯ", badge_new: "НОВИНКА", updated: "Оновлено:",
             cart_title: "🛒 Ваш кошик", empty: "Кошик порожній 😔", total: "Разом до сплати:", 
-            add_cart: "В кошик", name: "Ваше ім'я", phone: "Телефон або Telegram", order_btn: "🚀 ОФОРМИТИ ЗАМОВЛЕННЯ",
+            add_cart: "В кошик", name: "Ваше ім'я", phone: "Телефон або Telegram", city: "Місто відправки (Пошта)", order_btn: "🚀 ОФОРМИТИ ЗАМОВЛЕННЯ",
             order_success: "✅ Замовлення успішно відправлено! Ми зв'яжемося з вами."
         },
         pl: { 
             zalivka: "Liquid", prodazh: "Snus", other: "Kartridże", cart: "Koszyk",
             sold: "SPRZEDANE", badge_hit: "HIT", badge_promo: "PROMOCJA", badge_new: "NOWOŚĆ", updated: "Aktualizacja:",
             cart_title: "🛒 Twój koszyk", empty: "Koszyk jest pusty 😔", total: "Do zapłaty:", 
-            add_cart: "Do koszyka", name: "Twoje imię", phone: "Telefon lub Telegram", order_btn: "🚀 ZŁÓŻ ZAMÓWIENIE",
+            add_cart: "Do koszyka", name: "Twoje imię", phone: "Telefon lub Telegram", city: "Miasto wysyłki (Paczkomat)", order_btn: "🚀 ZŁÓŻ ZAMÓWIENIE",
             order_success: "✅ Zamówienie wysłane pomyślnie! Skontaktujemy się z Tobą."
         }
     };
@@ -516,15 +519,11 @@
 
     function getPriceNum(priceStr, selectedCurrency) {
         if (!priceStr) return 0;
-        // Шукаємо всі числа в рядку
         const matches = priceStr.match(/\d+([.,]\d+)?/g);
         if (!matches) return 0;
-        
-        // Якщо вибрано UAH і в рядку є хоча б два числа, беремо ДРУГЕ число
         if (selectedCurrency === 'UAH' && matches.length > 1) {
             return parseFloat(matches[1].replace(',', '.'));
         }
-        // Інакше (або якщо це PLN) беремо ПЕРШЕ число
         return parseFloat(matches[0].replace(',', '.'));
     }
 
@@ -586,12 +585,13 @@
     document.getElementById('submit-order-btn').onclick = async () => {
         const name = document.getElementById('order-name').value.trim();
         const phone = document.getElementById('order-phone').value.trim();
+        const city = document.getElementById('order-city').value.trim(); // Отримуємо місто
         const currency = document.getElementById('order-currency').value; 
         
-        if(!name || !phone) return alert("Будь ласка, введіть ім'я та контактні дані!");
+        if(!name || !phone || !city) return alert("Будь ласка, заповніть всі поля для відправки!");
 
         const orderData = {
-            user: name, contact: phone, items: cart,
+            user: name, contact: phone, city: city, items: cart,
             total: document.getElementById('cart-total-price').innerText,
             payCurrency: currency,
             date: new Date().toLocaleString('uk-UA'), status: 'new'
@@ -606,6 +606,7 @@
             cart = []; saveCart();
             document.getElementById('order-name').value = '';
             document.getElementById('order-phone').value = '';
+            document.getElementById('order-city').value = ''; // Очищаємо поле міста
             document.querySelector('.nav-item[data-tab="zalivka"]').click();
         } catch (e) { alert("Помилка відправки. Спробуйте ще раз."); }
         
@@ -753,7 +754,7 @@
                 list.innerHTML += `
                     <div style="background:rgba(255,255,255,0.05); border: 1px solid rgba(0, 240, 255, 0.2); padding:12px; border-radius:12px; font-size:13px;">
                         <div style="color: #aaa; font-size: 10px; margin-bottom: 5px;">${o.date}</div>
-                        <b>👤 ${o.user}</b> <br>📞 ${o.contact}<br>
+                        <b>👤 ${o.user}</b> <br>📞 ${o.contact}<br>📍 Місто: ${o.city || 'Не вказано'}<br>
                         <div style="margin: 8px 0; color: #ccc;">${itemsHtml}</div>
                         💰 Сума: <span style="color:var(--neon-blue); font-weight: bold;">${o.total}</span> | 💳 Оплата в: <b>${o.payCurrency || 'Не вказано'}</b>
                     </div>`;
