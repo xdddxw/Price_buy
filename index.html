@@ -89,6 +89,17 @@
         }
         .head-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.1); }
 
+        /* UPDATE DATE */
+        .update-date {
+            text-align: center; font-size: 11px; color: #888;
+            margin-bottom: 16px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1.5px; display: flex; justify-content: center; align-items: center; gap: 6px;
+        }
+        .update-date span.date-val { 
+            color: var(--neon-blue); background: rgba(0, 240, 255, 0.05); 
+            padding: 3px 10px; border-radius: 10px; border: 1px solid rgba(0, 240, 255, 0.2); 
+        }
+
         /* SUB-NAVIGATION (Вкладки підкатегорій) */
         .sub-nav {
             display: flex; gap: 10px; overflow-x: auto;
@@ -294,6 +305,13 @@
 </header>
    
 <div class="container" id="main-container">
+
+    <!-- ДАТА ОНОВЛЕННЯ -->
+    <div class="update-date">
+        <span data-i18n="updated">Оновлено:</span>
+        <span class="date-val" id="last-update-date">...</span>
+    </div>
+
     <div class="promo-slider" id="main-banner">
         <div class="promo-track" id="promoTrack">
             <div class="promo-slide">
@@ -397,6 +415,12 @@
         <button class="save-all-btn" id="save-all">💾 ЗБЕРЕГТИ ЗМІНИ</button>
     </div>
 
+    <div class="admin-section-title">📅 Дата оновлення</div>
+    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <input type="text" id="admin-update-date" class="admin-input" style="margin-bottom: 0;" placeholder="Напр. 24.07.2026">
+        <button class="admin-btn" id="save-date-btn" style="padding: 0 20px; font-size: 18px;">💾</button>
+    </div>
+
     <div class="admin-section-title">⚙️ Система</div>
     <div class="admin-grid">
         <button class="admin-btn" id="toggle-hide-sold"><span>🚫</span>Ховати Sold</button>
@@ -418,8 +442,8 @@
 
     // --- ЛОКАЛІЗАЦІЯ ---
     const translations = {
-        ua: { zalivka: "Жижа", prodazh: "Снюс", other: "Катриджі", sold: "ПРОДАНО", badge_hit: "ХІТ", badge_promo: "АКЦІЯ", badge_new: "НОВИНКА" },
-        pl: { zalivka: "Liquid", prodazh: "Snus", other: "Kartridże", sold: "SPRZEDANE", badge_hit: "HIT", badge_promo: "PROMOCJA", badge_new: "NOWOŚĆ" }
+        ua: { zalivka: "Жижа", prodazh: "Снюс", other: "Катриджі", sold: "ПРОДАНО", badge_hit: "ХІТ", badge_promo: "АКЦІЯ", badge_new: "НОВИНКА", updated: "Оновлено:" },
+        pl: { zalivka: "Liquid", prodazh: "Snus", other: "Kartridże", sold: "SPRZEDANE", badge_hit: "HIT", badge_promo: "PROMOCJA", badge_new: "NOWOŚĆ", updated: "Aktualizacja:" }
     };
 
     let currentLang = localStorage.getItem("lang") || "ua";
@@ -647,6 +671,28 @@
         if (isAdmin()) document.getElementById('dev-menu').classList.toggle('active');
         else if (prompt("Пароль:") === "smokehub2026") { localStorage.setItem('isHubAdmin', 'true'); location.reload(); }
     };
+
+    // --- ДАТА ОНОВЛЕННЯ ---
+    onValue(ref(db, 'settings/lastUpdate'), (snap) => {
+        const date = snap.val() || '24.07.2026';
+        const dateEl = document.getElementById('last-update-date');
+        if (dateEl) dateEl.innerText = date;
+        const adminInput = document.getElementById('admin-update-date');
+        if (adminInput) adminInput.value = date;
+    });
+
+    const saveDateBtn = document.getElementById('save-date-btn');
+    if(saveDateBtn) {
+        saveDateBtn.onclick = () => {
+            if (isAdmin()) {
+                const newDate = document.getElementById('admin-update-date').value.trim();
+                if(newDate) {
+                    set(ref(db, 'settings/lastUpdate'), newDate)
+                        .then(() => alert('Дату успішно оновлено!'));
+                }
+            }
+        };
+    }
 
     // --- СИСТЕМНІ НАЛАШТУВАННЯ (БАНЕР / ХОВАТИ SOLD) ---
     onValue(ref(db, 'settings/bannerVisible'), (s) => {
