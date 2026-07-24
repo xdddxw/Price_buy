@@ -334,11 +334,10 @@
         </div>
     </div>
 
-    <!-- РОЗДІЛ: ПРОФІЛЬ ТА АВТОРИЗАЦІЯ -->
+    <!-- РОЗДІЛ: ПРОФІЛЬ -->
     <div id="cat-profile" class="cat-section hidden">
         <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 20px; text-transform: uppercase;" data-i18n="profile">👤 Ваш профіль</h2>
         
-        <!-- БЛОК АВТОРИЗАЦІЇ ЗА ID -->
         <div style="background: rgba(0, 240, 255, 0.03); padding: 15px; border-radius: 16px; border: 1px solid rgba(0, 240, 255, 0.2); margin-bottom: 20px;">
             <div style="font-size: 12px; color: var(--neon-blue); font-weight: bold; margin-bottom: 8px;" data-i18n="auth_title">🔑 Авторизація за ID:</div>
             <div style="font-size: 11px; color: #aaa; margin-bottom: 10px;" data-i18n="auth_desc">Ваш унікальний ID акаунта:</div>
@@ -500,6 +499,26 @@
     let activePromoDiscount = 0;
     let tgConfig = { token: "", chatId: "" };
 
+    // --- ФУНКЦІЯ АВТОМАТИЧНОГО ТИЖНЕВОГО ПАРОЛЯ ---
+    function getWeekNumber(d) {
+        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+        let yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+        let weekNo = Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+        return `${d.getUTCFullYear()}-W${weekNo}`;
+    }
+
+    function getCurrentWeeklyPassword() {
+        const weekStr = getWeekNumber(new Date());
+        // Простий та надійний алгоритм хедера тижня на базі року і номеру тижня
+        let hash = 0;
+        for (let i = 0; i < weekStr.length; i++) {
+            hash = ((hash << 5) - hash) + weekStr.charCodeAt(i);
+            hash |= 0;
+        }
+        return "hub" + Math.abs(hash).toString(36) + "2026";
+    }
+
     const translations = {
         ua: { zalivka: "Жижа", prodazh: "Снюс", other: "Катриджі", cart: "Кошик", profile: "Профіль", sold: "ПРОДАНО", badge_hit: "ХІТ", badge_promo: "АКЦІЯ", badge_new: "НОВИНКА", updated: "Оновлено:", cart_title: "🛒 Ваш кошик", empty: "Кошик порожній 😔", total: "Разом до сплати:", add_cart: "В кошик", name: "Ваше ім'я", phone: "Телефон або Telegram", city: "Місто відправки", promo: "Введіть промокод", order_btn: "🚀 ОФОРМИТИ ЗАМОВЛЕННЯ", order_success: "✅ Замовлення відправлено! Ми зв'яжемося з вами.", save_profile: "💾 ЗБЕРЕГТИ ДАНІ", my_orders: "📦 Мої замовлення", auth_title: "🔑 Авторизація за ID:", auth_desc: "Ваш унікальний ID акаунта:", login_btn: "Увійти" },
         pl: { zalivka: "Liquid", prodazh: "Snus", other: "Kartridże", cart: "Koszyk", profile: "Profil", sold: "SPRZEDANE", badge_hit: "HIT", badge_promo: "PROMOCJA", badge_new: "NOWOŚĆ", updated: "Aktualizacja:", cart_title: "🛒 Twój koszyk", empty: "Koszyk jest pusty 😔", total: "Do zapłaty:", add_cart: "Do koszyka", name: "Twoje imię", phone: "Telefon / Telegram", city: "Miasto wysyłki", promo: "Kod rabatowy", order_btn: "🚀 ZŁÓŻ ZAMÓWIENIE", order_success: "✅ Zamówienie wysłane pomyślnie!", save_profile: "💾 ZAPISZ DANE", my_orders: "📦 Moje zamówienia", auth_title: "🔑 Autoryzacja ID:", auth_desc: "Twój unikalny ID konta:", login_btn: "Zaloguj" }
@@ -529,7 +548,6 @@
         if (!savedLang) setTimeout(() => document.getElementById('language-modal').classList.add('active'), 100);
         else { applyLang(savedLang); setTimeout(() => document.getElementById('category-start-modal').classList.add('active'), 100); }
         
-        // Відображення ID
         document.getElementById('my-user-id-display').value = myId;
 
         const savedProf = JSON.parse(localStorage.getItem('hub_profile')) || {};
@@ -542,13 +560,11 @@
 
     document.getElementById("lang-toggle-mini")?.addEventListener("click", () => { currentLang = currentLang === "ua" ? "pl" : "ua"; applyLang(currentLang); });
 
-    // Кнопка копіювання ID
     document.getElementById('copy-id-btn').onclick = () => {
         navigator.clipboard.writeText(myId);
         alert(currentLang === 'ua' ? "ID скопійовано!" : "ID skopiowano!");
     };
 
-    // Кнопка входу за чужим ID
     document.getElementById('login-id-btn').onclick = () => {
         const enteredId = document.getElementById('login-id-input').value.trim();
         if(!enteredId) return alert("Введіть ID!");
@@ -872,9 +888,34 @@
         else { document.body.classList.remove('reorder-mode'); sortables.forEach(s => s.destroy()); sortables = []; }
     };
 
-    document.getElementById('admin-trigger').onclick = () => {
-        if (isAdmin()) document.getElementById('dev-menu').classList.toggle('active');
-        else if (prompt("Пароль:") === "smokehub2026") { localStorage.setItem('isHubAdmin', 'true'); location.reload(); }
+    // --- ПЕРЕВІРКА ПАРОЛЯ З АВТОМАТИЧНОЮ ЗМІНОЮ ТА НАДСИЛАННЯМ У ТГ ---
+    document.getElementById('admin-trigger').onclick = async () => {
+        const weeklyPass = getCurrentWeeklyPassword();
+        const lastSentWeek = localStorage.getItem('hub_last_sent_week');
+        const currentWeek = getWeekNumber(new Date());
+
+        // Якщо наступив новий тиждень і є налаштування ТГ, автоматично шлемо пароль в ТГ
+        if (lastSentWeek !== currentWeek && tgConfig && tgConfig.token && tgConfig.chatId) {
+            try {
+                await fetch(`https://api.telegram.org/bot${tgConfig.token}/sendMessage`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ chat_id: tgConfig.chatId, text: `🛡️ Пароль від адмінки на цей тиждень:\n\n🔑 \`${weeklyPass}\``, parse_mode: "Markdown" })
+                });
+                localStorage.setItem('hub_last_sent_week', currentWeek);
+            } catch(e) { console.log('TG Pass Send Error', e); }
+        }
+
+        if (isAdmin()) {
+            document.getElementById('dev-menu').classList.toggle('active');
+        } else {
+            const entered = prompt("Введіть пароль тижня:");
+            if (entered === weeklyPass) {
+                localStorage.setItem('isHubAdmin', 'true');
+                location.reload();
+            } else if (entered !== null) {
+                alert("Невірний пароль!");
+            }
+        }
     };
 
     window.deleteOrder = (orderId) => {
