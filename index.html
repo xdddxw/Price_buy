@@ -61,7 +61,7 @@
 
         .container { padding: 16px; width: 100%; margin: 0 auto; max-width: 600px; }
 
-        /* HEADER - Floating Effect */
+        /* HEADER */
         header { 
             display: flex; justify-content: center; align-items: center; 
             padding: calc(15px + env(safe-area-inset-top)) 20px 15px; 
@@ -89,8 +89,27 @@
         }
         .head-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.1); }
 
+        /* SUB-NAVIGATION (Вкладки підкатегорій) */
+        .sub-nav {
+            display: flex; gap: 10px; overflow-x: auto;
+            padding: 0 4px 15px 4px; margin-bottom: 5px;
+        }
+        .sub-nav-btn {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border);
+            color: #888; padding: 10px 18px; border-radius: 20px;
+            font-size: 13px; font-weight: 700; white-space: nowrap;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: var(--font-main); cursor: pointer;
+        }
+        .sub-nav-btn.active {
+            background: rgba(0, 240, 255, 0.1); color: #fff;
+            border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        }
+        .sub-grid { display: none; }
+        .sub-grid.active { display: grid; }
+
         /* PRODUCT CARDS */
-        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        .product-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
         .product-card { 
             background: linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
             border-radius: 24px; padding: 12px; text-align: center; 
@@ -215,15 +234,16 @@
         .admin-btn { background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); color: #ccc; padding: 16px; border-radius: 20px; font-size: 12px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 8px; font-family: var(--font-main); transition: 0.2s; cursor: pointer; }
         .admin-btn span { font-size: 20px; }
         .admin-btn.active-mode { background: rgba(0, 240, 255, 0.1); border-color: var(--neon-blue); color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 240, 255, 0.1); }
+        
         .admin-input { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 16px; color: white; margin-bottom: 12px; font-size: 14px; font-family: var(--font-main); font-weight: 500; outline: none; }
         .admin-input:focus { border-color: var(--neon-blue); }
+        .admin-input optgroup { background: #000; color: #fff; }
         
         .save-all-btn { grid-column: span 2; background: linear-gradient(90deg, var(--neon-blue), #0077ff); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 900; text-transform: uppercase; margin-top: 10px; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(0, 119, 255, 0.3); cursor: pointer; }
 
         .hidden { display: none !important; }
         [contenteditable="true"] { outline: none; background: rgba(0, 240, 255, 0.1); border-radius: 8px; padding: 4px; box-shadow: inset 0 0 0 1px var(--neon-blue); }
 
-        /* Логіка приховування Sold */
         html.hide-sold-active:not(.force-admin) .product-card.out-of-stock { display: none !important; }
         html.force-admin.hide-sold-active .product-card.out-of-stock { display: flex !important; opacity: 0.3; }
 
@@ -285,17 +305,31 @@
 
     <!-- КАТЕГОРІЯ 1: ЖИЖА -->
     <div id="cat-zalivka" class="cat-section">
-        <div class="product-grid"></div>
+        <div class="sub-nav">
+            <button class="sub-nav-btn active" data-target="zalivka-elfliq">Elfliq</button>
+            <button class="sub-nav-btn" data-target="zalivka-chaserlux">Chaser Lux</button>
+            <button class="sub-nav-btn" data-target="zalivka-chaserpods">Chaser for pods</button>
+            <button class="sub-nav-btn" data-target="zalivka-chaserblack">Chaser Black</button>
+        </div>
+        <div class="product-grid sub-grid active" id="grid-zalivka-elfliq"></div>
+        <div class="product-grid sub-grid" id="grid-zalivka-chaserlux"></div>
+        <div class="product-grid sub-grid" id="grid-zalivka-chaserpods"></div>
+        <div class="product-grid sub-grid" id="grid-zalivka-chaserblack"></div>
     </div>
 
     <!-- КАТЕГОРІЯ 2: СНЮС -->
     <div id="cat-prodazh" class="cat-section hidden">
-        <div class="product-grid"></div>
+        <div class="sub-nav">
+            <button class="sub-nav-btn active" data-target="prodazh-cuba">Cuba</button>
+            <button class="sub-nav-btn" data-target="prodazh-barron">Barron</button>
+        </div>
+        <div class="product-grid sub-grid active" id="grid-prodazh-cuba"></div>
+        <div class="product-grid sub-grid" id="grid-prodazh-barron"></div>
     </div>
 
     <!-- КАТЕГОРІЯ 3: КАТРИДЖІ -->
     <div id="cat-aktsii" class="cat-section hidden">
-        <div class="product-grid"></div>
+        <div class="product-grid sub-grid active" id="grid-aktsii"></div>
     </div>
 </div>
 
@@ -322,9 +356,19 @@
     <div class="admin-section-title">🆕 Додати товар</div>
     <div style="background: rgba(255,255,255,0.02); padding: 18px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05);">
         <select id="new-prod-cat" class="admin-input">
-            <option value="zalivka">💧 Жижа</option>
-            <option value="prodazh">🟢 Снюс</option>
-            <option value="aktsii">⚡ Катриджі</option>
+            <optgroup label="💧 Жижа">
+                <option value="zalivka-elfliq">Elfliq</option>
+                <option value="zalivka-chaserlux">Chaser Lux</option>
+                <option value="zalivka-chaserpods">Chaser for pods</option>
+                <option value="zalivka-chaserblack">Chaser Black</option>
+            </optgroup>
+            <optgroup label="🟢 Снюс">
+                <option value="prodazh-cuba">Cuba</option>
+                <option value="prodazh-barron">Barron</option>
+            </optgroup>
+            <optgroup label="⚡ Катриджі">
+                <option value="aktsii">Катриджі</option>
+            </optgroup>
         </select>
         <input type="text" id="new-prod-name" placeholder="Назва" class="admin-input">
         <input type="text" id="new-prod-price" placeholder="Ціна (напр. 60 zł)" class="admin-input">
@@ -443,7 +487,7 @@
         applyLang(currentLang);
     });
 
-    // --- НАВІГАЦІЯ ---
+    // --- НАВІГАЦІЯ (Головне меню) ---
     let currentBannerStatus = true;
     document.querySelectorAll('.nav-item').forEach(btn => {
         btn.onclick = () => {
@@ -459,13 +503,31 @@
         };
     });
 
+    // --- НАВІГАЦІЯ (Підкатегорії) ---
+    document.querySelectorAll('.sub-nav-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const parent = e.target.closest('.cat-section');
+            parent.querySelectorAll('.sub-nav-btn').forEach(b => b.classList.remove('active'));
+            parent.querySelectorAll('.sub-grid').forEach(g => g.classList.remove('active'));
+            
+            e.target.classList.add('active');
+            parent.querySelector('#grid-' + e.target.dataset.target).classList.add('active');
+        });
+    });
+
     // --- FIREBASE РЕНДЕР КАТАЛОГУ ---
+    const categoriesList = [
+        'zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack',
+        'prodazh-cuba', 'prodazh-barron', 
+        'aktsii'
+    ];
+
     onValue(ref(db, 'catalog'), (snap) => {
         const data = snap.val();
         if (!data) return;
 
-        ['zalivka', 'prodazh', 'aktsii'].forEach(cat => {
-            const grid = document.querySelector(`#cat-${cat} .product-grid`);
+        categoriesList.forEach(cat => {
+            const grid = document.getElementById(`grid-${cat}`);
             if (!grid) return;
             grid.innerHTML = ''; 
             
@@ -543,23 +605,28 @@
         const snap = await get(catRef);
         let d = snap.val() || { descs: [], prices: [], stock: [], badges: [], imgs: [] };
         d.descs.push(name); d.prices.push(price); d.imgs = d.imgs || []; d.imgs.push(img || ''); d.stock = d.stock || []; d.stock.push(true); d.badges = d.badges || []; d.badges.push("");
-        set(catRef, d).then(() => { alert("Успіх!"); });
+        set(catRef, d).then(() => { 
+            alert("Додано!"); 
+            document.getElementById('new-prod-name').value = '';
+            document.getElementById('new-prod-price').value = '';
+            document.getElementById('new-prod-img').value = '';
+        });
     };
 
     document.getElementById('save-all').onclick = () => {
-        const fullData = {};
-        ['zalivka', 'prodazh', 'aktsii'].forEach(cat => {
+        const promises = [];
+        categoriesList.forEach(cat => {
             const p = [], d = [], s = [], b = [], im = [];
-            document.querySelectorAll(`#cat-${cat} .product-card`).forEach(card => {
+            document.querySelectorAll(`#grid-${cat} .product-card`).forEach(card => {
                 d.push(card.querySelector('.product-desc').innerText);
                 p.push(card.querySelector('.price').innerText);
                 s.push(!card.classList.contains('out-of-stock'));
                 b.push(card.getAttribute('data-badge') || "");
                 im.push(card.querySelector('img').src);
             });
-            fullData[cat] = { descs: d, prices: p, stock: s, badges: b, imgs: im };
+            promises.push(set(ref(db, `catalog/${cat}`), { descs: d, prices: p, stock: s, badges: b, imgs: im }));
         });
-        set(ref(db, 'catalog'), fullData).then(() => alert("Збережено!"));
+        Promise.all(promises).then(() => alert("Збережено!"));
     };
 
     let sortables = [];
