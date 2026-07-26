@@ -553,7 +553,9 @@
 
             <div style="font-size: 10px; color:var(--neon-blue); margin-bottom:5px; font-weight:bold;">🤖 БОТ ДЛЯ ЗАМОВЛЕНЬ</div>
             <input type="text" id="admin-tg-token" class="admin-input" placeholder="Bot Token (Замовлення)">
-            <input type="text" id="admin-tg-chat" class="admin-input" placeholder="Chat ID (Замовлення)">
+            <input type="text" id="admin-tg-chat" class="admin-input" placeholder="Chat ID 1 (Замовлення)">
+            <!-- НОВЕ ПОЛЕ ДЛЯ ДРУГОГО CHAT ID -->
+            <input type="text" id="admin-tg-chat2" class="admin-input" placeholder="Chat ID 2 (Опціонально)">
 
             <div style="font-size: 10px; color:var(--neon-pink); margin: 10px 0 5px; font-weight:bold;">🔐 БОТ ДЛЯ ПАРОЛІВ</div>
             <input type="text" id="admin-pass-token" class="admin-input" placeholder="Bot Token (Паролі)">
@@ -577,7 +579,8 @@
     let globalCatalog = null;
     let promoConfig = { code: "", percent: 0, maxUses: 0, usedCount: 0 }; 
     let activePromoDiscount = 0;
-    let tgConfig = { token: "", chatId: "" };
+    // ТЕПЕР tgConfig ЗБЕРІГАЄ chatId ТА chatId2
+    let tgConfig = { token: "", chatId: "", chatId2: "" };
     let passConfig = { token: "", chatId: "" };
 
     // Слухач для Бану
@@ -948,19 +951,25 @@
                 await set(ref(db, 'settings/promo/usedCount'), (promoConfig.usedCount || 0) + 1);
             }
             
-            if (tgConfig && tgConfig.token && tgConfig.chatId) {
+            // ВІДПРАВКА НА TELEGRAM (ПІДТРИМКА 2 CHAT ID)
+            if (tgConfig && tgConfig.token) {
                 const itemsText = cart.map(i => `- ${i.name} x${i.qty}`).join('\n');
                 let tgMsg = `🚨 НОВЕ ЗАМОВЛЕННЯ ${generatedOrderNumber}!\n\n👤 ${name}\n📞 ${phone}\n📍 ${city}\n\n📦 Товари:\n${itemsText}\n\n💰 Сума: ${totalText}\n🆔 ID: ${myId}`;
                 if(activePromoDiscount > 0) tgMsg += `\n🎁 (Застосовано знижку -${activePromoDiscount}%)`;
                 
-                try {
-                    await fetch(`https://api.telegram.org/bot${tgConfig.token}/sendMessage`, {
-                        method: 'POST', 
-                        headers: {'Content-Type': 'application/json'}, 
-                        body: JSON.stringify({ chat_id: tgConfig.chatId, text: tgMsg })
-                    });
-                } catch(tgError) {
-                    console.log('TG Send Error', tgError);
+                // Збираємо Chat IDs, відфільтровуємо порожні
+                const chatIdsToNotify = [tgConfig.chatId, tgConfig.chatId2].filter(id => id && id.trim() !== "");
+
+                for (let cid of chatIdsToNotify) {
+                    try {
+                        await fetch(`https://api.telegram.org/bot${tgConfig.token}/sendMessage`, {
+                            method: 'POST', 
+                            headers: {'Content-Type': 'application/json'}, 
+                            body: JSON.stringify({ chat_id: cid, text: tgMsg })
+                        });
+                    } catch(tgError) {
+                        console.log(`TG Send Error for ChatID ${cid}:`, tgError);
+                    }
                 }
             }
 
@@ -1311,27 +1320,31 @@
         if (isAdmin()) set(ref(db, 'settings/hideSold'), !currentHideSoldStatus); 
     };
 
+    // ЧИТАННЯ З БАЗИ З УРАХУВАННЯМ chatId2
     onValue(ref(db, 'settings/telegram'), (snap) => { 
-        tgConfig = snap.val() || {token: "", chatId: ""};
-        document.getElementById('admin-tg-token').value = tgConfig.token; 
-        document.getElementById('admin-tg-chat').value = tgConfig.chatId;
+        tgConfig = snap.val() || {token: "", chatId: "", chatId2: ""};
+        document.getElementById('admin-tg-token').value = tgConfig.token || ""; 
+        document.getElementById('admin-tg-chat').value = tgConfig.chatId || "";
+        document.getElementById('admin-tg-chat2').value = tgConfig.chatId2 || "";
     });
 
     onValue(ref(db, 'settings/telegramPass'), (snap) => { 
         passConfig = snap.val() || {token: "", chatId: ""};
-        document.getElementById('admin-pass-token').value = passConfig.token; 
-        document.getElementById('admin-pass-chat').value = passConfig.chatId;
+        document.getElementById('admin-pass-token').value = passConfig.token || ""; 
+        document.getElementById('admin-pass-chat').value = passConfig.chatId || "";
     });
 
+    // ЗБЕРЕЖЕННЯ З УРАХУВАННЯМ chatId2
     document.getElementById('save-tg-btn').onclick = () => {
         if(isAdmin()) {
             const tTg = document.getElementById('admin-tg-token').value.trim();
             const cTg = document.getElementById('admin-tg-chat').value.trim();
+            const cTg2 = document.getElementById('admin-tg-chat2').value.trim(); // Нове поле
             const tPass = document.getElementById('admin-pass-token').value.trim();
             const cPass = document.getElementById('admin-pass-chat').value.trim();
 
             Promise.all([
-                set(ref(db, 'settings/telegram'), { token: tTg, chatId: cTg }),
+                set(ref(db, 'settings/telegram'), { token: tTg, chatId: cTg, chatId2: cTg2 }), // Зберігаємо обидва ID
                 set(ref(db, 'settings/telegramPass'), { token: tPass, chatId: cPass })
             ]).then(() => alert('Налаштування обох ботів збережено!'));
         }
