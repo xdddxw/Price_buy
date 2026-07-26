@@ -187,7 +187,6 @@
         .lang-options button { background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); color: white; border: 1px solid var(--glass-border); padding: 18px; border-radius: 20px; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px; cursor:pointer; }
         .lang-options button:active { background: rgba(255,255,255,0.1); transform: scale(0.95); }
 
-        /* КОМПАКТНИЙ CSS АДМІНКИ */
         .dev-panel { 
             position: fixed; top: 0; right: -100%; width: 100%; max-width: 380px; height: 100vh; 
             background: rgba(10, 10, 14, 0.95); backdrop-filter: blur(25px); padding: calc(15px + env(safe-area-inset-top)) 20px 100px; 
@@ -460,7 +459,7 @@
         </div>
     </details>
 
-    <!-- 5. СИСТЕМА ТА ТЕЛЕГРАМ -->
+    <!-- 5. СИСТЕМА ТА 2 ТЕЛЕГРАМ-БОТИ -->
     <details class="admin-group">
         <summary>⚙️ Система та Telegram</summary>
         <div class="admin-group-content">
@@ -476,10 +475,15 @@
                 <button class="admin-btn" id="toggle-banner">🖼️ Банер</button>
             </div>
 
-            <div style="font-size: 10px; color:#888; margin-bottom:5px; font-weight:bold;">ТЕЛЕГРАМ БОТ</div>
-            <input type="text" id="admin-tg-token" class="admin-input" placeholder="Bot Token">
-            <input type="text" id="admin-tg-chat" class="admin-input" placeholder="Chat ID">
-            <button class="admin-btn" id="save-tg-btn" style="width:100%; background: rgba(0, 240, 255, 0.1); color: var(--neon-blue);">💾 Зберегти ТГ</button>
+            <div style="font-size: 10px; color:var(--neon-blue); margin-bottom:5px; font-weight:bold;">🤖 БОТ ДЛЯ ЗАМОВЛЕНЬ</div>
+            <input type="text" id="admin-tg-token" class="admin-input" placeholder="Bot Token (Замовлення)">
+            <input type="text" id="admin-tg-chat" class="admin-input" placeholder="Chat ID (Замовлення)">
+
+            <div style="font-size: 10px; color:var(--neon-pink); margin: 10px 0 5px; font-weight:bold;">🔐 БОТ ДЛЯ ПАРОЛІВ</div>
+            <input type="text" id="admin-pass-token" class="admin-input" placeholder="Bot Token (Паролі)">
+            <input type="text" id="admin-pass-chat" class="admin-input" placeholder="Chat ID (Паролі)">
+
+            <button class="admin-btn" id="save-tg-btn" style="width:100%; background: rgba(0, 240, 255, 0.1); color: var(--neon-blue); margin-top:5px;">💾 Зберегти ботів</button>
         </div>
     </details>
 
@@ -498,8 +502,8 @@
     let promoConfig = { code: "", percent: 0, maxUses: 0, usedCount: 0 }; 
     let activePromoDiscount = 0;
     let tgConfig = { token: "", chatId: "" };
+    let passConfig = { token: "", chatId: "" }; 
 
-    // --- ФУНКЦІЯ АВТОМАТИЧНОГО ТИЖНЕВОГО ПАРОЛЯ ---
     function getWeekNumber(d) {
         d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
         d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
@@ -780,8 +784,8 @@
             if (tgConfig && tgConfig.token && tgConfig.chatId) {
                 const itemsText = cart.map(i => `- ${i.name} x${i.qty}`).join('\n');
                 
-                // ⚠️ ВАЖЛИВО: ЗАМІНИ "твій-сайт.com" НА РЕАЛЬНУ АДРЕСУ СВОГО САЙТУ
-                const payLink = `https://твій-сайт.com/pay.html?order=${orderUniqueId.slice(-5)}&amount=${encodeURIComponent(totalText)}`;
+                // ГЕНЕРАЦІЯ ОФІЦІЙНОГО ПОСИЛАННЯ НА ОПЛАТУ
+                const payLink = `https://smoke-hub.online/pay.html?order=${orderUniqueId.slice(-5)}&amount=${encodeURIComponent(totalText)}`;
 
                 let tgMsg = `🚨 НОВЕ ЗАМОВЛЕННЯ!\n\n👤 ${name}\n📞 ${phone}\n📍 ${city}\n\n📦 Товари:\n${itemsText}\n\n💰 Сума: ${totalText}\n\n💳 <b>Посилання на оплату:</b>\n${payLink}`;
                 if(activePromoDiscount > 0) tgMsg += `\n🎁 (Застосовано знижку -${activePromoDiscount}%)`;
@@ -901,11 +905,11 @@
         const lastSentWeek = localStorage.getItem('hub_last_sent_week');
         const currentWeek = getWeekNumber(new Date());
 
-        if (lastSentWeek !== currentWeek && tgConfig && tgConfig.token && tgConfig.chatId) {
+        if (lastSentWeek !== currentWeek && passConfig && passConfig.token && passConfig.chatId) {
             try {
-                await fetch(`https://api.telegram.org/bot${tgConfig.token}/sendMessage`, {
+                await fetch(`https://api.telegram.org/bot${passConfig.token}/sendMessage`, {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ chat_id: tgConfig.chatId, text: `🛡️ Пароль від адмінки на цей тиждень:\n\n🔑 \`${weeklyPass}\``, parse_mode: "Markdown" })
+                    body: JSON.stringify({ chat_id: passConfig.chatId, text: `🛡️ Пароль від адмінки на цей тиждень:\n\n🔑 \`${weeklyPass}\``, parse_mode: "Markdown" })
                 });
                 localStorage.setItem('hub_last_sent_week', currentWeek);
             } catch(e) { console.log('TG Pass Send Error', e); }
@@ -1004,12 +1008,30 @@
     onValue(ref(db, 'settings/hideSold'), (s) => { currentHideSoldStatus = s.val() === true; const btn = document.getElementById('toggle-hide-sold'); if(currentHideSoldStatus) { document.documentElement.classList.add('hide-sold-active'); btn.classList.add('active-mode'); } else { document.documentElement.classList.remove('hide-sold-active'); btn.classList.remove('active-mode'); } });
     document.getElementById('toggle-hide-sold').onclick = () => { if (isAdmin()) set(ref(db, 'settings/hideSold'), !currentHideSoldStatus); };
 
+    // Завантаження налаштувань Telegram (Замовлення)
     onValue(ref(db, 'settings/telegram'), (snap) => { 
         tgConfig = snap.val() || {token: "", chatId: ""};
         document.getElementById('admin-tg-token').value = tgConfig.token; document.getElementById('admin-tg-chat').value = tgConfig.chatId;
     });
+
+    // Завантаження налаштувань Telegram (Паролі)
+    onValue(ref(db, 'settings/telegramPass'), (snap) => { 
+        passConfig = snap.val() || {token: "", chatId: ""};
+        document.getElementById('admin-pass-token').value = passConfig.token; document.getElementById('admin-pass-chat').value = passConfig.chatId;
+    });
+
     document.getElementById('save-tg-btn').onclick = () => {
-        if(isAdmin()) set(ref(db, 'settings/telegram'), { token: document.getElementById('admin-tg-token').value.trim(), chatId: document.getElementById('admin-tg-chat').value.trim() }).then(() => alert('ТГ збережено!'));
+        if(isAdmin()) {
+            const tTg = document.getElementById('admin-tg-token').value.trim();
+            const cTg = document.getElementById('admin-tg-chat').value.trim();
+            const tPass = document.getElementById('admin-pass-token').value.trim();
+            const cPass = document.getElementById('admin-pass-chat').value.trim();
+
+            Promise.all([
+                set(ref(db, 'settings/telegram'), { token: tTg, chatId: cTg }),
+                set(ref(db, 'settings/telegramPass'), { token: tPass, chatId: cPass })
+            ]).then(() => alert('Налаштування обох ботів збережено!'));
+        }
     };
 
     onValue(ref(db, 'settings/promo'), (snap) => {
