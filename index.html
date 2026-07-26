@@ -213,9 +213,24 @@
         [contenteditable="true"] { outline: none; background: rgba(0, 240, 255, 0.1); border-radius: 8px; padding: 4px; box-shadow: inset 0 0 0 1px var(--neon-blue); }
         html.hide-sold-active:not(.force-admin) .product-card.out-of-stock { display: none !important; }
         html.force-admin.hide-sold-active .product-card.out-of-stock { display: flex !important; opacity: 0.3; }
+
+        /* ЕКРАН БЛОКУВАННЯ */
+        #ban-screen {
+            position: fixed; inset: 0; background: #050508; z-index: 9999999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 20px; font-family: var(--font-main);
+        }
     </style>
 </head>
 <body>
+
+<!-- ЕКРАН БЛОКУВАННЯ (ЯКЩО КОРИСТУВАЧ ЗАБЛОКОВАНИЙ) -->
+<div id="ban-screen" class="hidden">
+    <div style="font-size: 64px; margin-bottom: 20px;">🚫</div>
+    <div class="logo" style="font-size: 32px; margin-bottom: 15px;">SMOKE HUB</div>
+    <h2 style="color: var(--neon-pink); font-size: 20px; margin-bottom: 10px;">ДОСТУП ОБМЕЖЕНО</h2>
+    <p style="color: #888; font-size: 14px; max-width: 300px; line-height: 1.4;">Ваш акаунт було заблоковано адміністрацією. Якщо це помилка, зверніться до підтримки.</p>
+</div>
 
 <div id="language-modal" class="lang-modal-overlay">
     <div class="lang-modal-content">
@@ -384,7 +399,7 @@
         <button onclick="document.getElementById('dev-menu').classList.remove('active')" style="background:rgba(255,255,255,0.1); border:none; color:white; width: 32px; height: 32px; border-radius: 50%; font-size:16px; cursor: pointer;">×</button>
     </div>
 
-    <!-- 1. ЗАМОВЛЕННЯ -->
+    <!-- 1. ЗАМОВЛЕННЯ ТА БЛОКУВАННЯ -->
     <details class="admin-group" open>
         <summary>📥 Останні замовлення</summary>
         <div class="admin-group-content">
@@ -395,7 +410,21 @@
         </div>
     </details>
 
-    <!-- 2. УПРАВЛІННЯ ВІТРИНОЮ -->
+    <!-- 2. БЛОКУВАННЯ КОРИСТУВАЧІВ -->
+    <details class="admin-group">
+        <summary>🚫 Заблоковані користувачі</summary>
+        <div class="admin-group-content">
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+                <input type="text" id="ban-id-input" class="admin-input" style="margin-bottom:0;" placeholder="Ввести ID для бана">
+                <button class="admin-btn" id="ban-user-btn" style="padding:0 15px; background: rgba(255,0,85,0.1); color:var(--neon-pink);">Бан</button>
+            </div>
+            <div id="admin-banned-list" style="max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
+                <div style="color: #888; font-size: 11px;">Список порожній</div>
+            </div>
+        </div>
+    </details>
+
+    <!-- 3. УПРАВЛІННЯ ВІТРИНОЮ -->
     <details class="admin-group">
         <summary>📦 Управління вітриною</summary>
         <div class="admin-group-content">
@@ -418,7 +447,7 @@
         </div>
     </details>
 
-    <!-- 3. ДОДАТИ ТОВАР -->
+    <!-- 4. ДОДАТИ ТОВАР -->
     <details class="admin-group">
         <summary>➕ Додати товар</summary>
         <div class="admin-group-content">
@@ -444,7 +473,7 @@
         </div>
     </details>
 
-    <!-- 4. ПРОМОКОД -->
+    <!-- 5. ПРОМОКОД -->
     <details class="admin-group">
         <summary>🎟️ Промокод</summary>
         <div class="admin-group-content">
@@ -460,7 +489,7 @@
         </div>
     </details>
 
-    <!-- 5. СИСТЕМА ТА ТЕЛЕГРАМ -->
+    <!-- 6. СИСТЕМА ТА ТЕЛЕГРАМ -->
     <details class="admin-group">
         <summary>⚙️ Система та Telegram</summary>
         <div class="admin-group-content">
@@ -504,6 +533,15 @@
     let activePromoDiscount = 0;
     let tgConfig = { token: "", chatId: "" };
     let passConfig = { token: "", chatId: "" };
+
+    // --- ПЕРЕВІРКА НА БАН (БЛОКУВАННЯ) ---
+    onValue(ref(db, `bannedUsers/${myId}`), (snap) => {
+        if (snap.val() === true && !isAdmin()) {
+            document.getElementById('ban-screen').classList.remove('hidden');
+        } else {
+            document.getElementById('ban-screen').classList.add('hidden');
+        }
+    });
 
     function getWeekNumber(d) {
         d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -892,7 +930,6 @@
         else { document.body.classList.remove('reorder-mode'); sortables.forEach(s => s.destroy()); sortables = []; }
     };
 
-    // --- ПЕРЕВІРКА ПАРОЛЯ З НЕОНОВИМ ПОВІДОМЛЕННЯМ ---
     document.getElementById('admin-trigger').onclick = async () => {
         const weeklyPass = getCurrentWeeklyPassword();
         const lastSentWeek = localStorage.getItem('hub_last_sent_week');
@@ -924,6 +961,47 @@
     window.deleteOrder = (orderId) => {
         if (isAdmin() && confirm("Точно видалити це замовлення?")) remove(ref(db, `orders/${orderId}`)).then(() => alert("Замовлення видалено!"));
     };
+
+    // ФУНКЦІЇ БАНУ / РОЗБЛОКУВАННЯ
+    window.banUser = (userId) => {
+        if (isAdmin() && confirm(`Заблокувати користувача ${userId}?`)) {
+            set(ref(db, `bannedUsers/${userId}`), true).then(() => alert("Користувача заблоковано!"));
+        }
+    };
+    window.unbanUser = (userId) => {
+        if (isAdmin() && confirm(`Розблокувати користувача ${userId}?`)) {
+            remove(ref(db, `bannedUsers/${userId}`)).then(() => alert("Доступ відновлено!"));
+        }
+    };
+
+    document.getElementById('ban-user-btn').onclick = () => {
+        const uid = document.getElementById('ban-id-input').value.trim();
+        if(uid) {
+            set(ref(db, `bannedUsers/${uid}`), true).then(() => {
+                alert("Користувача заблоковано!");
+                document.getElementById('ban-id-input').value = '';
+            });
+        }
+    };
+
+    // Слухаємо список заблокованих для адмінки
+    onValue(ref(db, 'bannedUsers'), snap => {
+        if(!isAdmin()) return;
+        const bList = document.getElementById('admin-banned-list');
+        bList.innerHTML = '';
+        const data = snap.val();
+        if(data) {
+            Object.keys(data).forEach(uid => {
+                bList.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding:6px 10px; border-radius:8px; font-size:11px;">
+                        <span>👤 ${uid}</span>
+                        <button onclick="unbanUser('${uid}')" style="background:rgba(0,255,153,0.2); color:#00ff99; border:none; padding:3px 8px; border-radius:6px; cursor:pointer;">✅ Розблокувати</button>
+                    </div>`;
+            });
+        } else {
+            bList.innerHTML = '<div style="color: #888; font-size: 11px;">Список порожній</div>';
+        }
+    });
 
     window.allOrdersForExport = [];
 
@@ -957,8 +1035,10 @@
                 aList.innerHTML += `
                     <div style="background:rgba(255,255,255,0.05); border: 1px solid rgba(0, 240, 255, 0.2); padding:10px; border-radius:12px; font-size:12px; position:relative;">
                         <button onclick="deleteOrder('${key}')" style="position:absolute; top:8px; right:8px; background: rgba(255,51,102,0.2); color: #ff3366; border: 1px solid rgba(255,51,102,0.4); padding: 4px 8px; border-radius: 8px; cursor: pointer; font-size: 10px;">🗑️</button>
+                        <button onclick="banUser('${o.userId}')" style="position:absolute; top:8px; right:68px; background: rgba(255,0,85,0.2); color: #ff0055; border: 1px solid rgba(255,0,85,0.4); padding: 4px 8px; border-radius: 8px; cursor: pointer; font-size: 10px;">🚫 Бан</button>
                         <div style="color: #aaa; font-size: 10px; margin-bottom: 4px;">${o.date}</div>
                         <b>👤 ${o.user}</b> <br>📞 ${o.contact}<br>📍 ${o.city || 'Не вказано'}<br>
+                        <div style="font-size:10px; color:#666;">ID: ${o.userId || 'немає'}</div>
                         <div style="margin: 6px 0; color: #ccc;">${itemsHtml}</div>
                         💰 <span style="color:var(--neon-blue); font-weight: bold;">${o.total}</span> | 💳 <b>${o.payCurrency || 'Не вказано'}</b>
                     </div>`;
