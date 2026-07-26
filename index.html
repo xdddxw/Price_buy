@@ -213,24 +213,9 @@
         [contenteditable="true"] { outline: none; background: rgba(0, 240, 255, 0.1); border-radius: 8px; padding: 4px; box-shadow: inset 0 0 0 1px var(--neon-blue); }
         html.hide-sold-active:not(.force-admin) .product-card.out-of-stock { display: none !important; }
         html.force-admin.hide-sold-active .product-card.out-of-stock { display: flex !important; opacity: 0.3; }
-
-        /* ЕКРАН БЛОКУВАННЯ */
-        #ban-screen {
-            position: fixed; inset: 0; background: #050508; z-index: 9999999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; padding: 20px; font-family: var(--font-main);
-        }
     </style>
 </head>
 <body>
-
-<!-- ЕКРАН БЛОКУВАННЯ (ЯКЩО КОРИСТУВАЧ ЗАБЛОКОВАНИЙ) -->
-<div id="ban-screen" class="hidden">
-    <div style="font-size: 64px; margin-bottom: 20px;">🚫</div>
-    <div class="logo" style="font-size: 32px; margin-bottom: 15px;">SMOKE HUB</div>
-    <h2 style="color: var(--neon-pink); font-size: 20px; margin-bottom: 10px;">ДОСТУП ОБМЕЖЕНО</h2>
-    <p style="color: #888; font-size: 14px; max-width: 300px; line-height: 1.4;">Ваш акаунт було заблоковано адміністрацією. Якщо це помилка, зверніться до підтримки. Telegram: @liquid_br</p>
-</div>
 
 <div id="language-modal" class="lang-modal-overlay">
     <div class="lang-modal-content">
@@ -332,8 +317,8 @@
             </div>
             
             <input type="text" id="order-name" class="checkout-input" placeholder="Ваше ім'я" data-i18n-ph="name">
-            <input type="text" id="order-phone" class="checkout-input" placeholder="Telegram" data-i18n-ph="phone">
-            <input type="text" id="order-city" class="checkout-input" placeholder="Місто відправки" data-i18n-ph="city">
+            <input type="text" id="order-phone" class="checkout-input" placeholder="Телефон або Telegram" data-i18n-ph="phone">
+            <input type="text" id="order-city" class="checkout-input" placeholder="Місто відправки (Пошта)" data-i18n-ph="city">
             
             <select id="order-currency" class="checkout-input">
                 <option value="PLN">🇵🇱 Оплата в PLN (Злоті)</option>
@@ -399,7 +384,7 @@
         <button onclick="document.getElementById('dev-menu').classList.remove('active')" style="background:rgba(255,255,255,0.1); border:none; color:white; width: 32px; height: 32px; border-radius: 50%; font-size:16px; cursor: pointer;">×</button>
     </div>
 
-    <!-- 1. ЗАМОВЛЕННЯ ТА БЛОКУВАННЯ -->
+    <!-- 1. ЗАМОВЛЕННЯ -->
     <details class="admin-group" open>
         <summary>📥 Останні замовлення</summary>
         <div class="admin-group-content">
@@ -410,21 +395,7 @@
         </div>
     </details>
 
-    <!-- 2. БЛОКУВАННЯ КОРИСТУВАЧІВ -->
-    <details class="admin-group">
-        <summary>🚫 Заблоковані користувачі</summary>
-        <div class="admin-group-content">
-            <div style="display:flex; gap:8px; margin-bottom:12px;">
-                <input type="text" id="ban-id-input" class="admin-input" style="margin-bottom:0;" placeholder="Ввести ID для бана">
-                <button class="admin-btn" id="ban-user-btn" style="padding:0 15px; background: rgba(255,0,85,0.1); color:var(--neon-pink);">Бан</button>
-            </div>
-            <div id="admin-banned-list" style="max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
-                <div style="color: #888; font-size: 11px;">Список порожній</div>
-            </div>
-        </div>
-    </details>
-
-    <!-- 3. УПРАВЛІННЯ ВІТРИНОЮ -->
+    <!-- 2. УПРАВЛІННЯ ВІТРИНОЮ -->
     <details class="admin-group">
         <summary>📦 Управління вітриною</summary>
         <div class="admin-group-content">
@@ -447,7 +418,7 @@
         </div>
     </details>
 
-    <!-- 4. ДОДАТИ ТОВАР -->
+    <!-- 3. ДОДАТИ ТОВАР -->
     <details class="admin-group">
         <summary>➕ Додати товар</summary>
         <div class="admin-group-content">
@@ -473,7 +444,7 @@
         </div>
     </details>
 
-    <!-- 5. ПРОМОКОД -->
+    <!-- 4. ПРОМОКОД -->
     <details class="admin-group">
         <summary>🎟️ Промокод</summary>
         <div class="admin-group-content">
@@ -489,7 +460,7 @@
         </div>
     </details>
 
-    <!-- 6. СИСТЕМА ТА ТЕЛЕГРАМ -->
+    <!-- 5. СИСТЕМА ТА ТЕЛЕГРАМ -->
     <details class="admin-group">
         <summary>⚙️ Система та Telegram</summary>
         <div class="admin-group-content">
@@ -505,15 +476,10 @@
                 <button class="admin-btn" id="toggle-banner">🖼️ Банер</button>
             </div>
 
-            <div style="font-size: 10px; color:var(--neon-blue); margin-bottom:5px; font-weight:bold;">🤖 БОТ ДЛЯ ЗАМОВЛЕНЬ</div>
-            <input type="text" id="admin-tg-token" class="admin-input" placeholder="Bot Token (Замовлення)">
-            <input type="text" id="admin-tg-chat" class="admin-input" placeholder="Chat ID (Замовлення)">
-
-            <div style="font-size: 10px; color:var(--neon-pink); margin: 10px 0 5px; font-weight:bold;">🔐 БОТ ДЛЯ ПАРОЛІВ</div>
-            <input type="text" id="admin-pass-token" class="admin-input" placeholder="Bot Token (Паролі)">
-            <input type="text" id="admin-pass-chat" class="admin-input" placeholder="Chat ID (Паролі)">
-
-            <button class="admin-btn" id="save-tg-btn" style="width:100%; background: rgba(0, 240, 255, 0.1); color: var(--neon-blue); margin-top:5px;">💾 Зберегти ботів</button>
+            <div style="font-size: 10px; color:#888; margin-bottom:5px; font-weight:bold;">ТЕЛЕГРАМ БОТ</div>
+            <input type="text" id="admin-tg-token" class="admin-input" placeholder="Bot Token">
+            <input type="text" id="admin-tg-chat" class="admin-input" placeholder="Chat ID">
+            <button class="admin-btn" id="save-tg-btn" style="width:100%; background: rgba(0, 240, 255, 0.1); color: var(--neon-blue);">💾 Зберегти ТГ</button>
         </div>
     </details>
 
@@ -532,17 +498,8 @@
     let promoConfig = { code: "", percent: 0, maxUses: 0, usedCount: 0 }; 
     let activePromoDiscount = 0;
     let tgConfig = { token: "", chatId: "" };
-    let passConfig = { token: "", chatId: "" };
 
-    // --- ПЕРЕВІРКА НА БАН (БЛОКУВАННЯ) ---
-    onValue(ref(db, `bannedUsers/${myId}`), (snap) => {
-        if (snap.val() === true && !isAdmin()) {
-            document.getElementById('ban-screen').classList.remove('hidden');
-        } else {
-            document.getElementById('ban-screen').classList.add('hidden');
-        }
-    });
-
+    // --- ФУНКЦІЯ АВТОМАТИЧНОГО ТИЖНЕВОГО ПАРОЛЯ ---
     function getWeekNumber(d) {
         d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
         d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
@@ -795,6 +752,7 @@
         else if(e.target.classList.contains('cart-btn-min')) { const idx = e.target.dataset.idx; cart[idx].qty--; if(cart[idx].qty <= 0) cart.splice(idx, 1); saveCart(); }
     });
 
+    // --- ВІДПРАВКА ЗАМОВЛЕННЯ З АВТОГЕНЕРАЦІЄЮ ПОСИЛАННЯ ---
     document.getElementById('submit-order-btn').onclick = async () => {
         const name = document.getElementById('order-name').value.trim();
         const phone = document.getElementById('order-phone').value.trim();
@@ -814,16 +772,23 @@
         const btn = document.getElementById('submit-order-btn'); btn.innerText = "⏳ Відправка..."; btn.disabled = true;
 
         try {
-            await push(ref(db, 'orders'), orderData);
+            const newOrderRef = await push(ref(db, 'orders'), orderData);
+            const orderUniqueId = newOrderRef.key;
+
             if (activePromoDiscount > 0 && promoConfig.code) await set(ref(db, 'settings/promo/usedCount'), (promoConfig.usedCount || 0) + 1);
             
             if (tgConfig && tgConfig.token && tgConfig.chatId) {
                 const itemsText = cart.map(i => `- ${i.name} x${i.qty}`).join('\n');
-                let tgMsg = `🚨 НОВЕ ЗАМОВЛЕННЯ!\n\n👤 ${name}\n📞 ${phone}\n📍 ${city}\n\n📦 Товари:\n${itemsText}\n\n💰 Сума: ${totalText}`;
+                
+                // ⚠️ ВАЖЛИВО: ЗАМІНИ "твій-сайт.com" НА РЕАЛЬНУ АДРЕСУ СВОГО САЙТУ
+                const payLink = `https://твій-сайт.com/pay.html?order=${orderUniqueId.slice(-5)}&amount=${encodeURIComponent(totalText)}`;
+
+                let tgMsg = `🚨 НОВЕ ЗАМОВЛЕННЯ!\n\n👤 ${name}\n📞 ${phone}\n📍 ${city}\n\n📦 Товари:\n${itemsText}\n\n💰 Сума: ${totalText}\n\n💳 <b>Посилання на оплату:</b>\n${payLink}`;
                 if(activePromoDiscount > 0) tgMsg += `\n🎁 (Застосовано знижку -${activePromoDiscount}%)`;
                 
                 fetch(`https://api.telegram.org/bot${tgConfig.token}/sendMessage`, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ chat_id: tgConfig.chatId, text: tgMsg })
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({ chat_id: tgConfig.chatId, text: tgMsg, parse_mode: "HTML" })
                 }).catch(e => console.log('TG Send Error', e));
             }
 
@@ -930,16 +895,17 @@
         else { document.body.classList.remove('reorder-mode'); sortables.forEach(s => s.destroy()); sortables = []; }
     };
 
+    // --- ПЕРЕВІРКА ПАРОЛЯ З АВТОМАТИЧНОЮ ЗМІНОЮ ТА НАДСИЛАННЯМ У ТГ ---
     document.getElementById('admin-trigger').onclick = async () => {
         const weeklyPass = getCurrentWeeklyPassword();
         const lastSentWeek = localStorage.getItem('hub_last_sent_week');
         const currentWeek = getWeekNumber(new Date());
 
-        if (lastSentWeek !== currentWeek && passConfig && passConfig.token && passConfig.chatId) {
+        if (lastSentWeek !== currentWeek && tgConfig && tgConfig.token && tgConfig.chatId) {
             try {
-                await fetch(`https://api.telegram.org/bot${passConfig.token}/sendMessage`, {
+                await fetch(`https://api.telegram.org/bot${tgConfig.token}/sendMessage`, {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ chat_id: passConfig.chatId, text: `🛡️ Пароль від адмінки на цей тиждень:\n\n🔑 \`${weeklyPass}\``, parse_mode: "Markdown" })
+                    body: JSON.stringify({ chat_id: tgConfig.chatId, text: `🛡️ Пароль від адмінки на цей тиждень:\n\n🔑 \`${weeklyPass}\``, parse_mode: "Markdown" })
                 });
                 localStorage.setItem('hub_last_sent_week', currentWeek);
             } catch(e) { console.log('TG Pass Send Error', e); }
@@ -953,7 +919,7 @@
                 localStorage.setItem('isHubAdmin', 'true');
                 location.reload();
             } else if (entered !== null) {
-                alert("⛔ Вхід тільки для адміністрації!");
+                alert("Невірний пароль!");
             }
         }
     };
@@ -961,47 +927,6 @@
     window.deleteOrder = (orderId) => {
         if (isAdmin() && confirm("Точно видалити це замовлення?")) remove(ref(db, `orders/${orderId}`)).then(() => alert("Замовлення видалено!"));
     };
-
-    // ФУНКЦІЇ БАНУ / РОЗБЛОКУВАННЯ
-    window.banUser = (userId) => {
-        if (isAdmin() && confirm(`Заблокувати користувача ${userId}?`)) {
-            set(ref(db, `bannedUsers/${userId}`), true).then(() => alert("Користувача заблоковано!"));
-        }
-    };
-    window.unbanUser = (userId) => {
-        if (isAdmin() && confirm(`Розблокувати користувача ${userId}?`)) {
-            remove(ref(db, `bannedUsers/${userId}`)).then(() => alert("Доступ відновлено!"));
-        }
-    };
-
-    document.getElementById('ban-user-btn').onclick = () => {
-        const uid = document.getElementById('ban-id-input').value.trim();
-        if(uid) {
-            set(ref(db, `bannedUsers/${uid}`), true).then(() => {
-                alert("Користувача заблоковано!");
-                document.getElementById('ban-id-input').value = '';
-            });
-        }
-    };
-
-    // Слухаємо список заблокованих для адмінки
-    onValue(ref(db, 'bannedUsers'), snap => {
-        if(!isAdmin()) return;
-        const bList = document.getElementById('admin-banned-list');
-        bList.innerHTML = '';
-        const data = snap.val();
-        if(data) {
-            Object.keys(data).forEach(uid => {
-                bList.innerHTML += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding:6px 10px; border-radius:8px; font-size:11px;">
-                        <span>👤 ${uid}</span>
-                        <button onclick="unbanUser('${uid}')" style="background:rgba(0,255,153,0.2); color:#00ff99; border:none; padding:3px 8px; border-radius:6px; cursor:pointer;">✅ Розблокувати</button>
-                    </div>`;
-            });
-        } else {
-            bList.innerHTML = '<div style="color: #888; font-size: 11px;">Список порожній</div>';
-        }
-    });
 
     window.allOrdersForExport = [];
 
@@ -1035,10 +960,8 @@
                 aList.innerHTML += `
                     <div style="background:rgba(255,255,255,0.05); border: 1px solid rgba(0, 240, 255, 0.2); padding:10px; border-radius:12px; font-size:12px; position:relative;">
                         <button onclick="deleteOrder('${key}')" style="position:absolute; top:8px; right:8px; background: rgba(255,51,102,0.2); color: #ff3366; border: 1px solid rgba(255,51,102,0.4); padding: 4px 8px; border-radius: 8px; cursor: pointer; font-size: 10px;">🗑️</button>
-                        <button onclick="banUser('${o.userId}')" style="position:absolute; top:8px; right:68px; background: rgba(255,0,85,0.2); color: #ff0055; border: 1px solid rgba(255,0,85,0.4); padding: 4px 8px; border-radius: 8px; cursor: pointer; font-size: 10px;">🚫 Бан</button>
                         <div style="color: #aaa; font-size: 10px; margin-bottom: 4px;">${o.date}</div>
                         <b>👤 ${o.user}</b> <br>📞 ${o.contact}<br>📍 ${o.city || 'Не вказано'}<br>
-                        <div style="font-size:10px; color:#666;">ID: ${o.userId || 'немає'}</div>
                         <div style="margin: 6px 0; color: #ccc;">${itemsHtml}</div>
                         💰 <span style="color:var(--neon-blue); font-weight: bold;">${o.total}</span> | 💳 <b>${o.payCurrency || 'Не вказано'}</b>
                     </div>`;
@@ -1085,24 +1008,8 @@
         tgConfig = snap.val() || {token: "", chatId: ""};
         document.getElementById('admin-tg-token').value = tgConfig.token; document.getElementById('admin-tg-chat').value = tgConfig.chatId;
     });
-
-    onValue(ref(db, 'settings/telegramPass'), (snap) => { 
-        passConfig = snap.val() || {token: "", chatId: ""};
-        document.getElementById('admin-pass-token').value = passConfig.token; document.getElementById('admin-pass-chat').value = passConfig.chatId;
-    });
-
     document.getElementById('save-tg-btn').onclick = () => {
-        if(isAdmin()) {
-            const tTg = document.getElementById('admin-tg-token').value.trim();
-            const cTg = document.getElementById('admin-tg-chat').value.trim();
-            const tPass = document.getElementById('admin-pass-token').value.trim();
-            const cPass = document.getElementById('admin-pass-chat').value.trim();
-
-            Promise.all([
-                set(ref(db, 'settings/telegram'), { token: tTg, chatId: cTg }),
-                set(ref(db, 'settings/telegramPass'), { token: tPass, chatId: cPass })
-            ]).then(() => alert('Налаштування обох ботів збережено!'));
-        }
+        if(isAdmin()) set(ref(db, 'settings/telegram'), { token: document.getElementById('admin-tg-token').value.trim(), chatId: document.getElementById('admin-tg-chat').value.trim() }).then(() => alert('ТГ збережено!'));
     };
 
     onValue(ref(db, 'settings/promo'), (snap) => {
