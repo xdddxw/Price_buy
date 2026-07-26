@@ -33,20 +33,36 @@
             --neon-blue: #00f0ff; 
             --neon-purple: #7000ff;
             --font-main: 'Outfit', sans-serif;
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        * { scrollbar-width: none; -ms-overflow-style: none; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { 
+            scrollbar-width: none; 
+            -ms-overflow-style: none; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+        }
         *::-webkit-scrollbar { display: none !important; }
 
         body {
-            margin: 0; min-height: 100vh; padding-bottom: calc(110px + env(safe-area-inset-bottom)); 
+            margin: 0; 
+            min-height: 100vh; 
+            padding-bottom: calc(110px + env(safe-area-inset-bottom)); 
             background-color: var(--bg-color);
             background-image: 
                 radial-gradient(circle at 10% 0%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
                 radial-gradient(circle at 90% 100%, rgba(255, 0, 85, 0.08) 0%, transparent 40%),
                 radial-gradient(circle at 50% 50%, rgba(112, 0, 255, 0.05) 0%, transparent 50%);
-            background-attachment: fixed; font-family: var(--font-main); color: #ffffff;
+            background-attachment: fixed; 
+            font-family: var(--font-main); 
+            color: #ffffff;
             -webkit-overflow-scrolling: touch;
+        }
+
+        /* Додано покращений фокус для доступності */
+        button:focus-visible, input:focus-visible, select:focus-visible {
+            outline: 2px solid var(--neon-blue);
+            outline-offset: 2px;
         }
 
         .container { padding: 16px; width: 100%; margin: 0 auto; max-width: 600px; }
@@ -56,7 +72,10 @@
             padding: calc(15px + env(safe-area-inset-top)) 20px 15px; 
             background: linear-gradient(180deg, rgba(5,5,8,0.9) 0%, rgba(5,5,8,0) 100%);
             position: sticky; top: 0; z-index: 100; 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
+        
         .logo { 
             font-weight: 900; font-size: 24px; letter-spacing: 2px; text-transform: uppercase; 
             background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue), var(--neon-purple)); 
@@ -69,7 +88,7 @@
             background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
             color: white; padding: 8px 12px; border-radius: 14px; 
             font-size: 13px; font-weight: 700; font-family: var(--font-main);
-            backdrop-filter: blur(10px); cursor: pointer; transition: 0.2s;
+            backdrop-filter: blur(10px); cursor: pointer; transition: 0.2s ease;
         }
         .head-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.1); }
 
@@ -78,13 +97,16 @@
             font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; 
             display: flex; justify-content: center; align-items: center; gap: 6px;
         }
-        .update-date span.date-val { color: var(--neon-blue); background: rgba(0, 240, 255, 0.05); padding: 3px 10px; border-radius: 10px; border: 1px solid rgba(0, 240, 255, 0.2); }
+        .update-date span.date-val { 
+            color: var(--neon-blue); background: rgba(0, 240, 255, 0.05); 
+            padding: 3px 10px; border-radius: 10px; border: 1px solid rgba(0, 240, 255, 0.2); 
+        }
 
         .sub-nav { display: flex; gap: 10px; overflow-x: auto; padding: 0 4px 15px 4px; margin-bottom: 5px; }
         .sub-nav-btn {
             background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); color: #888; 
             padding: 10px 18px; border-radius: 20px; font-size: 13px; font-weight: 700; white-space: nowrap;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); font-family: var(--font-main); cursor: pointer;
+            transition: var(--transition-smooth); font-family: var(--font-main); cursor: pointer;
         }
         .sub-nav-btn.active {
             background: rgba(0, 240, 255, 0.1); color: #fff;
@@ -98,14 +120,18 @@
             background: linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
             border-radius: 24px; padding: 12px; text-align: center; border: 1px solid var(--glass-border); 
             display: flex; flex-direction: column; position: relative; backdrop-filter: blur(15px); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s;
         }
         .product-card:active { transform: scale(0.96); border-color: rgba(0, 240, 255, 0.3); }
         .product-img { width: 100%; aspect-ratio: 1/1; border-radius: 18px; overflow: hidden; margin-bottom: 12px; position: relative; background: #0a0a0f; }
-        .product-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .product-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
         .product-card:hover .product-img img { transform: scale(1.05); }
         
-        .product-desc { font-size: 14px; font-weight: 500; min-height: 36px; line-height: 1.2; margin: 0 0 10px; color: #e0e0e0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-desc { 
+            font-size: 14px; font-weight: 500; min-height: 36px; line-height: 1.2; 
+            margin: 0 0 10px; color: #e0e0e0; display: -webkit-box; 
+            -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; 
+        }
         .price { 
             font-weight: 900; font-size: 16px; margin-top: auto; 
             background: linear-gradient(90deg, #fff, var(--neon-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -115,7 +141,7 @@
         .add-to-cart-btn {
             background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.2);
             color: white; border-radius: 10px; padding: 8px; margin-top: 10px;
-            font-family: var(--font-main); font-weight: 700; cursor: pointer; transition: 0.2s;
+            font-family: var(--font-main); font-weight: 700; cursor: pointer; transition: all 0.2s ease;
         }
         .add-to-cart-btn:active { transform: scale(0.95); background: rgba(0, 240, 255, 0.2); }
         .out-of-stock .add-to-cart-btn { display: none; }
@@ -132,16 +158,34 @@
         .cart-btn-min, .cart-btn-plus { 
             background: rgba(255,255,255,0.1); border: none; color: white; 
             width: 30px; height: 30px; border-radius: 8px; font-weight: bold; cursor: pointer; 
+            transition: background 0.2s;
         }
-        .checkout-input { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 16px; color: white; margin-bottom: 12px; font-size: 14px; font-family: var(--font-main); font-weight: 500; outline: none; }
-        .checkout-input:focus { border-color: var(--neon-blue); }
+        .cart-btn-min:hover, .cart-btn-plus:hover { background: rgba(255,255,255,0.2); }
+
+        .checkout-input { 
+            width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); 
+            padding: 16px; border-radius: 16px; color: white; margin-bottom: 12px; 
+            font-size: 14px; font-family: var(--font-main); font-weight: 500; 
+            outline: none; transition: border-color 0.3s, box-shadow 0.3s; 
+        }
+        .checkout-input:focus { 
+            border-color: var(--neon-blue); 
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.1); 
+        }
+
         .checkout-submit { 
             width: 100%; background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
             color: #fff; border: none; padding: 18px; border-radius: 16px; font-weight: 900; 
-            text-transform: uppercase; margin-top: 10px; cursor: pointer; box-shadow: 0 5px 20px rgba(0, 240, 255, 0.3);
+            text-transform: uppercase; margin-top: 10px; cursor: pointer; 
+            box-shadow: 0 5px 20px rgba(0, 240, 255, 0.3); transition: transform 0.2s, box-shadow 0.2s;
         }
+        .checkout-submit:active { transform: translateY(2px); box-shadow: 0 2px 10px rgba(0, 240, 255, 0.3); }
 
-        .badge { position: absolute; top: 10px; left: 10px; padding: 5px 12px; border-radius: 10px; font-size: 10px; font-weight: 900; z-index: 5; display: none; text-transform: uppercase; color: white; letter-spacing: 1px; backdrop-filter: blur(5px); }
+        .badge { 
+            position: absolute; top: 10px; left: 10px; padding: 5px 12px; border-radius: 10px; 
+            font-size: 10px; font-weight: 900; z-index: 5; display: none; text-transform: uppercase; 
+            color: white; letter-spacing: 1px; backdrop-filter: blur(5px); 
+        }
         .badge-hit { display: block !important; background: linear-gradient(135deg, var(--neon-pink), #ff5e00); box-shadow: 0 4px 15px rgba(255, 0, 85, 0.4); }
         .badge-promo { display: block !important; background: linear-gradient(135deg, #ffd900, #ff8c00); color: #000; box-shadow: 0 4px 15px rgba(255, 217, 0, 0.3); }
         .badge-new { display: block !important; background: linear-gradient(135deg, #00ff99, #00ccff); box-shadow: 0 4px 15px rgba(0, 255, 153, 0.3); color: #000;}
@@ -162,9 +206,9 @@
         }
         .nav-item { 
             background: transparent; border: none; color: #666; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-size: 11px; font-weight: 700; gap: 4px; font-family: var(--font-main); padding: 8px 12px; border-radius: 20px; transition: 0.3s; position: relative;
+            font-size: 11px; font-weight: 700; gap: 4px; font-family: var(--font-main); padding: 8px 12px; border-radius: 20px; transition: var(--transition-smooth); position: relative;
         }
-        .nav-item span:first-child { font-size: 20px; filter: grayscale(1); opacity: 0.5; transition: 0.3s; }
+        .nav-item span:first-child { font-size: 20px; filter: grayscale(1); opacity: 0.5; transition: var(--transition-smooth); }
         .nav-item.active { background: rgba(255,255,255,0.08); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); }
         .nav-item.active span:first-child { filter: grayscale(0); opacity: 1; transform: scale(1.15); }
         .nav-cart-badge { 
@@ -179,17 +223,18 @@
         .promo-slide img { width: 100%; height: 100%; object-fit: cover; }
         .promo-overlay { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(5,5,8,0.8) 0%, transparent 100%); }
 
-        .lang-modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(15px); z-index: 1000001; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
-        .lang-modal-content { background: rgba(15, 15, 20, 0.8); border: 1px solid var(--glass-border); padding: 32px 24px; border-radius: 32px; text-align: center; width: 85%; max-width: 340px; transform: scale(0.9); transition: transform 0.4s; }
+        .lang-modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 1000001; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
+        .lang-modal-content { background: rgba(15, 15, 20, 0.8); border: 1px solid var(--glass-border); padding: 32px 24px; border-radius: 32px; text-align: center; width: 85%; max-width: 340px; transform: scale(0.9); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .lang-modal-overlay.active { opacity: 1; display: flex; }
         .lang-modal-overlay.active .lang-modal-content { transform: scale(1); }
         .lang-options { display: grid; gap: 14px; }
-        .lang-options button { background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); color: white; border: 1px solid var(--glass-border); padding: 18px; border-radius: 20px; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px; cursor:pointer; }
+        .lang-options button { background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); color: white; border: 1px solid var(--glass-border); padding: 18px; border-radius: 20px; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px; cursor:pointer; transition: transform 0.2s, background 0.2s; }
         .lang-options button:active { background: rgba(255,255,255,0.1); transform: scale(0.95); }
 
+        /* КОМПАКТНИЙ CSS АДМІНКИ */
         .dev-panel { 
             position: fixed; top: 0; right: -100%; width: 100%; max-width: 380px; height: 100vh; 
-            background: rgba(10, 10, 14, 0.95); backdrop-filter: blur(25px); padding: calc(15px + env(safe-area-inset-top)) 20px 100px; 
+            background: rgba(10, 10, 14, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); padding: calc(15px + env(safe-area-inset-top)) 20px 100px; 
             transition: right 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 2000; border-left: 1px solid rgba(255, 255, 255, 0.05); overflow-y: auto; 
         }
         .dev-panel.active { right: 0; box-shadow: -20px 0 50px rgba(0,0,0,0.8); }
@@ -206,7 +251,8 @@
         .admin-btn { background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); color: #ccc; padding: 12px; border-radius: 12px; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: 0.2s; }
         .admin-btn.active-mode { background: rgba(0, 240, 255, 0.1); border-color: var(--neon-blue); color: var(--neon-blue); }
         .admin-input { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 12px; color: white; margin-bottom: 8px; font-size: 13px; font-family: var(--font-main); outline: none; }
-        .save-all-btn { width: 100%; background: linear-gradient(90deg, var(--neon-blue), #0077ff); color: #fff; border: none; padding: 14px; border-radius: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 5px 15px rgba(0, 119, 255, 0.3); margin-top: 5px; }
+        .save-all-btn { width: 100%; background: linear-gradient(90deg, var(--neon-blue), #0077ff); color: #fff; border: none; padding: 14px; border-radius: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 5px 15px rgba(0, 119, 255, 0.3); margin-top: 5px; transition: transform 0.2s; }
+        .save-all-btn:active { transform: translateY(2px); }
 
         .hidden { display: none !important; }
         [contenteditable="true"] { outline: none; background: rgba(0, 240, 255, 0.1); border-radius: 8px; padding: 4px; box-shadow: inset 0 0 0 1px var(--neon-blue); }
@@ -459,7 +505,7 @@
         </div>
     </details>
 
-    <!-- 5. СИСТЕМА ТА 2 ТЕЛЕГРАМ-БОТИ -->
+    <!-- 5. СИСТЕМА ТА ТЕЛЕГРАМ -->
     <details class="admin-group">
         <summary>⚙️ Система та Telegram</summary>
         <div class="admin-group-content">
@@ -502,7 +548,7 @@
     let promoConfig = { code: "", percent: 0, maxUses: 0, usedCount: 0 }; 
     let activePromoDiscount = 0;
     let tgConfig = { token: "", chatId: "" };
-    let passConfig = { token: "", chatId: "" }; 
+    let passConfig = { token: "", chatId: "" };
 
     function getWeekNumber(d) {
         d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -534,34 +580,60 @@
         document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.placeholder = translations[lang][el.dataset.i18nPh]; });
         document.querySelectorAll('.product-card').forEach(card => {
             card.setAttribute('data-out-of-stock-text', translations[lang].sold);
-            const badgeDiv = card.querySelector('.badge'); const bType = card.getAttribute('data-badge');
+            const badgeDiv = card.querySelector('.badge'); 
+            const bType = card.getAttribute('data-badge');
             if (bType && translations[lang]['badge_' + bType]) badgeDiv.innerText = translations[lang]['badge_' + bType];
-            const btn = card.querySelector('.add-to-cart-btn'); if(btn) btn.innerText = translations[lang].add_cart;
+            const btn = card.querySelector('.add-to-cart-btn'); 
+            if(btn) btn.innerText = translations[lang].add_cart;
         });
-        const langLabel = document.getElementById("lang-label"); const langFlag = document.getElementById("lang-flag");
-        if(langLabel) { langLabel.innerText = lang.toUpperCase(); langFlag.innerText = lang === "ua" ? "🇺🇦" : "🇵🇱"; }
-        localStorage.setItem("lang", lang); currentLang = lang; renderCart(); 
+        const langLabel = document.getElementById("lang-label"); 
+        const langFlag = document.getElementById("lang-flag");
+        if(langLabel) { 
+            langLabel.innerText = lang.toUpperCase(); 
+            langFlag.innerText = lang === "ua" ? "🇺🇦" : "🇵🇱"; 
+        }
+        localStorage.setItem("lang", lang); 
+        currentLang = lang; 
+        renderCart(); 
     }
 
-    window.selectInitialLang = (lang) => { applyLang(lang); document.getElementById('language-modal').classList.remove('active'); setTimeout(() => document.getElementById('category-start-modal').classList.add('active'), 300); };
-    window.selectInitialCategory = (tab) => { document.getElementById('category-start-modal').classList.remove('active'); setTimeout(() => { document.querySelector(`.nav-item[data-tab="${tab}"]`)?.click(); }, 300); };
+    window.selectInitialLang = (lang) => { 
+        applyLang(lang); 
+        document.getElementById('language-modal').classList.remove('active'); 
+        setTimeout(() => document.getElementById('category-start-modal').classList.add('active'), 300); 
+    };
+    
+    window.selectInitialCategory = (tab) => { 
+        document.getElementById('category-start-modal').classList.remove('active'); 
+        setTimeout(() => { document.querySelector(`.nav-item[data-tab="${tab}"]`)?.click(); }, 300); 
+    };
     
     window.addEventListener('DOMContentLoaded', () => {
         const savedLang = localStorage.getItem("lang");
-        if (!savedLang) setTimeout(() => document.getElementById('language-modal').classList.add('active'), 100);
-        else { applyLang(savedLang); setTimeout(() => document.getElementById('category-start-modal').classList.add('active'), 100); }
+        if (!savedLang) {
+            setTimeout(() => document.getElementById('language-modal').classList.add('active'), 100);
+        } else { 
+            applyLang(savedLang); 
+            setTimeout(() => document.getElementById('category-start-modal').classList.add('active'), 100); 
+        }
         
         document.getElementById('my-user-id-display').value = myId;
 
         const savedProf = JSON.parse(localStorage.getItem('hub_profile')) || {};
         if(savedProf.name) {
-            document.getElementById('prof-name').value = savedProf.name; document.getElementById('order-name').value = savedProf.name;
-            document.getElementById('prof-phone').value = savedProf.phone || ''; document.getElementById('order-phone').value = savedProf.phone || '';
-            document.getElementById('prof-city').value = savedProf.city || ''; document.getElementById('order-city').value = savedProf.city || '';
+            document.getElementById('prof-name').value = savedProf.name; 
+            document.getElementById('order-name').value = savedProf.name;
+            document.getElementById('prof-phone').value = savedProf.phone || ''; 
+            document.getElementById('order-phone').value = savedProf.phone || '';
+            document.getElementById('prof-city').value = savedProf.city || ''; 
+            document.getElementById('order-city').value = savedProf.city || '';
         }
     });
 
-    document.getElementById("lang-toggle-mini")?.addEventListener("click", () => { currentLang = currentLang === "ua" ? "pl" : "ua"; applyLang(currentLang); });
+    document.getElementById("lang-toggle-mini")?.addEventListener("click", () => { 
+        currentLang = currentLang === "ua" ? "pl" : "ua"; 
+        applyLang(currentLang); 
+    });
 
     document.getElementById('copy-id-btn').onclick = () => {
         navigator.clipboard.writeText(myId);
@@ -589,12 +661,14 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
     });
+    
     document.querySelectorAll('.sub-nav-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const parent = e.target.closest('.cat-section');
             parent.querySelectorAll('.sub-nav-btn').forEach(b => b.classList.remove('active'));
             parent.querySelectorAll('.sub-grid').forEach(g => g.classList.remove('active'));
-            e.target.classList.add('active'); parent.querySelector('#grid-' + e.target.dataset.target).classList.add('active');
+            e.target.classList.add('active'); 
+            parent.querySelector('#grid-' + e.target.dataset.target).classList.add('active');
         });
     });
 
@@ -615,8 +689,14 @@
     function saveCart() { localStorage.setItem('hub_cart', JSON.stringify(cart)); updateCartBadge(); renderCart(); }
 
     function updateCartBadge() {
-        const badge = document.getElementById('cart-badge'); const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-        if(totalItems > 0) { badge.innerText = totalItems; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
+        const badge = document.getElementById('cart-badge'); 
+        const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+        if(totalItems > 0) { 
+            badge.innerText = totalItems; 
+            badge.classList.remove('hidden'); 
+        } else { 
+            badge.classList.add('hidden'); 
+        }
     }
 
     function getBasePrice(priceStr, selectedCurrency) {
@@ -664,9 +744,12 @@
         
         container.innerHTML = '';
         if(cart.length === 0) {
-            emptyMsg.classList.remove('hidden'); summary.classList.add('hidden'); recSection.classList.add('hidden');
+            emptyMsg.classList.remove('hidden'); 
+            summary.classList.add('hidden'); 
+            recSection.classList.add('hidden');
         } else {
-            emptyMsg.classList.add('hidden'); summary.classList.remove('hidden'); 
+            emptyMsg.classList.add('hidden'); 
+            summary.classList.remove('hidden'); 
             let totalSum = 0;
             
             cart.forEach((item, index) => {
@@ -697,7 +780,9 @@
                 totalSum = totalSum - discValue;
                 discMsg.innerText = `🎁 Знижка -${activePromoDiscount}% застосована!`;
                 discMsg.style.display = 'block';
-            } else { discMsg.style.display = 'none'; }
+            } else { 
+                discMsg.style.display = 'none'; 
+            }
             
             totalEl.innerText = `${totalSum.toFixed(2)} ${selectedCurrency}`;
             renderRecommended();
@@ -707,7 +792,8 @@
     function renderRecommended() {
         const recGrid = document.getElementById('recommended-grid');
         const recSection = document.getElementById('recommended-section');
-        recGrid.innerHTML = ''; recSection.classList.add('hidden');
+        recGrid.innerHTML = ''; 
+        recSection.classList.add('hidden');
 
         if (!globalCatalog || !globalCatalog['aktsii'] || !globalCatalog['aktsii'].descs) return;
         if (!isLiquidInCart()) return;
@@ -742,9 +828,16 @@
         const val = document.getElementById('cart-promo-input').value.trim().toUpperCase();
         if(promoConfig.code && val === promoConfig.code.toUpperCase()) {
             if(promoConfig.maxUses > 0 && (promoConfig.usedCount || 0) >= promoConfig.maxUses) {
-                activePromoDiscount = 0; alert(currentLang === 'ua' ? "Цей промокод вже використали максимальну кількість разів 😔" : "Limit użycia tego kodu został wyczerpany 😔");
-            } else { activePromoDiscount = promoConfig.percent; alert(`Промокод прийнято! Знижка ${promoConfig.percent}%`); }
-        } else { activePromoDiscount = 0; alert(currentLang === 'ua' ? "Невірний промокод" : "Błędny kod"); }
+                activePromoDiscount = 0; 
+                alert(currentLang === 'ua' ? "Цей промокод вже використали максимальну кількість разів 😔" : "Limit użycia tego kodu został wyczerpany 😔");
+            } else { 
+                activePromoDiscount = promoConfig.percent; 
+                alert(`Промокод прийнято! Знижка ${promoConfig.percent}%`); 
+            }
+        } else { 
+            activePromoDiscount = 0; 
+            alert(currentLang === 'ua' ? "Невірний промокод" : "Błędny kod"); 
+        }
         renderCart();
     };
 
@@ -752,11 +845,18 @@
     if (orderCurrencyEl) orderCurrencyEl.addEventListener('change', renderCart);
 
     document.getElementById('cart-items-container').addEventListener('click', e => {
-        if(e.target.classList.contains('cart-btn-plus')) { cart[e.target.dataset.idx].qty++; saveCart(); } 
-        else if(e.target.classList.contains('cart-btn-min')) { const idx = e.target.dataset.idx; cart[idx].qty--; if(cart[idx].qty <= 0) cart.splice(idx, 1); saveCart(); }
+        if(e.target.classList.contains('cart-btn-plus')) { 
+            cart[e.target.dataset.idx].qty++; 
+            saveCart(); 
+        } 
+        else if(e.target.classList.contains('cart-btn-min')) { 
+            const idx = e.target.dataset.idx; 
+            cart[idx].qty--; 
+            if(cart[idx].qty <= 0) cart.splice(idx, 1); 
+            saveCart(); 
+        }
     });
 
-    // --- ВІДПРАВКА ЗАМОВЛЕННЯ З АВТОГЕНЕРАЦІЄЮ ПОСИЛАННЯ ---
     document.getElementById('submit-order-btn').onclick = async () => {
         const name = document.getElementById('order-name').value.trim();
         const phone = document.getElementById('order-phone').value.trim();
@@ -773,54 +873,70 @@
             date: new Date().toLocaleString('uk-UA'), status: 'new'
         };
 
-        const btn = document.getElementById('submit-order-btn'); btn.innerText = "⏳ Відправка..."; btn.disabled = true;
+        const btn = document.getElementById('submit-order-btn'); 
+        btn.innerText = "⏳ Відправка..."; 
+        btn.disabled = true;
 
         try {
-            const newOrderRef = await push(ref(db, 'orders'), orderData);
-            const orderUniqueId = newOrderRef.key;
-
-            if (activePromoDiscount > 0 && promoConfig.code) await set(ref(db, 'settings/promo/usedCount'), (promoConfig.usedCount || 0) + 1);
+            await push(ref(db, 'orders'), orderData);
+            if (activePromoDiscount > 0 && promoConfig.code) {
+                await set(ref(db, 'settings/promo/usedCount'), (promoConfig.usedCount || 0) + 1);
+            }
             
             if (tgConfig && tgConfig.token && tgConfig.chatId) {
                 const itemsText = cart.map(i => `- ${i.name} x${i.qty}`).join('\n');
-                
-                // ГЕНЕРАЦІЯ ОФІЦІЙНОГО ПОСИЛАННЯ НА ОПЛАТУ
-                const payLink = `https://smoke-hub.online/pay.html?order=${orderUniqueId.slice(-5)}&amount=${encodeURIComponent(totalText)}`;
-
-                let tgMsg = `🚨 НОВЕ ЗАМОВЛЕННЯ!\n\n👤 ${name}\n📞 ${phone}\n📍 ${city}\n\n📦 Товари:\n${itemsText}\n\n💰 Сума: ${totalText}\n\n💳 <b>Посилання на оплату:</b>\n${payLink}`;
+                let tgMsg = `🚨 НОВЕ ЗАМОВЛЕННЯ!\n\n👤 ${name}\n📞 ${phone}\n📍 ${city}\n\n📦 Товари:\n${itemsText}\n\n💰 Сума: ${totalText}`;
                 if(activePromoDiscount > 0) tgMsg += `\n🎁 (Застосовано знижку -${activePromoDiscount}%)`;
                 
-                fetch(`https://api.telegram.org/bot${tgConfig.token}/sendMessage`, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({ chat_id: tgConfig.chatId, text: tgMsg, parse_mode: "HTML" })
-                }).catch(e => console.log('TG Send Error', e));
+                // Додано обробку помилок fetch для надійності
+                try {
+                    await fetch(`https://api.telegram.org/bot${tgConfig.token}/sendMessage`, {
+                        method: 'POST', 
+                        headers: {'Content-Type': 'application/json'}, 
+                        body: JSON.stringify({ chat_id: tgConfig.chatId, text: tgMsg })
+                    });
+                } catch(tgError) {
+                    console.log('TG Send Error', tgError);
+                }
             }
 
             alert(translations[currentLang].order_success);
-            cart = []; activePromoDiscount = 0; document.getElementById('cart-promo-input').value = '';
+            cart = []; 
+            activePromoDiscount = 0; 
+            document.getElementById('cart-promo-input').value = '';
             saveCart();
             localStorage.setItem('hub_profile', JSON.stringify({ name: name, phone: phone, city: city }));
             document.querySelector('.nav-item[data-tab="profile"]').click();
-        } catch (e) { alert("Помилка відправки. Спробуйте ще раз."); }
-        
-        btn.innerText = translations[currentLang].order_btn; btn.disabled = false;
+        } catch (e) { 
+            alert("Помилка відправки. Спробуйте ще раз."); 
+        } finally {
+            btn.innerText = translations[currentLang].order_btn; 
+            btn.disabled = false;
+        }
     };
 
     updateCartBadge(); renderCart();
 
     const categoriesList = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack', 'prodazh-cuba', 'prodazh-barron', 'aktsii'];
+    
     onValue(ref(db, 'catalog'), (snap) => {
         globalCatalog = snap.val(); 
         if (!globalCatalog) return;
+        
         categoriesList.forEach(cat => {
-            const grid = document.getElementById(`grid-${cat}`); if (!grid) return;
+            const grid = document.getElementById(`grid-${cat}`); 
+            if (!grid) return;
             grid.innerHTML = ''; 
+            
             const catData = globalCatalog[cat];
             if (catData && catData.descs) {
                 catData.descs.forEach((name, i) => {
                     const price = catData.prices?.[i] || "";
-                    const card = document.createElement('div'); card.className = `product-card ${catData.stock?.[i] === false ? 'out-of-stock' : ''}`;
-                    const bType = catData.badges?.[i]; if (bType) card.setAttribute('data-badge', bType);
+                    const card = document.createElement('div'); 
+                    card.className = `product-card ${catData.stock?.[i] === false ? 'out-of-stock' : ''}`;
+                    const bType = catData.badges?.[i]; 
+                    if (bType) card.setAttribute('data-badge', bType);
+                    
                     card.setAttribute('data-out-of-stock-text', translations[currentLang].sold);
                     const badgeHtml = bType ? `<div class="badge badge-${bType}">${translations[currentLang]['badge_' + bType] || ""}</div>` : '<div class="badge"></div>';
 
@@ -839,44 +955,101 @@
     document.addEventListener('click', e => {
         if(e.target.classList.contains('add-to-cart-btn')) {
             if(isAdmin() && mode !== null) return;
-            const name = e.target.dataset.name; const price = e.target.dataset.price;
+            
+            const name = e.target.dataset.name; 
+            const price = e.target.dataset.price;
             const existing = cart.find(i => i.name === name);
-            if(existing) existing.qty++; else cart.push({ name, price, qty: 1 });
+            
+            if(existing) existing.qty++; 
+            else cart.push({ name, price, qty: 1 });
+            
             saveCart();
             const origText = e.target.innerText;
-            e.target.innerText = "✅ Додано"; e.target.style.background = "rgba(0, 255, 153, 0.2)";
-            setTimeout(() => { e.target.innerText = origText; e.target.style.background = ""; }, 1000);
+            e.target.innerText = "✅ Додано"; 
+            e.target.style.background = "rgba(0, 255, 153, 0.2)";
+            setTimeout(() => { 
+                e.target.innerText = origText; 
+                e.target.style.background = ""; 
+            }, 1000);
         }
     });
 
     let mode = null;
-    function updateModeBtns(activeBtn) { document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode')); if (mode) activeBtn.classList.add('active-mode'); }
+    function updateModeBtns(activeBtn) { 
+        document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active-mode')); 
+        if (mode) activeBtn.classList.add('active-mode'); 
+    }
 
-    document.getElementById('edit-price').onclick = (e) => { mode = mode === 'price' ? null : 'price'; document.querySelectorAll('.price').forEach(el => el.contentEditable = (mode === 'price')); updateModeBtns(e.target); };
-    document.getElementById('edit-desc').onclick = (e) => { mode = mode === 'desc' ? null : 'desc'; document.querySelectorAll('.product-desc').forEach(el => el.contentEditable = (mode === 'desc')); updateModeBtns(e.target); };
+    document.getElementById('edit-price').onclick = (e) => { 
+        mode = mode === 'price' ? null : 'price'; 
+        document.querySelectorAll('.price').forEach(el => el.contentEditable = (mode === 'price')); 
+        updateModeBtns(e.target); 
+    };
+    document.getElementById('edit-desc').onclick = (e) => { 
+        mode = mode === 'desc' ? null : 'desc'; 
+        document.querySelectorAll('.product-desc').forEach(el => el.contentEditable = (mode === 'desc')); 
+        updateModeBtns(e.target); 
+    };
     document.getElementById('edit-stock').onclick = (e) => { mode = mode === 'stock' ? null : 'stock'; updateModeBtns(e.target); };
     document.getElementById('edit-badge').onclick = (e) => { mode = mode === 'badge' ? null : 'badge'; updateModeBtns(e.target); };
     document.getElementById('edit-img-mode').onclick = (e) => { mode = mode === 'img' ? null : 'img'; updateModeBtns(e.target); };
     document.getElementById('edit-delete').onclick = (e) => { mode = mode === 'delete' ? null : 'delete'; updateModeBtns(e.target); };
 
     document.addEventListener('click', (e) => {
-        const card = e.target.closest('.product-card'); if(!card || !isAdmin() || !mode) return;
-        if(mode === 'stock') { card.classList.toggle('out-of-stock'); card.setAttribute('data-out-of-stock-text', translations[currentLang].sold); }
+        const card = e.target.closest('.product-card'); 
+        if(!card || !isAdmin() || !mode) return;
+        
+        if(mode === 'stock') { 
+            card.classList.toggle('out-of-stock'); 
+            card.setAttribute('data-out-of-stock-text', translations[currentLang].sold); 
+        }
         if(mode === 'badge') {
-            const type = document.getElementById('badge-selector').value; const badgeDiv = card.querySelector('.badge'); badgeDiv.className = 'badge';
-            if(type) { card.setAttribute('data-badge', type); badgeDiv.classList.add('badge-' + type); badgeDiv.innerText = translations[currentLang]['badge_' + type]; } 
-            else { card.removeAttribute('data-badge'); badgeDiv.innerText = ''; }
+            const type = document.getElementById('badge-selector').value; 
+            const badgeDiv = card.querySelector('.badge'); 
+            badgeDiv.className = 'badge';
+            if(type) { 
+                card.setAttribute('data-badge', type); 
+                badgeDiv.classList.add('badge-' + type); 
+                badgeDiv.innerText = translations[currentLang]['badge_' + type]; 
+            } else { 
+                card.removeAttribute('data-badge'); 
+                badgeDiv.innerText = ''; 
+            }
         }
         if(mode === 'delete' && confirm("Видалити товар з каталогу?")) card.remove();
-        if(mode === 'img') { const newUrl = prompt("URL нового фото:", card.querySelector('img').src); if(newUrl) card.querySelector('img').src = newUrl; }
+        if(mode === 'img') { 
+            const newUrl = prompt("URL нового фото:", card.querySelector('img').src); 
+            if(newUrl) card.querySelector('img').src = newUrl; 
+        }
     });
 
     document.getElementById('add-product-btn').onclick = async () => {
-        const cat = document.getElementById('new-prod-cat').value; const name = document.getElementById('new-prod-name').value.trim(); const price = document.getElementById('new-prod-price').value.trim(); const img = document.getElementById('new-prod-img').value.trim();
+        const cat = document.getElementById('new-prod-cat').value; 
+        const name = document.getElementById('new-prod-name').value.trim(); 
+        const price = document.getElementById('new-prod-price').value.trim(); 
+        const img = document.getElementById('new-prod-img').value.trim();
+        
         if (!name || !price) return alert("Введіть назву та ціну!");
-        const catRef = ref(db, `catalog/${cat}`); const snap = await get(catRef); let d = snap.val() || { descs: [], prices: [], stock: [], badges: [], imgs: [] };
-        d.descs.push(name); d.prices.push(price); d.imgs = d.imgs || []; d.imgs.push(img || ''); d.stock = d.stock || []; d.stock.push(true); d.badges = d.badges || []; d.badges.push("");
-        set(catRef, d).then(() => { alert("Додано!"); document.getElementById('new-prod-name').value = ''; document.getElementById('new-prod-price').value = ''; document.getElementById('new-prod-img').value = ''; });
+        
+        const catRef = ref(db, `catalog/${cat}`); 
+        const snap = await get(catRef); 
+        let d = snap.val() || { descs: [], prices: [], stock: [], badges: [], imgs: [] };
+        
+        d.descs.push(name); 
+        d.prices.push(price); 
+        d.imgs = d.imgs || []; 
+        d.imgs.push(img || ''); 
+        d.stock = d.stock || []; 
+        d.stock.push(true); 
+        d.badges = d.badges || []; 
+        d.badges.push("");
+        
+        set(catRef, d).then(() => { 
+            alert("Додано!"); 
+            document.getElementById('new-prod-name').value = ''; 
+            document.getElementById('new-prod-price').value = ''; 
+            document.getElementById('new-prod-img').value = ''; 
+        });
     };
 
     document.getElementById('save-all').onclick = () => {
@@ -884,8 +1057,11 @@
         categoriesList.forEach(cat => {
             const p = [], d = [], s = [], b = [], im = [];
             document.querySelectorAll(`#grid-${cat} .product-card`).forEach(card => {
-                d.push(card.querySelector('.product-desc').innerText); p.push(card.querySelector('.price').innerText);
-                s.push(!card.classList.contains('out-of-stock')); b.push(card.getAttribute('data-badge') || ""); im.push(card.querySelector('img').src);
+                d.push(card.querySelector('.product-desc').innerText); 
+                p.push(card.querySelector('.price').innerText);
+                s.push(!card.classList.contains('out-of-stock')); 
+                b.push(card.getAttribute('data-badge') || ""); 
+                im.push(card.querySelector('img').src);
             });
             promises.push(set(ref(db, `catalog/${cat}`), { descs: d, prices: p, stock: s, badges: b, imgs: im }));
         });
@@ -894,12 +1070,19 @@
 
     let sortables = [];
     document.getElementById('edit-reorder').onclick = (e) => {
-        mode = mode === 'reorder' ? null : 'reorder'; updateModeBtns(e.target);
-        if (mode === 'reorder') { document.body.classList.add('reorder-mode'); document.querySelectorAll('.product-grid').forEach(g => sortables.push(new Sortable(g, { animation: 150, delay: 100 }))); } 
-        else { document.body.classList.remove('reorder-mode'); sortables.forEach(s => s.destroy()); sortables = []; }
+        mode = mode === 'reorder' ? null : 'reorder'; 
+        updateModeBtns(e.target);
+        if (mode === 'reorder') { 
+            document.body.classList.add('reorder-mode'); 
+            document.querySelectorAll('.product-grid').forEach(g => sortables.push(new Sortable(g, { animation: 150, delay: 100 }))); 
+        } else { 
+            document.body.classList.remove('reorder-mode'); 
+            sortables.forEach(s => s.destroy()); 
+            sortables = []; 
+        }
     };
 
-    // --- ПЕРЕВІРКА ПАРОЛЯ З АВТОМАТИЧНОЮ ЗМІНОЮ ТА НАДСИЛАННЯМ У ТГ ---
+    // --- ПЕРЕВІРКА ПАРОЛЯ З НЕОНОВИМ ПОВІДОМЛЕННЯМ ---
     document.getElementById('admin-trigger').onclick = async () => {
         const weeklyPass = getCurrentWeeklyPassword();
         const lastSentWeek = localStorage.getItem('hub_last_sent_week');
@@ -908,7 +1091,8 @@
         if (lastSentWeek !== currentWeek && passConfig && passConfig.token && passConfig.chatId) {
             try {
                 await fetch(`https://api.telegram.org/bot${passConfig.token}/sendMessage`, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ chat_id: passConfig.chatId, text: `🛡️ Пароль від адмінки на цей тиждень:\n\n🔑 \`${weeklyPass}\``, parse_mode: "Markdown" })
                 });
                 localStorage.setItem('hub_last_sent_week', currentWeek);
@@ -923,13 +1107,15 @@
                 localStorage.setItem('isHubAdmin', 'true');
                 location.reload();
             } else if (entered !== null) {
-                alert("Невірний пароль!");
+                alert("⛔ Вхід тільки для адміністрації!");
             }
         }
     };
 
     window.deleteOrder = (orderId) => {
-        if (isAdmin() && confirm("Точно видалити це замовлення?")) remove(ref(db, `orders/${orderId}`)).then(() => alert("Замовлення видалено!"));
+        if (isAdmin() && confirm("Точно видалити це замовлення?")) {
+            remove(ref(db, `orders/${orderId}`)).then(() => alert("Замовлення видалено!"));
+        }
     };
 
     window.allOrdersForExport = [];
@@ -951,12 +1137,18 @@
                             💰 <span style="color:var(--neon-blue); font-weight: bold;">${o.total}</span> | 💳 <b>${o.payCurrency || 'Не вказано'}</b>
                         </div>`;
                 });
-            } else { uList.innerHTML = '<div style="color: #888; font-size: 13px; text-align:center;">У вас ще немає замовлень</div>'; }
-        } else { uList.innerHTML = '<div style="color: #888; font-size: 13px; text-align:center;">У вас ще немає замовлень</div>'; }
+            } else { 
+                uList.innerHTML = '<div style="color: #888; font-size: 13px; text-align:center;">У вас ще немає замовлень</div>'; 
+            }
+        } else { 
+            uList.innerHTML = '<div style="color: #888; font-size: 13px; text-align:center;">У вас ще немає замовлень</div>'; 
+        }
 
         if(!isAdmin()) return;
-        const aList = document.getElementById('admin-orders-list'); aList.innerHTML = '';
+        const aList = document.getElementById('admin-orders-list'); 
+        aList.innerHTML = '';
         window.allOrdersForExport = []; 
+        
         if(data) {
             Object.entries(data).reverse().forEach(([key, o]) => {
                 window.allOrdersForExport.push(o);
@@ -970,7 +1162,9 @@
                         💰 <span style="color:var(--neon-blue); font-weight: bold;">${o.total}</span> | 💳 <b>${o.payCurrency || 'Не вказано'}</b>
                     </div>`;
             });
-        } else { aList.innerHTML = '<div style="color: #888; font-size: 12px;">Поки немає замовлень</div>'; }
+        } else { 
+            aList.innerHTML = '<div style="color: #888; font-size: 12px;">Поки немає замовлень</div>'; 
+        }
     });
 
     document.getElementById('export-csv-btn').onclick = () => {
@@ -999,25 +1193,65 @@
         document.body.removeChild(link);
     };
 
-    onValue(ref(db, 'settings/lastUpdate'), (snap) => { const date = snap.val() || '24.07.2026'; const dateEl = document.getElementById('last-update-date'); if (dateEl) dateEl.innerText = date; const adminInput = document.getElementById('admin-update-date'); if (adminInput) adminInput.value = date; });
-    document.getElementById('save-date-btn')?.addEventListener('click', () => { if (isAdmin()) { const newDate = document.getElementById('admin-update-date').value.trim(); if(newDate) set(ref(db, 'settings/lastUpdate'), newDate).then(() => alert('Дату оновлено!')); } });
-
-    onValue(ref(db, 'settings/bannerVisible'), (s) => { currentBannerStatus = s.val() !== false; const btn = document.getElementById('toggle-banner'); if(currentBannerStatus) { btn.classList.add('active-mode'); const banner = document.getElementById('main-banner'); if (banner && !document.getElementById('cat-cart').classList.contains('active') && !document.getElementById('cat-profile').classList.contains('active')) banner.style.display = 'block'; } else { btn.classList.remove('active-mode'); const banner = document.getElementById('main-banner'); if (banner) banner.style.display = 'none'; } });
-    document.getElementById('toggle-banner').onclick = () => { if (isAdmin()) set(ref(db, 'settings/bannerVisible'), !currentBannerStatus); };
-
-    onValue(ref(db, 'settings/hideSold'), (s) => { currentHideSoldStatus = s.val() === true; const btn = document.getElementById('toggle-hide-sold'); if(currentHideSoldStatus) { document.documentElement.classList.add('hide-sold-active'); btn.classList.add('active-mode'); } else { document.documentElement.classList.remove('hide-sold-active'); btn.classList.remove('active-mode'); } });
-    document.getElementById('toggle-hide-sold').onclick = () => { if (isAdmin()) set(ref(db, 'settings/hideSold'), !currentHideSoldStatus); };
-
-    // Завантаження налаштувань Telegram (Замовлення)
-    onValue(ref(db, 'settings/telegram'), (snap) => { 
-        tgConfig = snap.val() || {token: "", chatId: ""};
-        document.getElementById('admin-tg-token').value = tgConfig.token; document.getElementById('admin-tg-chat').value = tgConfig.chatId;
+    onValue(ref(db, 'settings/lastUpdate'), (snap) => { 
+        const date = snap.val() || '24.07.2026'; 
+        const dateEl = document.getElementById('last-update-date'); 
+        if (dateEl) dateEl.innerText = date; 
+        const adminInput = document.getElementById('admin-update-date'); 
+        if (adminInput) adminInput.value = date; 
+    });
+    
+    document.getElementById('save-date-btn')?.addEventListener('click', () => { 
+        if (isAdmin()) { 
+            const newDate = document.getElementById('admin-update-date').value.trim(); 
+            if(newDate) set(ref(db, 'settings/lastUpdate'), newDate).then(() => alert('Дату оновлено!')); 
+        } 
     });
 
-    // Завантаження налаштувань Telegram (Паролі)
+    onValue(ref(db, 'settings/bannerVisible'), (s) => { 
+        currentBannerStatus = s.val() !== false; 
+        const btn = document.getElementById('toggle-banner'); 
+        if(currentBannerStatus) { 
+            btn.classList.add('active-mode'); 
+            const banner = document.getElementById('main-banner'); 
+            if (banner && !document.getElementById('cat-cart').classList.contains('active') && !document.getElementById('cat-profile').classList.contains('active')) banner.style.display = 'block'; 
+        } else { 
+            btn.classList.remove('active-mode'); 
+            const banner = document.getElementById('main-banner'); 
+            if (banner) banner.style.display = 'none'; 
+        } 
+    });
+    
+    document.getElementById('toggle-banner').onclick = () => { 
+        if (isAdmin()) set(ref(db, 'settings/bannerVisible'), !currentBannerStatus); 
+    };
+
+    onValue(ref(db, 'settings/hideSold'), (s) => { 
+        currentHideSoldStatus = s.val() === true; 
+        const btn = document.getElementById('toggle-hide-sold'); 
+        if(currentHideSoldStatus) { 
+            document.documentElement.classList.add('hide-sold-active'); 
+            btn.classList.add('active-mode'); 
+        } else { 
+            document.documentElement.classList.remove('hide-sold-active'); 
+            btn.classList.remove('active-mode'); 
+        } 
+    });
+    
+    document.getElementById('toggle-hide-sold').onclick = () => { 
+        if (isAdmin()) set(ref(db, 'settings/hideSold'), !currentHideSoldStatus); 
+    };
+
+    onValue(ref(db, 'settings/telegram'), (snap) => { 
+        tgConfig = snap.val() || {token: "", chatId: ""};
+        document.getElementById('admin-tg-token').value = tgConfig.token; 
+        document.getElementById('admin-tg-chat').value = tgConfig.chatId;
+    });
+
     onValue(ref(db, 'settings/telegramPass'), (snap) => { 
         passConfig = snap.val() || {token: "", chatId: ""};
-        document.getElementById('admin-pass-token').value = passConfig.token; document.getElementById('admin-pass-chat').value = passConfig.chatId;
+        document.getElementById('admin-pass-token').value = passConfig.token; 
+        document.getElementById('admin-pass-chat').value = passConfig.chatId;
     });
 
     document.getElementById('save-tg-btn').onclick = () => {
