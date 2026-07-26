@@ -510,6 +510,14 @@
     <details class="admin-group">
         <summary>🎟️ Промокод</summary>
         <div class="admin-group-content">
+            <!-- НОВИЙ ВИБІР КАТЕГОРІЇ ПРОМОКОДУ -->
+            <select id="admin-promo-category" class="admin-input" style="margin-bottom: 8px;">
+                <option value="all">Усі товари (Глобально)</option>
+                <option value="liquid">Тільки Жижа</option>
+                <option value="snus">Тільки Снюс</option>
+                <option value="cartridges">Тільки Катриджі</option>
+            </select>
+            
             <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                 <input type="text" id="admin-promo-code" class="admin-input" style="margin-bottom: 0; flex: 2;" placeholder="Код (напр. HUB10)">
                 <input type="number" id="admin-promo-percent" class="admin-input" style="margin-bottom: 0; flex: 1;" placeholder="%">
@@ -554,7 +562,6 @@
             <div style="font-size: 10px; color:var(--neon-blue); margin-bottom:5px; font-weight:bold;">🤖 БОТ ДЛЯ ЗАМОВЛЕНЬ</div>
             <input type="text" id="admin-tg-token" class="admin-input" placeholder="Bot Token (Замовлення)">
             <input type="text" id="admin-tg-chat" class="admin-input" placeholder="Chat ID 1 (Замовлення)">
-            <!-- НОВЕ ПОЛЕ ДЛЯ ДРУГОГО CHAT ID -->
             <input type="text" id="admin-tg-chat2" class="admin-input" placeholder="Chat ID 2 (Опціонально)">
 
             <div style="font-size: 10px; color:var(--neon-pink); margin: 10px 0 5px; font-weight:bold;">🔐 БОТ ДЛЯ ПАРОЛІВ</div>
@@ -577,9 +584,9 @@
     const isAdmin = () => localStorage.getItem('isHubAdmin') === 'true';
 
     let globalCatalog = null;
-    let promoConfig = { code: "", percent: 0, maxUses: 0, usedCount: 0 }; 
+    let promoConfig = { code: "", percent: 0, maxUses: 0, usedCount: 0, category: "all" }; 
     let activePromoDiscount = 0;
-    // ТЕПЕР tgConfig ЗБЕРІГАЄ chatId ТА chatId2
+    let activePromoCategory = "all"; // Нова змінна для збереження активної категорії промокоду
     let tgConfig = { token: "", chatId: "", chatId2: "" };
     let passConfig = { token: "", chatId: "" };
 
@@ -785,13 +792,28 @@
         return basePrice;
     }
 
+    // Допоміжна функція для визначення категорії товару
+    function getCategoryByItemName(itemName) {
+        if (!globalCatalog) return "all";
+        const liquids = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack'];
+        const snus = ['prodazh-cuba', 'prodazh-barron'];
+        const cartridges = ['aktsii'];
+        
+        for (let cat of liquids) {
+            if (globalCatalog[cat] && globalCatalog[cat].descs && globalCatalog[cat].descs.includes(itemName)) return "liquid";
+        }
+        for (let cat of snus) {
+            if (globalCatalog[cat] && globalCatalog[cat].descs && globalCatalog[cat].descs.includes(itemName)) return "snus";
+        }
+        for (let cat of cartridges) {
+            if (globalCatalog[cat] && globalCatalog[cat].descs && globalCatalog[cat].descs.includes(itemName)) return "cartridges";
+        }
+        return "all";
+    }
+
     function isLiquidInCart() {
-        if (!globalCatalog) return false;
-        const liquidCats = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack'];
         for (let item of cart) {
-            for (let cat of liquidCats) {
-                if (globalCatalog[cat] && globalCatalog[cat].descs && globalCatalog[cat].descs.includes(item.name)) return true;
-            }
+            if (getCategoryByItemName(item.name) === "liquid") return true;
         }
         return false;
     }
@@ -815,10 +837,20 @@
             emptyMsg.classList.add('hidden'); 
             summary.classList.remove('hidden'); 
             let totalSum = 0;
+            let discountableSum = 0; // Сума товарів, на які діє промокод
             
             cart.forEach((item, index) => {
                 const finalItemPrice = getItemPrice(item.name, item.price, item.qty, selectedCurrency);
-                totalSum += finalItemPrice * item.qty;
+                const itemTotal = finalItemPrice * item.qty;
+                totalSum += itemTotal;
+
+                // Перевіряємо, чи підходить товар під категорію промокоду
+                if (activePromoDiscount > 0) {
+                    const itemCat = getCategoryByItemName(item.name);
+                    if (activePromoCategory === 'all' || itemCat === activePromoCategory) {
+                        discountableSum += itemTotal;
+                    }
+                }
 
                 const isDiscounted = finalItemPrice !== getBasePrice(item.price, selectedCurrency);
                 const priceTagHtml = isDiscounted 
@@ -839,13 +871,24 @@
                 container.appendChild(div);
             });
 
-            if (activePromoDiscount > 0) {
-                const discValue = totalSum * (activePromoDiscount / 100);
+            if (activePromoDiscount > 0 && discountableSum > 0) {
+                const discValue = discountableSum * (activePromoDiscount / 100);
                 totalSum = totalSum - discValue;
-                discMsg.innerText = `🎁 Знижка -${activePromoDiscount}% застосована!`;
+                
+                let catName = "усі товари";
+                if (activePromoCategory === 'liquid') catName = "жижу";
+                if (activePromoCategory === 'snus') catName = "снюс";
+                if (activePromoCategory === 'cartridges') catName = "катриджі";
+
+                discMsg.innerText = `🎁 Знижка -${activePromoDiscount}% на ${catName} застосована!`;
+                discMsg.style.color = 'var(--neon-pink)';
                 discMsg.style.display = 'block';
-            } else { 
-                discMsg.style.display = 'none'; 
+            } else if (activePromoDiscount > 0 && discountableSum === 0) {
+                discMsg.innerText = `⚠️ Промокод не діє на ці товари`;
+                discMsg.style.color = '#ffaa00';
+                discMsg.style.display = 'block';
+            } else {
+                discMsg.style.display = 'none';
             }
             
             totalEl.innerText = `${totalSum.toFixed(2)} ${selectedCurrency}`;
@@ -893,13 +936,16 @@
         if(promoConfig.code && val === promoConfig.code.toUpperCase()) {
             if(promoConfig.maxUses > 0 && (promoConfig.usedCount || 0) >= promoConfig.maxUses) {
                 activePromoDiscount = 0; 
+                activePromoCategory = "all";
                 alert(currentLang === 'ua' ? "Цей промокод вже використали максимальну кількість разів 😔" : "Limit użycia tego kodu został wyczerpany 😔");
             } else { 
                 activePromoDiscount = promoConfig.percent; 
+                activePromoCategory = promoConfig.category || 'all'; // Застосовуємо категорію
                 alert(`Промокод прийнято! Знижка ${promoConfig.percent}%`); 
             }
         } else { 
             activePromoDiscount = 0; 
+            activePromoCategory = "all";
             alert(currentLang === 'ua' ? "Невірний промокод" : "Błędny kod"); 
         }
         renderCart();
@@ -976,6 +1022,7 @@
             alert(translations[currentLang].order_success);
             cart = []; 
             activePromoDiscount = 0; 
+            activePromoCategory = "all";
             document.getElementById('cart-promo-input').value = '';
             saveCart();
             localStorage.setItem('hub_profile', JSON.stringify({ name: name, phone: phone, city: city }));
@@ -1339,22 +1386,24 @@
         if(isAdmin()) {
             const tTg = document.getElementById('admin-tg-token').value.trim();
             const cTg = document.getElementById('admin-tg-chat').value.trim();
-            const cTg2 = document.getElementById('admin-tg-chat2').value.trim(); // Нове поле
+            const cTg2 = document.getElementById('admin-tg-chat2').value.trim(); 
             const tPass = document.getElementById('admin-pass-token').value.trim();
             const cPass = document.getElementById('admin-pass-chat').value.trim();
 
             Promise.all([
-                set(ref(db, 'settings/telegram'), { token: tTg, chatId: cTg, chatId2: cTg2 }), // Зберігаємо обидва ID
+                set(ref(db, 'settings/telegram'), { token: tTg, chatId: cTg, chatId2: cTg2 }),
                 set(ref(db, 'settings/telegramPass'), { token: tPass, chatId: cPass })
             ]).then(() => alert('Налаштування обох ботів збережено!'));
         }
     };
 
+    // ЗБЕРЕЖЕННЯ ПРОМОКОДУ З КАТЕГОРІЄЮ
     onValue(ref(db, 'settings/promo'), (snap) => {
-        promoConfig = snap.val() || {code: "", percent: 0, maxUses: 0, usedCount: 0};
-        document.getElementById('admin-promo-code').value = promoConfig.code; 
+        promoConfig = snap.val() || {code: "", percent: 0, maxUses: 0, usedCount: 0, category: "all"};
+        document.getElementById('admin-promo-code').value = promoConfig.code || ""; 
         document.getElementById('admin-promo-percent').value = promoConfig.percent || '';
         document.getElementById('admin-promo-limit').value = promoConfig.maxUses || '';
+        document.getElementById('admin-promo-category').value = promoConfig.category || 'all';
         
         let statsText = `Використано: ${promoConfig.usedCount || 0}`;
         if (promoConfig.maxUses > 0) statsText += ` / ${promoConfig.maxUses}`;
@@ -1367,9 +1416,17 @@
             const newCode = document.getElementById('admin-promo-code').value.trim();
             const newPercent = Number(document.getElementById('admin-promo-percent').value.trim());
             const newLimit = Number(document.getElementById('admin-promo-limit').value.trim());
+            const newCategory = document.getElementById('admin-promo-category').value; // Читаємо категорію
+
             let used = (newCode.toUpperCase() === (promoConfig.code || "").toUpperCase()) ? (promoConfig.usedCount || 0) : 0;
 
-            set(ref(db, 'settings/promo'), { code: newCode, percent: newPercent, maxUses: newLimit, usedCount: used }).then(() => alert('Промокод збережено!'));
+            set(ref(db, 'settings/promo'), { 
+                code: newCode, 
+                percent: newPercent, 
+                maxUses: newLimit, 
+                usedCount: used,
+                category: newCategory 
+            }).then(() => alert('Промокод збережено!'));
         }
     };
 </script>
