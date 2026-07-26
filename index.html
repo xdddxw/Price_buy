@@ -59,7 +59,6 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Додано покращений фокус для доступності */
         button:focus-visible, input:focus-visible, select:focus-visible {
             outline: 2px solid var(--neon-blue);
             outline-offset: 2px;
@@ -231,6 +230,13 @@
         .lang-options button { background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); color: white; border: 1px solid var(--glass-border); padding: 18px; border-radius: 20px; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px; cursor:pointer; transition: transform 0.2s, background 0.2s; }
         .lang-options button:active { background: rgba(255,255,255,0.1); transform: scale(0.95); }
 
+        /* ЕКРАН БАНУ */
+        #ban-overlay {
+            display: none; position: fixed; inset: 0; z-index: 9999999;
+            background: rgba(5, 5, 8, 0.98); backdrop-filter: blur(20px);
+            align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 20px;
+        }
+
         /* КОМПАКТНИЙ CSS АДМІНКИ */
         .dev-panel { 
             position: fixed; top: 0; right: -100%; width: 100%; max-width: 380px; height: 100vh; 
@@ -261,6 +267,17 @@
     </style>
 </head>
 <body>
+
+<!-- ЕКРАН БЛОКУВАННЯ -->
+<div id="ban-overlay">
+    <div style="font-size: 50px; margin-bottom: 15px;">⛔</div>
+    <h1 style="color:var(--neon-pink); font-size:28px; margin: 0 0 10px; font-weight:900;">ДОСТУП ОБМЕЖЕНО</h1>
+    <p style="color:#ccc; font-size:15px; margin: 0 0 20px;">Ваш акаунт було заблоковано адміністрацією.</p>
+    <div style="background: rgba(255,255,255,0.05); padding: 15px 25px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);">
+        <p style="color:#888; font-size:12px; margin: 0 0 5px;">Ваш ID для оскарження:</p>
+        <p id="ban-user-id" style="color:var(--neon-blue); font-size:14px; font-weight:bold; margin:0; user-select:all;"></p>
+    </div>
+</div>
 
 <div id="language-modal" class="lang-modal-overlay">
     <div class="lang-modal-content">
@@ -505,6 +522,19 @@
         </div>
     </details>
 
+    <!-- БАН-ЛИСТ -->
+    <details class="admin-group">
+        <summary>⛔ Бан-лист</summary>
+        <div class="admin-group-content">
+            <div style="font-size: 10px; color:#888; margin-bottom:5px;">ЗАБЛОКУВАТИ / РОЗБЛОКУВАТИ ЗА ID</div>
+            <input type="text" id="admin-ban-id-input" class="admin-input" placeholder="Введіть ID користувача">
+            <div class="admin-grid">
+                <button class="admin-btn" onclick="banUser(document.getElementById('admin-ban-id-input').value.trim())" style="color: #ff3366; border-color: rgba(255, 51, 102, 0.3);">Забанити</button>
+                <button class="admin-btn" onclick="unbanUser(document.getElementById('admin-ban-id-input').value.trim())" style="color: #00ff99; border-color: rgba(0, 255, 153, 0.3);">Розбанити</button>
+            </div>
+        </div>
+    </details>
+
     <!-- 5. СИСТЕМА ТА ТЕЛЕГРАМ -->
     <details class="admin-group">
         <summary>⚙️ Система та Telegram</summary>
@@ -549,6 +579,37 @@
     let activePromoDiscount = 0;
     let tgConfig = { token: "", chatId: "" };
     let passConfig = { token: "", chatId: "" };
+
+    // Слухач для Бану
+    document.getElementById('ban-user-id').innerText = myId;
+    onValue(ref(db, `bannedUsers/${myId}`), (snap) => {
+        if (snap.val() === true && !isAdmin()) {
+            document.getElementById('ban-overlay').style.display = 'flex';
+        } else {
+            document.getElementById('ban-overlay').style.display = 'none';
+        }
+    });
+
+    // Глобальні функції бану для кнопок в HTML
+    window.banUser = (uid) => {
+        if(!uid) return alert("Введіть ID!");
+        if(confirm(`Точно заблокувати користувача ${uid}? Він більше не зможе користуватись сайтом.`)) {
+            set(ref(db, `bannedUsers/${uid}`), true).then(() => {
+                alert(`Користувач ${uid} заблокований!`);
+                document.getElementById('admin-ban-id-input').value = '';
+            });
+        }
+    };
+
+    window.unbanUser = (uid) => {
+        if(!uid) return alert("Введіть ID!");
+        if(confirm(`Розблокувати користувача ${uid}?`)) {
+            set(ref(db, `bannedUsers/${uid}`), null).then(() => {
+                alert(`Користувач ${uid} розблокований!`);
+                document.getElementById('admin-ban-id-input').value = '';
+            });
+        }
+    };
 
     function getWeekNumber(d) {
         d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -866,7 +927,11 @@
         
         if(!name || !phone || !city) return alert("Будь ласка, заповніть всі поля!");
 
+        // ГЕНЕРАЦІЯ НОМЕРУ ЗАМОВЛЕННЯ
+        const generatedOrderNumber = '#' + Math.floor(10000 + Math.random() * 90000);
+
         const orderData = {
+            orderNumber: generatedOrderNumber,
             userId: myId,
             user: name, contact: phone, city: city, items: cart,
             total: totalText, payCurrency: currency, promoDiscount: activePromoDiscount,
@@ -885,10 +950,9 @@
             
             if (tgConfig && tgConfig.token && tgConfig.chatId) {
                 const itemsText = cart.map(i => `- ${i.name} x${i.qty}`).join('\n');
-                let tgMsg = `🚨 НОВЕ ЗАМОВЛЕННЯ!\n\n👤 ${name}\n📞 ${phone}\n📍 ${city}\n\n📦 Товари:\n${itemsText}\n\n💰 Сума: ${totalText}`;
+                let tgMsg = `🚨 НОВЕ ЗАМОВЛЕННЯ ${generatedOrderNumber}!\n\n👤 ${name}\n📞 ${phone}\n📍 ${city}\n\n📦 Товари:\n${itemsText}\n\n💰 Сума: ${totalText}\n🆔 ID: ${myId}`;
                 if(activePromoDiscount > 0) tgMsg += `\n🎁 (Застосовано знижку -${activePromoDiscount}%)`;
                 
-                // Додано обробку помилок fetch для надійності
                 try {
                     await fetch(`https://api.telegram.org/bot${tgConfig.token}/sendMessage`, {
                         method: 'POST', 
@@ -1130,9 +1194,10 @@
             if(myOrders.length) {
                 myOrders.forEach(o => {
                     const itemsHtml = o.items.map(i => `• ${i.name} <b>x${i.qty}</b>`).join('<br>');
+                    const ordNumStr = o.orderNumber ? `Замовлення <span style="color:var(--neon-blue);">${o.orderNumber}</span> • ` : '';
                     uList.innerHTML += `
                         <div style="background:rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding:12px; border-radius:12px; font-size:13px;">
-                            <div style="color: #aaa; font-size: 10px; margin-bottom: 5px;">${o.date}</div>
+                            <div style="color: #aaa; font-size: 10px; margin-bottom: 5px;">${ordNumStr}${o.date}</div>
                             <div style="margin: 8px 0; color: #ccc;">${itemsHtml}</div>
                             💰 <span style="color:var(--neon-blue); font-weight: bold;">${o.total}</span> | 💳 <b>${o.payCurrency || 'Не вказано'}</b>
                         </div>`;
@@ -1153,11 +1218,15 @@
             Object.entries(data).reverse().forEach(([key, o]) => {
                 window.allOrdersForExport.push(o);
                 const itemsHtml = o.items.map(i => `• ${i.name} <b>x${i.qty}</b>`).join('<br>');
+                const ordNumStr = o.orderNumber ? `Замовлення <span style="color:var(--neon-blue);">${o.orderNumber}</span> • ` : '';
                 aList.innerHTML += `
-                    <div style="background:rgba(255,255,255,0.05); border: 1px solid rgba(0, 240, 255, 0.2); padding:10px; border-radius:12px; font-size:12px; position:relative;">
+                    <div style="background:rgba(255,255,255,0.05); border: 1px solid rgba(0, 240, 255, 0.2); padding:10px; border-radius:12px; font-size:12px; position:relative; margin-bottom:8px;">
                         <button onclick="deleteOrder('${key}')" style="position:absolute; top:8px; right:8px; background: rgba(255,51,102,0.2); color: #ff3366; border: 1px solid rgba(255,51,102,0.4); padding: 4px 8px; border-radius: 8px; cursor: pointer; font-size: 10px;">🗑️</button>
-                        <div style="color: #aaa; font-size: 10px; margin-bottom: 4px;">${o.date}</div>
+                        <div style="color: #aaa; font-size: 10px; margin-bottom: 4px;">${ordNumStr}${o.date}</div>
                         <b>👤 ${o.user}</b> <br>📞 ${o.contact}<br>📍 ${o.city || 'Не вказано'}<br>
+                        <div style="font-size:10px; color:#666; margin-top:4px;">ID: ${o.userId} 
+                            <span onclick="banUser('${o.userId}')" style="cursor:pointer; color:#ff3366; margin-left:5px; padding:2px 6px; background:rgba(255,51,102,0.1); border-radius:4px; border:1px solid rgba(255,51,102,0.3);">[Бан]</span>
+                        </div>
                         <div style="margin: 6px 0; color: #ccc;">${itemsHtml}</div>
                         💰 <span style="color:var(--neon-blue); font-weight: bold;">${o.total}</span> | 💳 <b>${o.payCurrency || 'Не вказано'}</b>
                     </div>`;
@@ -1171,12 +1240,12 @@
         if(!window.allOrdersForExport || !window.allOrdersForExport.length) return alert("Немає замовлень для експорту!");
         
         let csvContent = "\uFEFF";
-        csvContent += "Дата,Клієнт,Телефон,Місто,Сума,Валюта,Знижка (%),Товари\n";
+        csvContent += "Номер,Дата,Клієнт,Телефон,Місто,Сума,Валюта,Знижка (%),Товари\n";
         
         window.allOrdersForExport.forEach(o => {
             const itemsStr = o.items.map(i => `${i.name} (x${i.qty})`).join('; ');
             const row = [
-                o.date, o.user, o.contact, o.city, o.total.replace(',', '.'), 
+                o.orderNumber || 'B/N', o.date, o.user, o.contact, o.city, o.total.replace(',', '.'), 
                 o.payCurrency || '', o.promoDiscount || 0, itemsStr
             ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",");
             csvContent += row + "\n";
