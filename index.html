@@ -379,7 +379,7 @@
             </div>
             
             <input type="text" id="order-name" class="checkout-input" placeholder="Ваше ім'я" data-i18n-ph="name">
-            <input type="text" id="order-phone" class="checkout-input" placeholder="Telegram" data-i18n-ph="phone">
+            <input type="text" id="order-phone" class="checkout-input" placeholder="Телефон або @telegram" data-i18n-ph="phone">
             <input type="text" id="order-city" class="checkout-input" placeholder="Місто відправки (Пошта)" data-i18n-ph="city">
             
             <select id="order-currency" class="checkout-input">
@@ -419,6 +419,11 @@
             <input type="text" id="prof-city" class="checkout-input" placeholder="Місто відправки" data-i18n-ph="city">
             <button id="save-prof-btn" class="checkout-submit" style="padding: 12px; margin-top: 0; font-size: 14px;" data-i18n="save_profile">💾 ЗБЕРЕГТИ ДАНІ</button>
         </div>
+
+        <!-- КНОПКА SUPPORT -->
+        <a href="https://t.me/liquid_br" target="_blank" style="display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; background: rgba(112, 0, 255, 0.1); border: 1px solid var(--neon-purple); color: #fff; text-decoration: none; padding: 16px; border-radius: 16px; font-weight: 900; margin-bottom: 20px; box-shadow: 0 0 15px rgba(112, 0, 255, 0.2); transition: all 0.2s ease;">
+            💬 НАПИСАТИ В ПІДТРИМКУ
+        </a>
 
         <h3 style="font-size: 16px; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; color: #888;" data-i18n="my_orders">📦 Мої замовлення</h3>
         <div id="user-orders-list" style="display: flex; flex-direction: column; gap: 10px;">
@@ -976,6 +981,18 @@
         
         if(!name || !phone || !city) return alert("Будь ласка, заповніть всі поля!");
 
+        // --- НОВА ВАЛІДАЦІЯ ТЕЛЕФОНУ/TELEGRAM ---
+        const digitsOnly = phone.replace(/\D/g, '');
+        const isPhoneNumber = digitsOnly.length >= 7;
+        const isTelegram = phone.includes('@') || phone.toLowerCase().includes('t.me/');
+        
+        if (!isPhoneNumber && !isTelegram) {
+            return alert(currentLang === 'ua' 
+                ? "Помилка! Введіть номер телефону АБО додайте '@' перед вашим ніком в Telegram (наприклад, @username)." 
+                : "Błąd! Wpisz numer telefonu LUB dodaj '@' przed nazwą na Telegramie (np. @username).");
+        }
+        // ----------------------------------------
+
         // ГЕНЕРАЦІЯ НОМЕРУ ЗАМОВЛЕННЯ
         const generatedOrderNumber = '#' + Math.floor(10000 + Math.random() * 90000);
 
@@ -1351,6 +1368,7 @@
         if (isAdmin()) set(ref(db, 'settings/bannerVisible'), !currentBannerStatus); 
     };
 
+    let currentHideSoldStatus = false;
     onValue(ref(db, 'settings/hideSold'), (s) => { 
         currentHideSoldStatus = s.val() === true; 
         const btn = document.getElementById('toggle-hide-sold'); 
