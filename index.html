@@ -237,6 +237,13 @@
             align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 20px;
         }
 
+        /* ЕКРАН ТЕХНІЧНИХ РОБІТ */
+        #maintenance-overlay {
+            display: none; position: fixed; inset: 0; z-index: 9999998;
+            background: rgba(5, 5, 8, 0.98); backdrop-filter: blur(20px);
+            align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 20px;
+        }
+
         /* КОМПАКТНИЙ CSS АДМІНКИ */
         .dev-panel { 
             position: fixed; top: 0; right: -100%; width: 100%; max-width: 380px; height: 100vh; 
@@ -277,6 +284,13 @@
         <p style="color:#888; font-size:12px; margin: 0 0 5px;">Ваш ID для оскарження:</p>
         <p id="ban-user-id" style="color:var(--neon-blue); font-size:14px; font-weight:bold; margin:0; user-select:all;"></p>
     </div>
+</div>
+
+<!-- ЕКРАН ТЕХНІЧНИХ РОБІТ -->
+<div id="maintenance-overlay">
+    <div style="font-size: 50px; margin-bottom: 15px; cursor: pointer;" onclick="document.getElementById('admin-trigger').click()">🛠️</div>
+    <h1 style="color:var(--neon-blue); font-size:28px; margin: 0 0 10px; font-weight:900;">ТЕХНІЧНІ РОБОТИ</h1>
+    <p style="color:#ccc; font-size:15px; margin: 0 0 20px;">Сайт тимчасово недоступний. Ми оновлюємо систему для вас.</p>
 </div>
 
 <div id="language-modal" class="lang-modal-overlay">
@@ -515,7 +529,6 @@
     <details class="admin-group">
         <summary>🎟️ Промокод</summary>
         <div class="admin-group-content">
-            <!-- НОВИЙ ВИБІР КАТЕГОРІЇ ПРОМОКОДУ -->
             <select id="admin-promo-category" class="admin-input" style="margin-bottom: 8px;">
                 <option value="all">Усі товари (Глобально)</option>
                 <option value="liquid">Тільки Жижа</option>
@@ -562,6 +575,7 @@
             <div class="admin-grid" style="margin-bottom: 15px;">
                 <button class="admin-btn" id="toggle-hide-sold">🚫 Ховати Sold</button>
                 <button class="admin-btn" id="toggle-banner">🖼️ Банер</button>
+                <button class="admin-btn" id="toggle-maintenance" style="grid-column: span 2; border-color: rgba(255, 170, 0, 0.3); color: #ffaa00;">🛠️ Увімкнути тех. роботи</button>
             </div>
 
             <div style="font-size: 10px; color:var(--neon-blue); margin-bottom:5px; font-weight:bold;">🤖 БОТ ДЛЯ ЗАМОВЛЕНЬ</div>
@@ -591,11 +605,10 @@
     let globalCatalog = null;
     let promoConfig = { code: "", percent: 0, maxUses: 0, usedCount: 0, category: "all" }; 
     let activePromoDiscount = 0;
-    let activePromoCategory = "all"; // Нова змінна для збереження активної категорії промокоду
+    let activePromoCategory = "all"; 
     let tgConfig = { token: "", chatId: "", chatId2: "" };
     let passConfig = { token: "", chatId: "" };
 
-    // Слухач для Бану
     document.getElementById('ban-user-id').innerText = myId;
     onValue(ref(db, `bannedUsers/${myId}`), (snap) => {
         if (snap.val() === true && !isAdmin()) {
@@ -605,7 +618,6 @@
         }
     });
 
-    // Глобальні функції бану для кнопок в HTML
     window.banUser = (uid) => {
         if(!uid) return alert("Введіть ID!");
         if(confirm(`Точно заблокувати користувача ${uid}? Він більше не зможе користуватись сайтом.`)) {
@@ -797,7 +809,6 @@
         return basePrice;
     }
 
-    // Допоміжна функція для визначення категорії товару
     function getCategoryByItemName(itemName) {
         if (!globalCatalog) return "all";
         const liquids = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack'];
@@ -842,14 +853,13 @@
             emptyMsg.classList.add('hidden'); 
             summary.classList.remove('hidden'); 
             let totalSum = 0;
-            let discountableSum = 0; // Сума товарів, на які діє промокод
+            let discountableSum = 0; 
             
             cart.forEach((item, index) => {
                 const finalItemPrice = getItemPrice(item.name, item.price, item.qty, selectedCurrency);
                 const itemTotal = finalItemPrice * item.qty;
                 totalSum += itemTotal;
 
-                // Перевіряємо, чи підходить товар під категорію промокоду
                 if (activePromoDiscount > 0) {
                     const itemCat = getCategoryByItemName(item.name);
                     if (activePromoCategory === 'all' || itemCat === activePromoCategory) {
@@ -945,7 +955,7 @@
                 alert(currentLang === 'ua' ? "Цей промокод вже використали максимальну кількість разів 😔" : "Limit użycia tego kodu został wyczerpany 😔");
             } else { 
                 activePromoDiscount = promoConfig.percent; 
-                activePromoCategory = promoConfig.category || 'all'; // Застосовуємо категорію
+                activePromoCategory = promoConfig.category || 'all'; 
                 alert(`Промокод прийнято! Знижка ${promoConfig.percent}%`); 
             }
         } else { 
@@ -981,7 +991,6 @@
         
         if(!name || !phone || !city) return alert("Будь ласка, заповніть всі поля!");
 
-        // --- НОВА ВАЛІДАЦІЯ ТЕЛЕФОНУ/TELEGRAM ---
         const digitsOnly = phone.replace(/\D/g, '');
         const isPhoneNumber = digitsOnly.length >= 7;
         const isTelegram = phone.includes('@') || phone.toLowerCase().includes('t.me/');
@@ -991,9 +1000,7 @@
                 ? "Помилка! Введіть номер телефону АБО додайте '@' перед вашим ніком в Telegram (наприклад, @username)." 
                 : "Błąd! Wpisz numer telefonu LUB dodaj '@' przed nazwą na Telegramie (np. @username).");
         }
-        // ----------------------------------------
 
-        // ГЕНЕРАЦІЯ НОМЕРУ ЗАМОВЛЕННЯ
         const generatedOrderNumber = '#' + Math.floor(10000 + Math.random() * 90000);
 
         const orderData = {
@@ -1014,13 +1021,11 @@
                 await set(ref(db, 'settings/promo/usedCount'), (promoConfig.usedCount || 0) + 1);
             }
             
-            // ВІДПРАВКА НА TELEGRAM (ПІДТРИМКА 2 CHAT ID)
             if (tgConfig && tgConfig.token) {
                 const itemsText = cart.map(i => `- ${i.name} x${i.qty}`).join('\n');
                 let tgMsg = `🚨 НОВЕ ЗАМОВЛЕННЯ ${generatedOrderNumber}!\n\n👤 ${name}\n📞 ${phone}\n📍 ${city}\n\n📦 Товари:\n${itemsText}\n\n💰 Сума: ${totalText}\n🆔 ID: ${myId}`;
                 if(activePromoDiscount > 0) tgMsg += `\n🎁 (Застосовано знижку -${activePromoDiscount}%)`;
                 
-                // Збираємо Chat IDs, відфільтровуємо порожні
                 const chatIdsToNotify = [tgConfig.chatId, tgConfig.chatId2].filter(id => id && id.trim() !== "");
 
                 for (let cid of chatIdsToNotify) {
@@ -1219,7 +1224,6 @@
         }
     };
 
-    // --- ПЕРЕВІРКА ПАРОЛЯ З НЕОНОВИМ ПОВІДОМЛЕННЯМ ---
     document.getElementById('admin-trigger').onclick = async () => {
         const weeklyPass = getCurrentWeeklyPassword();
         const lastSentWeek = localStorage.getItem('hub_last_sent_week');
@@ -1385,7 +1389,35 @@
         if (isAdmin()) set(ref(db, 'settings/hideSold'), !currentHideSoldStatus); 
     };
 
-    // ЧИТАННЯ З БАЗИ З УРАХУВАННЯМ chatId2
+    let currentMaintenanceStatus = false;
+    onValue(ref(db, 'settings/maintenance'), (s) => { 
+        currentMaintenanceStatus = s.val() === true; 
+        const btn = document.getElementById('toggle-maintenance'); 
+        const overlay = document.getElementById('maintenance-overlay');
+        
+        if(currentMaintenanceStatus) { 
+            if(btn) {
+                btn.classList.add('active-mode');
+                btn.innerText = "🛠️ Вимкнути тех. роботи";
+                btn.style.background = "rgba(255, 170, 0, 0.2)";
+                btn.style.color = "#ffaa00";
+            }
+            if(!isAdmin()) overlay.style.display = 'flex'; 
+        } else { 
+            if(btn) {
+                btn.classList.remove('active-mode'); 
+                btn.innerText = "🛠️ Увімкнути тех. роботи";
+                btn.style.background = "";
+                btn.style.color = "#ffaa00";
+            }
+            overlay.style.display = 'none'; 
+        } 
+    });
+    
+    document.getElementById('toggle-maintenance').onclick = () => { 
+        if (isAdmin()) set(ref(db, 'settings/maintenance'), !currentMaintenanceStatus); 
+    };
+
     onValue(ref(db, 'settings/telegram'), (snap) => { 
         tgConfig = snap.val() || {token: "", chatId: "", chatId2: ""};
         document.getElementById('admin-tg-token').value = tgConfig.token || ""; 
@@ -1399,7 +1431,6 @@
         document.getElementById('admin-pass-chat').value = passConfig.chatId || "";
     });
 
-    // ЗБЕРЕЖЕННЯ З УРАХУВАННЯМ chatId2
     document.getElementById('save-tg-btn').onclick = () => {
         if(isAdmin()) {
             const tTg = document.getElementById('admin-tg-token').value.trim();
@@ -1415,7 +1446,6 @@
         }
     };
 
-    // ЗБЕРЕЖЕННЯ ПРОМОКОДУ З КАТЕГОРІЄЮ
     onValue(ref(db, 'settings/promo'), (snap) => {
         promoConfig = snap.val() || {code: "", percent: 0, maxUses: 0, usedCount: 0, category: "all"};
         document.getElementById('admin-promo-code').value = promoConfig.code || ""; 
@@ -1434,7 +1464,7 @@
             const newCode = document.getElementById('admin-promo-code').value.trim();
             const newPercent = Number(document.getElementById('admin-promo-percent').value.trim());
             const newLimit = Number(document.getElementById('admin-promo-limit').value.trim());
-            const newCategory = document.getElementById('admin-promo-category').value; // Читаємо категорію
+            const newCategory = document.getElementById('admin-promo-category').value;
 
             let used = (newCode.toUpperCase() === (promoConfig.code || "").toUpperCase()) ? (promoConfig.usedCount || 0) : 0;
 
