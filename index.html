@@ -275,7 +275,6 @@
 </head>
 <body>
 
-<!-- ЕКРАН БЛОКУВАННЯ -->
 <div id="ban-overlay">
     <div style="font-size: 50px; margin-bottom: 15px;">⛔</div>
     <h1 style="color:var(--neon-pink); font-size:28px; margin: 0 0 10px; font-weight:900;">ДОСТУП ОБМЕЖЕНО</h1>
@@ -286,7 +285,6 @@
     </div>
 </div>
 
-<!-- ЕКРАН ТЕХНІЧНИХ РОБІТ -->
 <div id="maintenance-overlay">
     <div style="font-size: 50px; margin-bottom: 15px; cursor: pointer;" onclick="document.getElementById('admin-trigger').click()">🛠️</div>
     <h1 style="color:var(--neon-blue); font-size:28px; margin: 0 0 10px; font-weight:900;">ТЕХНІЧНІ РОБОТИ</h1>
@@ -342,7 +340,6 @@
         </div>
     </div>
 
-    <!-- КАТЕГОРІЯ: ЖИЖА -->
     <div id="cat-zalivka" class="cat-section">
         <div class="sub-nav">
             <button class="sub-nav-btn active" data-target="zalivka-elfliq">Elfliq</button>
@@ -360,7 +357,6 @@
         <div class="product-grid sub-grid" id="grid-zalivka-chaseryoume"></div>
     </div>
 
-    <!-- КАТЕГОРІЯ: СНЮС -->
     <div id="cat-prodazh" class="cat-section hidden">
         <div class="sub-nav">
             <button class="sub-nav-btn active" data-target="prodazh-cuba">Cuba</button>
@@ -370,7 +366,6 @@
         <div class="product-grid sub-grid" id="grid-prodazh-barron"></div>
     </div>
 
-    <!-- КАТЕГОРІЯ: ПОДИ ТА КАТРИДЖІ -->
     <div id="cat-aktsii" class="cat-section hidden">
         <div class="sub-nav">
             <button class="sub-nav-btn active" data-target="aktsii">Картриджі</button>
@@ -380,7 +375,6 @@
         <div class="product-grid sub-grid" id="grid-aktsii-pods"></div>
     </div>
 
-    <!-- РОЗДІЛ: КОШИК -->
     <div id="cat-cart" class="cat-section hidden">
         <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 20px; text-transform: uppercase;" data-i18n="cart_title">🛒 Ваш кошик</h2>
         
@@ -419,7 +413,6 @@
         </div>
     </div>
 
-    <!-- РОЗДІЛ: ПРОФІЛЬ -->
     <div id="cat-profile" class="cat-section hidden">
         <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 20px; text-transform: uppercase;" data-i18n="profile">👤 Ваш профіль</h2>
         
@@ -443,7 +436,6 @@
             <button id="save-prof-btn" class="checkout-submit" style="padding: 12px; margin-top: 0; font-size: 14px;" data-i18n="save_profile">💾 ЗБЕРЕГТИ ДАНІ</button>
         </div>
 
-        <!-- КНОПКА SUPPORT -->
         <a href="https://t.me/liquid_br" target="_blank" style="display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; background: rgba(112, 0, 255, 0.1); border: 1px solid var(--neon-purple); color: #fff; text-decoration: none; padding: 16px; border-radius: 16px; font-weight: 900; margin-bottom: 20px; box-shadow: 0 0 15px rgba(112, 0, 255, 0.2); transition: all 0.2s ease;">
             💬 НАПИСАТИ В ПІДТРИМКУ
         </a>
@@ -467,14 +459,12 @@
     <button class="nav-item" data-tab="profile"><span>👤</span><span data-i18n="profile">Профіль</span></button>
 </nav>
 
-<!-- АДМІН-ПАНЕЛЬ -->
 <div id="dev-menu" class="dev-panel">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <div class="logo" style="font-size: 20px;">HUB CONTROL</div>
         <button onclick="document.getElementById('dev-menu').classList.remove('active')" style="background:rgba(255,255,255,0.1); border:none; color:white; width: 32px; height: 32px; border-radius: 50%; font-size:16px; cursor: pointer;">×</button>
     </div>
 
-    <!-- 1. ЗАМОВЛЕННЯ -->
     <details class="admin-group" open>
         <summary>📥 Останні замовлення</summary>
         <div class="admin-group-content">
@@ -485,7 +475,6 @@
         </div>
     </details>
 
-    <!-- 2. УПРАВЛІННЯ ВІТРИНОЮ -->
     <details class="admin-group">
         <summary>📦 Управління вітриною</summary>
         <div class="admin-group-content">
@@ -508,7 +497,6 @@
         </div>
     </details>
 
-    <!-- 3. ДОДАТИ ТОВАР -->
     <details class="admin-group">
         <summary>➕ Додати товар</summary>
         <div class="admin-group-content">
@@ -537,7 +525,6 @@
         </div>
     </details>
 
-    <!-- 4. ПРОМОКОД -->
     <details class="admin-group">
         <summary>🎟️ Промокод</summary>
         <div class="admin-group-content">
@@ -560,7 +547,6 @@
         </div>
     </details>
 
-    <!-- БАН-ЛИСТ -->
     <details class="admin-group">
         <summary>⛔ Бан-лист</summary>
         <div class="admin-group-content">
@@ -573,7 +559,6 @@
         </div>
     </details>
 
-    <!-- 5. СИСТЕМА ТА ТЕЛЕГРАМ -->
     <details class="admin-group">
         <summary>⚙️ Система та Telegram</summary>
         <div class="admin-group-content">
@@ -609,9 +594,21 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, onValue, set, get, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const app = initializeApp({ databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/" });
+    const firebaseConfig = {
+        apiKey: "AIzaSyAOW2GEW1McWRAzs4RLVOGHvcoAnRhgRC4",
+        authDomain: "smokehub-7a072.firebaseapp.com",
+        projectId: "smokehub-7a072",
+        storageBucket: "smokehub-7a072.firebasestorage.app",
+        messagingSenderId: "563107040578",
+        appId: "1:563107040578:web:6379a7bc43bb7b58794cdb",
+        databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const firestoreDb = getFirestore(app);
     const isAdmin = () => localStorage.getItem('isHubAdmin') === 'true';
 
     let globalCatalog = null;
@@ -1031,6 +1028,20 @@
             await push(ref(db, 'orders'), orderData);
             if (activePromoDiscount > 0 && promoConfig.code) {
                 await set(ref(db, 'settings/promo/usedCount'), (promoConfig.usedCount || 0) + 1);
+            }
+            
+            // ВІДПРАВКА ДАНИХ ДО КАСИ (FIRESTORE)
+            try {
+                const itemsTextCashier = cart.map(i => `${i.name} (x${i.qty})`).join(', ');
+                await addDoc(collection(firestoreDb, "tg_orders"), {
+                    client_name: `${name} (${phone})`,
+                    items: itemsTextCashier,
+                    total_price: totalText,
+                    status: "new",
+                    timestamp: new Date().getTime()
+                });
+            } catch (firestoreErr) {
+                console.error("Помилка передачі в Касу:", firestoreErr);
             }
             
             if (tgConfig && tgConfig.token) {
