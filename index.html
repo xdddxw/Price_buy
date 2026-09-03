@@ -349,11 +349,15 @@
             <button class="sub-nav-btn" data-target="zalivka-chaserlux">Chaser Lux</button>
             <button class="sub-nav-btn" data-target="zalivka-chaserpods">Chaser for pods</button>
             <button class="sub-nav-btn" data-target="zalivka-chaserblack">Chaser Black</button>
+            <button class="sub-nav-btn" data-target="zalivka-chaserspecial">Chaser Special</button>
+            <button class="sub-nav-btn" data-target="zalivka-chaseryoume">Chaser You&Me</button>
         </div>
         <div class="product-grid sub-grid active" id="grid-zalivka-elfliq"></div>
         <div class="product-grid sub-grid" id="grid-zalivka-chaserlux"></div>
         <div class="product-grid sub-grid" id="grid-zalivka-chaserpods"></div>
         <div class="product-grid sub-grid" id="grid-zalivka-chaserblack"></div>
+        <div class="product-grid sub-grid" id="grid-zalivka-chaserspecial"></div>
+        <div class="product-grid sub-grid" id="grid-zalivka-chaseryoume"></div>
     </div>
 
     <!-- КАТЕГОРІЯ: СНЮС -->
@@ -366,9 +370,14 @@
         <div class="product-grid sub-grid" id="grid-prodazh-barron"></div>
     </div>
 
-    <!-- КАТЕГОРІЯ: КАТРИДЖІ -->
+    <!-- КАТЕГОРІЯ: ПОДИ ТА КАТРИДЖІ -->
     <div id="cat-aktsii" class="cat-section hidden">
+        <div class="sub-nav">
+            <button class="sub-nav-btn active" data-target="aktsii">Картриджі</button>
+            <button class="sub-nav-btn" data-target="aktsii-pods">Подіки (Девайси)</button>
+        </div>
         <div class="product-grid sub-grid active" id="grid-aktsii"></div>
+        <div class="product-grid sub-grid" id="grid-aktsii-pods"></div>
     </div>
 
     <!-- РОЗДІЛ: КОШИК -->
@@ -450,7 +459,7 @@
 <nav class="bottom-nav">
     <button class="nav-item active" data-tab="zalivka"><span>💧</span><span data-i18n="zalivka">Жижа</span></button>
     <button class="nav-item" data-tab="prodazh"><span>🟢</span><span data-i18n="prodazh">Снюс</span></button>
-    <button class="nav-item" data-tab="aktsii"><span>⚡</span><span data-i18n="other">Катриджі</span></button>
+    <button class="nav-item" data-tab="aktsii"><span>⚡</span><span data-i18n="other">Поди / Карт.</span></button>
     <button class="nav-item" data-tab="cart">
         <span>🛒</span><span data-i18n="cart">Кошик</span>
         <div class="nav-cart-badge hidden" id="cart-badge">0</div>
@@ -509,13 +518,16 @@
                     <option value="zalivka-chaserlux">Chaser Lux</option>
                     <option value="zalivka-chaserpods">Chaser for pods</option>
                     <option value="zalivka-chaserblack">Chaser Black</option>
+                    <option value="zalivka-chaserspecial">Chaser Special</option>
+                    <option value="zalivka-chaseryoume">Chaser You&Me</option>
                 </optgroup>
                 <optgroup label="🟢 Снюс">
                     <option value="prodazh-cuba">Cuba</option>
                     <option value="prodazh-barron">Barron</option>
                 </optgroup>
-                <optgroup label="⚡ Катриджі">
-                    <option value="aktsii">Катриджі</option>
+                <optgroup label="⚡ Поди та Картриджі">
+                    <option value="aktsii">Картриджі</option>
+                    <option value="aktsii-pods">Подіки</option>
                 </optgroup>
             </select>
             <input type="text" id="new-prod-name" placeholder="Назва" class="admin-input">
@@ -533,7 +545,7 @@
                 <option value="all">Усі товари (Глобально)</option>
                 <option value="liquid">Тільки Жижа</option>
                 <option value="snus">Тільки Снюс</option>
-                <option value="cartridges">Тільки Катриджі</option>
+                <option value="cartridges">Тільки Катриджі та Поди</option>
             </select>
             
             <div style="display: flex; gap: 8px; margin-bottom: 8px;">
@@ -657,8 +669,8 @@
     }
 
     const translations = {
-        ua: { zalivka: "Жижа", prodazh: "Снюс", other: "Катриджі", cart: "Кошик", profile: "Профіль", sold: "ПРОДАНО", badge_hit: "ХІТ", badge_promo: "АКЦІЯ", badge_new: "НОВИНКА", updated: "Оновлено:", cart_title: "🛒 Ваш кошик", empty: "Кошик порожній 😔", total: "Разом до сплати:", add_cart: "В кошик", name: "Ваше ім'я", phone: "Телефон або Telegram", city: "Місто відправки", promo: "Введіть промокод", order_btn: "🚀 ОФОРМИТИ ЗАМОВЛЕННЯ", order_success: "✅ Замовлення відправлено! Ми зв'яжемося з вами.", save_profile: "💾 ЗБЕРЕГТИ ДАНІ", my_orders: "📦 Мої замовлення", auth_title: "🔑 Авторизація за ID:", auth_desc: "Ваш унікальний ID акаунта:", login_btn: "Увійти" },
-        pl: { zalivka: "Liquid", prodazh: "Snus", other: "Kartridże", cart: "Koszyk", profile: "Profil", sold: "SPRZEDANE", badge_hit: "HIT", badge_promo: "PROMOCJA", badge_new: "NOWOŚĆ", updated: "Aktualizacja:", cart_title: "🛒 Twój koszyk", empty: "Koszyk jest pusty 😔", total: "Do zapłaty:", add_cart: "Do koszyka", name: "Twoje imię", phone: "Telefon / Telegram", city: "Miasto wysyłki", promo: "Kod rabatowy", order_btn: "🚀 ZŁÓŻ ZAMÓWIENIE", order_success: "✅ Zamówienie wysłane pomyślnie!", save_profile: "💾 ZAPISZ DANE", my_orders: "📦 Moje zamówienia", auth_title: "🔑 Autoryzacja ID:", auth_desc: "Twój unikalny ID konta:", login_btn: "Zaloguj" }
+        ua: { zalivka: "Жижа", prodazh: "Снюс", other: "Поди / Карт.", cart: "Кошик", profile: "Профіль", sold: "ПРОДАНО", badge_hit: "ХІТ", badge_promo: "АКЦІЯ", badge_new: "НОВИНКА", updated: "Оновлено:", cart_title: "🛒 Ваш кошик", empty: "Кошик порожній 😔", total: "Разом до сплати:", add_cart: "В кошик", name: "Ваше ім'я", phone: "Телефон або Telegram", city: "Місто відправки", promo: "Введіть промокод", order_btn: "🚀 ОФОРМИТИ ЗАМОВЛЕННЯ", order_success: "✅ Замовлення відправлено! Ми зв'яжемося з вами.", save_profile: "💾 ЗБЕРЕГТИ ДАНІ", my_orders: "📦 Мої замовлення", auth_title: "🔑 Авторизація за ID:", auth_desc: "Ваш унікальний ID акаунта:", login_btn: "Увійти" },
+        pl: { zalivka: "Liquid", prodazh: "Snus", other: "Pody / Wkłady", cart: "Koszyk", profile: "Profil", sold: "SPRZEDANE", badge_hit: "HIT", badge_promo: "PROMOCJA", badge_new: "NOWOŚĆ", updated: "Aktualizacja:", cart_title: "🛒 Twój koszyk", empty: "Koszyk jest pusty 😔", total: "Do zapłaty:", add_cart: "Do koszyka", name: "Twoje imię", phone: "Telefon / Telegram", city: "Miasto wysyłki", promo: "Kod rabatowy", order_btn: "🚀 ZŁÓŻ ZAMÓWIENIE", order_success: "✅ Zamówienie wysłane pomyślnie!", save_profile: "💾 ZAPISZ DANE", my_orders: "📦 Moje zamówienia", auth_title: "🔑 Autoryzacja ID:", auth_desc: "Twój unikalny ID konta:", login_btn: "Zaloguj" }
     };
 
     let currentLang = localStorage.getItem("lang") || "ua";
@@ -811,9 +823,9 @@
 
     function getCategoryByItemName(itemName) {
         if (!globalCatalog) return "all";
-        const liquids = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack'];
+        const liquids = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack', 'zalivka-chaserspecial', 'zalivka-chaseryoume'];
         const snus = ['prodazh-cuba', 'prodazh-barron'];
-        const cartridges = ['aktsii'];
+        const cartridges = ['aktsii', 'aktsii-pods'];
         
         for (let cat of liquids) {
             if (globalCatalog[cat] && globalCatalog[cat].descs && globalCatalog[cat].descs.includes(itemName)) return "liquid";
@@ -893,7 +905,7 @@
                 let catName = "усі товари";
                 if (activePromoCategory === 'liquid') catName = "жижу";
                 if (activePromoCategory === 'snus') catName = "снюс";
-                if (activePromoCategory === 'cartridges') catName = "катриджі";
+                if (activePromoCategory === 'cartridges') catName = "поди та картриджі";
 
                 discMsg.innerText = `🎁 Знижка -${activePromoDiscount}% на ${catName} застосована!`;
                 discMsg.style.color = 'var(--neon-pink)';
@@ -1059,7 +1071,7 @@
 
     updateCartBadge(); renderCart();
 
-    const categoriesList = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack', 'prodazh-cuba', 'prodazh-barron', 'aktsii'];
+    const categoriesList = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack', 'zalivka-chaserspecial', 'zalivka-chaseryoume', 'prodazh-cuba', 'prodazh-barron', 'aktsii', 'aktsii-pods'];
     
     onValue(ref(db, 'catalog'), (snap) => {
         globalCatalog = snap.val(); 
