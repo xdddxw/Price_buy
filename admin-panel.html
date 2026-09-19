@@ -18,8 +18,9 @@
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
-<!-- Підключаємо бібліотеку для генерації PDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<!-- Підключаємо html2canvas та jspdf для стабільної генерації PDF в PWA -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -561,9 +562,11 @@ margin-top:8px;
 text-align:right
 }
 
-/* Стилі для блоку накладної, який конвертується в PDF */
+/* Прихований шаблон накладної для генерації в PDF */
 #invoice-print-area{
-display:none;
+position: fixed;
+left: -9999px;
+top: 0;
 width: 80mm;
 background: #fff;
 color: #000;
@@ -571,10 +574,9 @@ padding: 16px;
 font-family: 'Courier New', Courier, monospace;
 font-size: 12px;
 line-height: 1.4;
-position: relative;
+z-index: -9999;
 }
 
-/* Водяний знак всередині PDF */
 #invoice-print-area::before {
 content: "";
 position: absolute;
@@ -666,7 +668,6 @@ margin-top:15px
     </button>
 </div>
 
-<!-- БЛОК НАКЛАДНОЇ ДЛЯ ГЕНЕРАЦІЇ PDF -->
 <div id="invoice-print-area">
     <div class="inv-header">
         <h2>SMOKE HUB</h2>
@@ -868,7 +869,7 @@ margin-top:15px
             class="btn-submit btn-invoice"
             onclick="printInvoice()"
         >
-            🧾 ВИДАТИ НАКЛАДНУ (PDF)
+            🧾 ЗБЕРЕГТИ НАКЛАДНУ (PDF)
         </button>
 
     </div>
@@ -2449,10 +2450,10 @@ async function restoreInventory(items) {
 
 
 /* =========================================================
-   PDF INVOICE GENERATION
+   PDF GENERATION & PWA SAVE
 ========================================================= */
 
-function printInvoice() {
+async function printInvoice() {
 
     const type =
         document.getElementById("opType").value;
@@ -2608,26 +2609,46 @@ function printInvoice() {
         itemsList.appendChild(row);
     }
 
-    // Тимчасово показуємо блок, щоб html2pdf міг його зчитати
+    showToast("⏳ Генерація PDF...");
+
     const element = document.getElementById('invoice-print-area');
-    element.style.display = 'block';
 
-    const opt = {
-        margin:       5,
-        filename:     `Nakladna_${invoiceNum.replace('#', '')}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
-    };
+    try {
+        const canvas = await html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true
+        });
 
-    html2pdf().from(element).set(opt).save().then(() => {
-        element.style.display = 'none';
-        showToast("✅ PDF накладну успішно створено!");
-    }).catch(err => {
+        const imgData = canvas.toDataURL('image/jpeg', 0.98);
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a5');
+
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+
+        // Формуємо файл для завантаження в PWA
+        const pdfBlob = pdf.output('blob');
+        const fileName = `Nakladna_${invoiceNum.replace('#', '')}.pdf`;
+
+        const blobUrl = URL.createObjectURL(pdfBlob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+
+        showToast("✅ PDF накладну збережено!");
+
+    } catch (err) {
         console.error(err);
-        element.style.display = 'none';
         showToast("❌ Помилка створення PDF", "var(--danger)");
-    });
+    }
 }
 
 
