@@ -514,7 +514,7 @@
         return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`;
     }
 
-    /* --- ВИБІР ЗАМОВЛЕННЯ ІЗ ВИПАДАЮЧОГО СПИСКУ АБО СТРІЧКИ --- */
+    /* --- ВИБІР ЗАМОВЛЕННЯ --- */
     function selectTgOrder(id, client, itemText, price) {
         document.querySelectorAll('.tg-order-card').forEach(c => c.classList.remove('selected'));
         if(document.getElementById(`tg-card-${id}`)) {
@@ -541,7 +541,7 @@
         }
     }
 
-    /* --- ФУНКЦІЯ ДРУКУ НАКЛАДНОЇ --- */
+    /* --- ДРУК НАКЛАДНОЇ --- */
     function printInvoice() {
         const type = document.getElementById('opType').value;
         if(type !== 'sale') {
@@ -551,8 +551,9 @@
 
         const clientName = document.getElementById('debtorName').value || "Роздрібний клієнт";
         const priceStr = document.getElementById('total').innerText;
-        const tgItems = document.getElementById('activeTgOrderId').getAttribute('data-items');
         const activeId = document.getElementById('activeTgOrderId').value;
+        const tgItems = document.getElementById('activeTgOrderId').getAttribute('data-items');
+        
         const invoiceNum = activeId ? "#" + activeId.substring(0, 6).toUpperCase() : "#SH-" + Math.floor(1000 + Math.random() * 9000);
 
         document.getElementById('inv-num').innerText = invoiceNum;
@@ -563,29 +564,31 @@
         const itemsListTable = document.getElementById('inv-items-list');
         itemsListTable.innerHTML = "";
 
-        if(tgItems) {
+        if(tgItems && tgItems.trim() !== "") {
             let goods = tgItems.split(/,|\n/);
             goods.forEach(good => {
                 if(good.trim()) {
                     itemsListTable.innerHTML += `
                         <tr>
-                            <td style="padding-top: 5px; padding-bottom: 5px;">• ${good.trim()}</td>
-                            <td style="text-align: right; padding-top: 5px;">-</td>
+                            <td style="padding-top: 6px; padding-bottom: 6px; border-bottom: 1px dotted #ccc;">• ${good.trim()}</td>
+                            <td style="text-align: right; padding-top: 6px; padding-bottom: 6px; border-bottom: 1px dotted #ccc;">-</td>
                         </tr>
                     `;
                 }
             });
         } else {
-            const fName = document.getElementById('flavor').value || "Товар";
+            const fName = document.getElementById('flavor').value || "Товар з каталогу";
             itemsListTable.innerHTML += `
                 <tr>
-                    <td style="padding-top: 5px; padding-bottom: 5px;">• ${fName}</td>
-                    <td style="text-align: right; padding-top: 5px;">${priceStr}</td>
+                    <td style="padding-top: 6px; padding-bottom: 6px; border-bottom: 1px dotted #ccc;">• ${fName}</td>
+                    <td style="text-align: right; padding-top: 6px; padding-bottom: 6px; border-bottom: 1px dotted #ccc;">${priceStr}</td>
                 </tr>
             `;
         }
 
-        window.print();
+        setTimeout(() => {
+            window.print();
+        }, 100);
     }
 
     async function saveOrder() {
@@ -629,7 +632,6 @@
     }
 
     function sync() {
-        // Синхронізація Telegram замовлень
         db.collection("tg_orders").where("status", "==", "new").onSnapshot(snap => {
             const list = document.getElementById('tg-orders-list');
             const dropdown = document.getElementById('tgOrderSelect');
@@ -653,7 +655,6 @@
                 const itemText = tg.items || "Товар";
                 const price = tg.total_price || 0;
                 
-                // Додаємо картку у стрічку
                 list.innerHTML += `
                 <div class="tg-order-card" id="tg-card-${doc.id}" onclick="selectTgOrder('${doc.id}', '${client}', '${itemText.replace(/'/g, "")}', ${price})">
                     <div class="tg-order-title">👤 ${client}</div>
@@ -661,12 +662,10 @@
                     <div class="tg-order-price">${price} грн</div>
                 </div>`;
 
-                // Додаємо пункт у випадаючий список замість потворного інпуту
                 dropdown.innerHTML += `<option value="${doc.id}">👤 ${client} — ${itemText} (${price} грн)</option>`;
             });
         });
 
-        // Синхронізація складу
         db.collection("inventory").orderBy("name").onSnapshot(snap => {
             inventory = [];
             const list = document.getElementById('inventoryList');
@@ -698,7 +697,6 @@
             updateFlavorList();
         });
 
-        // Синхронізація історії, боргів та статистики
         db.collection("orders").orderBy("date", "desc").onSnapshot(snap => {
             const logs = document.getElementById('logs'), debts = document.getElementById('debtList');
             const dailyList = document.getElementById('dailyStatsList');
