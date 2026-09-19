@@ -572,68 +572,175 @@ display:block!important;
 position:absolute;
 left:0;
 top:0;
-width:80mm;
-background:#fff;
-color:#000;
-padding:12px;
-font-family:'Courier New',Courier,monospace;
-font-size:12px;
-line-height:1.4
+width:100%;
+background:#fff!important;
+color:#000!important;
+padding:24px;
+font-family:'Inter',sans-serif;
+font-size:13px;
+line-height:1.4;
+-webkit-print-color-adjust:exact;
+print-color-adjust:exact
 }
 
-.inv-header{
-text-align:center;
-margin-bottom:10px
+.inv-top-row{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+border-bottom:2px solid #000;
+padding-bottom:15px;
+margin-bottom:15px
 }
 
-.inv-header h2{
+.inv-brand h1{
 margin:0;
-font-size:16px;
-font-weight:bold
+font-size:24px;
+font-weight:800;
+color:#000;
+letter-spacing:.5px
 }
 
-.inv-header p{
-margin:2px 0;
-font-size:10px
+.inv-brand p{
+margin:4px 0 0;
+font-size:11px;
+font-weight:600;
+color:#555;
+text-transform:uppercase
 }
 
-.inv-divider{
-border:0;
-border-top:1px dashed #000;
-margin:8px 0
+.inv-contacts{
+text-align:right;
+font-size:11px;
+color:#333
+}
+
+.inv-contacts div{margin-bottom:2px}
+
+.inv-title-section{
+display:flex;
+justify-content:space-between;
+align-items:baseline;
+margin-bottom:15px
+}
+
+.inv-title-section h2{
+margin:0;
+font-size:22px;
+font-weight:800;
+color:#000;
+text-transform:uppercase
+}
+
+.inv-meta-dates{
+font-size:12px;
+font-weight:600;
+color:#333
+}
+
+.inv-party-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+background:#f8fafc;
+border:1px solid #e2e8f0;
+padding:12px 16px;
+border-radius:8px;
+margin-bottom:15px
+}
+
+.inv-party-box h4{
+margin:0 0 6px;
+font-size:12px;
+text-transform:uppercase;
+color:#555;
+border-bottom:1px solid #cbd5e1;
+padding-bottom:4px
+}
+
+.inv-party-box div{
+font-size:12px;
+margin-bottom:3px;
+color:#1e293b
 }
 
 .inv-table{
 width:100%;
 border-collapse:collapse;
-margin-top:5px
+margin-top:10px;
+margin-bottom:15px
 }
 
 .inv-table th{
+background:#0f172a;
+color:#fff;
 text-align:left;
 font-size:11px;
-border-bottom:1px solid #000;
-padding-bottom:3px
+text-transform:uppercase;
+padding:8px 10px;
+font-weight:700
 }
 
 .inv-table td{
+font-size:12px;
+padding:8px 10px;
+border-bottom:1px solid #e2e8f0;
+color:#1e293b;
+vertical-align:middle
+}
+
+.inv-table tr:nth-child(even){background:#f8fafc}
+
+.inv-totals-box{
+display:flex;
+flex-direction:column;
+align-items:flex-end;
+margin-bottom:20px;
+font-size:13px
+}
+
+.inv-totals-row{
+display:flex;
+justify-content:space-between;
+width:260px;
+margin-bottom:4px;
+color:#333
+}
+
+.inv-grand-total{
+display:flex;
+justify-content:space-between;
+width:260px;
+background:#0f172a;
+color:#fff;
+padding:8px 12px;
+font-weight:800;
+font-size:15px;
+border-radius:6px;
+margin-top:6px
+}
+
+.inv-info-footer{
+display:grid;
+grid-template-columns:1fr 1fr 1fr;
+gap:10px;
+border-top:1px dashed #cbd5e1;
+border-bottom:1px dashed #cbd5e1;
+padding:10px 0;
+margin-bottom:15px;
 font-size:11px;
-padding:4px 0;
-border-bottom:1px dotted #ccc;
-vertical-align:top
+color:#333
 }
 
-.inv-total{
-font-size:14px;
-font-weight:bold;
-text-align:right;
-margin-top:10px
-}
+.inv-info-footer div b{display:block;color:#000;margin-bottom:2px}
 
-.inv-footer{
-text-align:center;
-font-size:10px;
-margin-top:15px
+.inv-bottom-note{
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-size:11px;
+color:#555;
+font-weight:600
+}
 }
 </style>
 </head>
@@ -654,44 +761,94 @@ margin-top:15px
     </button>
 </div>
 
+<!-- ОНОВЛЕНИЙ БЛОК НАКЛАДНОЇ ДЛЯ ДРУКУ -->
 <div id="invoice-print-area">
-    <div class="inv-header">
-        <h2>SMOKE HUB</h2>
-        <p>ТОВАРНА НАКЛАДНА</p>
+    <div class="inv-top-row">
+        <div class="inv-brand">
+            <h1>SMOKE HUB</h1>
+            <p>ВЕЙПІ | СНЮС | АКСЕСУАРИ</p>
+        </div>
+        <div class="inv-contacts">
+            <div>✉️ @smokehub_support</div>
+            <div>🌐 smokehub.com.ua</div>
+            <div>📍 Доставка по всій Україні та Європі</div>
+        </div>
     </div>
 
-    <hr class="inv-divider">
-
-    <div style="font-size:11px;margin-bottom:5px">
-        <div><b>Замовлення:</b> <span id="inv-num">#001</span></div>
-        <div><b>Дата:</b> <span id="inv-date"></span></div>
-        <div><b>Покупець:</b> <span id="inv-client">Роздрібний клієнт</span></div>
-        <div><b>Оплата:</b> <span id="inv-pay-method">Готівка</span></div>
+    <div class="inv-title-section">
+        <h2>Накладна до замовлення <span id="inv-num">#5428</span></h2>
+        <div class="inv-meta-dates">
+            📅 <span id="inv-date"></span>
+        </div>
     </div>
 
-    <hr class="inv-divider">
+    <div class="inv-party-grid">
+        <div class="inv-party-box">
+            <h4>Відправник:</h4>
+            <div><b>SMOKE HUB</b></div>
+            <div>ФОП Ковальчук І.В.</div>
+            <div>ЄДРПОУ: 1234567890</div>
+        </div>
+        <div class="inv-party-box">
+            <h4>Отримувач:</h4>
+            <div><b>ПІБ:</b> <span id="inv-client">Роздрібний клієнт</span></div>
+            <div><b>Телефон:</b> —</div>
+            <div><b>Місто:</b> —</div>
+            <div><b>Відділення:</b> —</div>
+        </div>
+    </div>
 
     <table class="inv-table">
         <thead>
             <tr>
+                <th style="width:36px;text-align:center">№</th>
                 <th>Найменування товару</th>
-                <th style="text-align:right">Сума</th>
+                <th style="width:60px;text-align:center">Кільк.</th>
+                <th style="width:90px;text-align:right">Ціна</th>
+                <th style="width:100px;text-align:right">Сума</th>
             </tr>
         </thead>
-
         <tbody id="inv-items-list"></tbody>
     </table>
 
-    <hr class="inv-divider">
-
-    <div class="inv-total">
-        ДО СПЛАТИ:
-        <span id="inv-total">0</span>
-        <span id="inv-currency">грн</span>
+    <div class="inv-totals-box">
+        <div class="inv-totals-row">
+            <span>Всього без знижки:</span>
+            <span><span id="inv-subtotal">0</span> <span id="inv-currency">грн</span></span>
+        </div>
+        <div class="inv-totals-row">
+            <span>Знижка:</span>
+            <span>- 0.00 <span class="inv-curr-label">грн</span></span>
+        </div>
+        <div class="inv-grand-total">
+            <span>ДО СПЛАТИ:</span>
+            <span><span id="inv-total">0</span> <span class="inv-curr-label">грн</span></span>
+        </div>
     </div>
 
-    <div class="inv-footer">
-        Дякуємо за покупку!
+    <div class="inv-info-footer">
+        <div>
+            <b>Спосіб оплати:</b>
+            <span id="inv-pay-method">Готівка</span>
+        </div>
+        <div>
+            <b>Спосіб доставки:</b>
+            Нова Пошта (відділення / поштомат)
+        </div>
+        <div>
+            <b>Гарантія:</b>
+            Обмін та повернення протягом 14 днів
+        </div>
+    </div>
+
+    <div class="inv-bottom-note">
+        <div>
+            <b>Дякуємо за замовлення! ❤️</b><br>
+            Завжди раді бачити тебе в Smoke Hub!
+        </div>
+        <div style="font-weight:800;font-size:13px;font-style:italic">
+            Вейп — це стиль!
+        </div>
     </div>
 </div>
 
@@ -1497,24 +1654,9 @@ async function onScanSuccess(decodedText) {
 
     document.getElementById("newBarcode").value = barcode;
 
-    /*
-       Пошук 1:
-       точний штрихкод
-    */
-
     let existing = inventory.find(item =>
         String(item.barcode || "").trim() === barcode
     );
-
-    /*
-       Пошук 2:
-       тільки цифри.
-       Це допомагає, якщо одна база має:
-       5901234567890
-       а сканер повернув:
-       5901234567890
-       або з пробілами/символами.
-    */
 
     if (!existing) {
 
@@ -1881,12 +2023,6 @@ function calc() {
     const manual =
         document.getElementById("manualPrice").value;
 
-    /*
-       Якщо вибране Telegram-замовлення,
-       валюту НЕ беремо з кнопки оплати.
-       Валюта повинна залишатися валютою самого замовлення.
-    */
-
     let currency =
         activeOrderCurrency ||
         (pay === "Монобанк" ? "UAH" : "PLN");
@@ -2173,13 +2309,6 @@ function splitOrderItems(text) {
         return [];
     }
 
-    /*
-       Основні розділювачі:
-       кома
-       новий рядок
-       ;
-    */
-
     const result =
         value
             .split(/\n|,|;/)
@@ -2199,10 +2328,6 @@ function findInventoryMatch(text) {
         return null;
     }
 
-    /*
-       Спочатку точне співпадіння
-    */
-
     let exact = inventory.find(item =>
         normalizeProductName(item.name) === normalizedPart
     );
@@ -2210,11 +2335,6 @@ function findInventoryMatch(text) {
     if (exact) {
         return exact;
     }
-
-    /*
-       Потім шукаємо назву товару всередині
-       тексту замовлення.
-    */
 
     const candidates = inventory
         .filter(item => {
@@ -2247,10 +2367,6 @@ function buildInventoryDeductions(
 
     const deductions = {};
 
-    /*
-       Якщо це Telegram-замовлення
-    */
-
     if (tgItems && String(tgItems).trim()) {
 
         const parts =
@@ -2281,10 +2397,6 @@ function buildInventoryDeductions(
         });
     }
 
-    /*
-       Якщо це звичайний продаж
-    */
-
     if (
         !tgItems &&
         manualFlavor &&
@@ -2306,11 +2418,6 @@ function buildInventoryDeductions(
             };
         }
     }
-
-    /*
-       ICE SHOT також списується,
-       якщо він реально є у Firebase inventory.
-    */
 
     if (
         !tgItems &&
@@ -2352,13 +2459,6 @@ async function deductInventoryForSale(
             manualFlavor
         );
 
-    /*
-       Нічого не знайшли.
-       Для ручного продажу ICE SHOT,
-       якщо його немає у складі,
-       дозволяємо продати без списання.
-    */
-
     if (!deductions.length) {
 
         if (
@@ -2382,12 +2482,6 @@ async function deductInventoryForSale(
     await db.runTransaction(async transaction => {
 
         const snapshots = [];
-
-        /*
-           ВАЖЛИВО:
-           Спочатку читаємо всі документи.
-           Потім робимо update.
-        */
 
         for (const ref of refs) {
 
@@ -2547,11 +2641,6 @@ function printInvoice() {
             document.getElementById("total").innerText
         );
 
-    /*
-       Якщо це Telegram-замовлення,
-       валюта береться саме з нього.
-    */
-
     let currency =
         activeOrderCurrency;
 
@@ -2593,11 +2682,18 @@ function printInvoice() {
     document.getElementById("inv-pay-method").innerText =
         payMethod;
 
+    document.getElementById("inv-subtotal").innerText =
+        priceNum;
+
     document.getElementById("inv-total").innerText =
         priceNum;
 
     document.getElementById("inv-currency").innerText =
         currencyText;
+
+    document.querySelectorAll(".inv-curr-label").forEach(el => {
+        el.innerText = currencyText;
+    });
 
     const itemsList =
         document.getElementById("inv-items-list");
@@ -2614,24 +2710,16 @@ function printInvoice() {
             const row =
                 document.createElement("tr");
 
-            const nameCell =
-                document.createElement("td");
+            const qty = getQuantityFromItem(good);
+            const unitPrice = index === 0 ? priceNum : 0; // умовно розподіляємо або ставимо загальну
 
-            nameCell.innerText =
-                `${index + 1}. ${good}`;
-
-            const priceCell =
-                document.createElement("td");
-
-            priceCell.style.textAlign = "right";
-
-            priceCell.innerText =
-                index === 0
-                    ? `${priceNum} ${currencyText}`
-                    : "-";
-
-            row.appendChild(nameCell);
-            row.appendChild(priceCell);
+            row.innerHTML = `
+                <td style="text-align:center">${index + 1}</td>
+                <td>${escapeHtml(good)}</td>
+                <td style="text-align:center">${qty}</td>
+                <td style="text-align:right">${index === 0 ? priceNum : '-'}</td>
+                <td style="text-align:right">${index === 0 ? priceNum : '-'}</td>
+            `;
 
             itemsList.appendChild(row);
         });
@@ -2645,22 +2733,13 @@ function printInvoice() {
         const row =
             document.createElement("tr");
 
-        const nameCell =
-            document.createElement("td");
-
-        nameCell.innerText =
-            `1. ${flavor}`;
-
-        const priceCell =
-            document.createElement("td");
-
-        priceCell.style.textAlign = "right";
-
-        priceCell.innerText =
-            `${priceNum} ${currencyText}`;
-
-        row.appendChild(nameCell);
-        row.appendChild(priceCell);
+        row.innerHTML = `
+            <td style="text-align:center">1</td>
+            <td>${escapeHtml(flavor)}</td>
+            <td style="text-align:center">1</td>
+            <td style="text-align:right">${priceNum}</td>
+            <td style="text-align:right">${priceNum}</td>
+        `;
 
         itemsList.appendChild(row);
     }
@@ -2742,10 +2821,6 @@ async function saveOrder() {
                 return;
             }
 
-            /*
-               Валюта Telegram замовлення.
-            */
-
             let currency =
                 activeOrderCurrency;
 
@@ -2769,12 +2844,6 @@ async function saveOrder() {
                     pVal,
                     currency
                 );
-
-            /*
-               СПОЧАТКУ списуємо товар.
-               Якщо недостатньо товару —
-               замовлення НЕ буде записане.
-            */
 
             const deducted =
                 await deductInventoryForSale(
@@ -2809,24 +2878,12 @@ async function saveOrder() {
 
                 date: Date.now(),
 
-                /*
-                   Запам'ятовуємо, що саме списали.
-                   Це потрібно для повернення товару,
-                   якщо транзакцію видалять.
-                */
-
                 inventoryDeducted: deducted
             };
 
             await db
                 .collection("orders")
                 .add(orderData);
-
-            /*
-               Telegram замовлення переводимо
-               у completed тільки після успішного
-               збереження продажу.
-            */
 
             if (tgId) {
 
@@ -2881,10 +2938,6 @@ async function saveOrder() {
                     date: Date.now()
                 });
         }
-
-        /*
-           Очищаємо форму
-        */
 
         document.getElementById(
             "manualPrice"
@@ -2974,11 +3027,6 @@ async function deleteOrder(id) {
         const data =
             snap.data();
 
-        /*
-           Якщо при продажі товар був списаний,
-           повертаємо його назад.
-        */
-
         if (
             data.type === "sale" &&
             Array.isArray(data.inventoryDeducted) &&
@@ -3046,10 +3094,6 @@ async function payDebt(id) {
 
 function sync() {
 
-    /*
-       TELEGRAM ORDERS
-    */
-
     db
         .collection("tg_orders")
         .where("status", "==", "new")
@@ -3092,12 +3136,6 @@ function sync() {
 
                 section.style.display =
                     "block";
-
-                /*
-                   Сортуємо вручну,
-                   тому composite index Firebase
-                   тут не потрібен.
-                */
 
                 const docs =
                     snap.docs.slice().sort(
@@ -3173,12 +3211,6 @@ function sync() {
                         tg.id ||
                         doc.id.substring(0, 5);
 
-                    /*
-                       Картка.
-                       Не вставляємо значення
-                       безпосередньо в onclick.
-                    */
-
                     const card =
                         document.createElement("div");
 
@@ -3208,10 +3240,6 @@ function sync() {
 
                     list.appendChild(card);
 
-                    /*
-                       Dropdown
-                    */
-
                     const option =
                         document.createElement("option");
 
@@ -3238,11 +3266,6 @@ function sync() {
                 );
             }
         );
-
-
-    /*
-       INVENTORY
-    */
 
     db
         .collection("inventory")
@@ -3405,11 +3428,6 @@ function sync() {
             }
         );
 
-
-    /*
-       ORDERS
-    */
-
     db
         .collection("orders")
         .orderBy("date", "desc")
@@ -3448,11 +3466,6 @@ function sync() {
 
                 logs.innerHTML = "";
                 debts.innerHTML = "";
-
-                /*
-                   Додаткове сортування.
-                   Гарантує нові → старі.
-                */
 
                 const docs =
                     snap.docs.slice().sort(
@@ -3697,11 +3710,6 @@ function sync() {
                     }
                 });
 
-
-                /*
-                   КАСА
-                */
-
                 document.getElementById(
                     "totalPLN"
                 ).innerText =
@@ -3711,11 +3719,6 @@ function sync() {
                     "totalUAH"
                 ).innerText =
                     `${uah} ₴`;
-
-
-                /*
-                   7 ДНІВ
-                */
 
                 document.getElementById(
                     "st-sales-pln"
@@ -3736,11 +3739,6 @@ function sync() {
                     "st-exp-uah"
                 ).innerText =
                     `${eUah} ₴`;
-
-
-                /*
-                   ДЕННА СТАТИСТИКА
-                */
 
                 dailyList.innerHTML = "";
 
