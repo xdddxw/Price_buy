@@ -18,6 +18,9 @@
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
+<!-- Підключаємо бібліотеку для генерації PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
@@ -558,50 +561,41 @@ margin-top:8px;
 text-align:right
 }
 
-#invoice-print-area{display:none}
-
-@media print{
-body *{visibility:hidden}
-
-#invoice-print-area,#invoice-print-area *{
-visibility:visible
-}
-
+/* Стилі для блоку накладної, який конвертується в PDF */
 #invoice-print-area{
-display:block!important;
-position:absolute;
-left:0;
-top:0;
-width:80mm;
-background:#fff !important;
-color:#000 !important;
-padding:12px;
-font-family:'Courier New',Courier,monospace;
-font-size:12px;
-line-height:1.4;
-/* Водяний знак у вигляді логотипу позаду */
-background-image: url('https://i.ibb.co/3ykX12L/logo.png') !important; /* Можете замінити на своє пряме посилання на картинку логотипу */
-background-repeat: no-repeat !important;
-background-position: center center !important;
-background-size: 65% auto !important;
--webkit-print-color-adjust: exact;
-print-color-adjust: exact;
+display:none;
+width: 80mm;
+background: #fff;
+color: #000;
+padding: 16px;
+font-family: 'Courier New', Courier, monospace;
+font-size: 12px;
+line-height: 1.4;
+position: relative;
 }
 
-/* Напівпрозорий білий шар поверх водяного знаку, щоб текст був ідеально читабельним */
+/* Водяний знак всередині PDF */
 #invoice-print-area::before {
 content: "";
 position: absolute;
 top: 0; left: 0; right: 0; bottom: 0;
-background: rgba(255, 255, 255, 0.90);
-z-index: -1;
+background-image: url('https://i.ibb.co/3ykX12L/logo.png');
+background-repeat: no-repeat;
+background-position: center center;
+background-size: 60% auto;
+opacity: 0.12;
+z-index: 0;
+pointer-events: none;
+}
+
+.inv-header, .inv-divider, .inv-table, .inv-total, .inv-footer {
+position: relative;
+z-index: 1;
 }
 
 .inv-header{
 text-align:center;
-margin-bottom:10px;
-position: relative;
-z-index: 1;
+margin-bottom:10px
 }
 
 .inv-header h2{
@@ -618,17 +612,13 @@ font-size:10px
 .inv-divider{
 border:0;
 border-top:1px dashed #000;
-margin:8px 0;
-position: relative;
-z-index: 1;
+margin:8px 0
 }
 
 .inv-table{
 width:100%;
 border-collapse:collapse;
-margin-top:5px;
-position: relative;
-z-index: 1;
+margin-top:5px
 }
 
 .inv-table th{
@@ -649,18 +639,13 @@ vertical-align:top
 font-size:14px;
 font-weight:bold;
 text-align:right;
-margin-top:10px;
-position: relative;
-z-index: 1;
+margin-top:10px
 }
 
 .inv-footer{
 text-align:center;
 font-size:10px;
-margin-top:15px;
-position: relative;
-z-index: 1;
-}
+margin-top:15px
 }
 </style>
 </head>
@@ -681,6 +666,7 @@ z-index: 1;
     </button>
 </div>
 
+<!-- БЛОК НАКЛАДНОЇ ДЛЯ ГЕНЕРАЦІЇ PDF -->
 <div id="invoice-print-area">
     <div class="inv-header">
         <h2>SMOKE HUB</h2>
@@ -689,7 +675,7 @@ z-index: 1;
 
     <hr class="inv-divider">
 
-    <div style="font-size:11px;margin-bottom:5px;position:relative;z-index:1;">
+    <div style="font-size:11px;margin-bottom:5px">
         <div><b>Замовлення:</b> <span id="inv-num">#001</span></div>
         <div><b>Дата:</b> <span id="inv-date"></span></div>
         <div><b>Покупець:</b> <span id="inv-client">Роздрібний клієнт</span></div>
@@ -882,7 +868,7 @@ z-index: 1;
             class="btn-submit btn-invoice"
             onclick="printInvoice()"
         >
-            🧾 ВИДАТИ НАКЛАДНУ (ДРУК)
+            🧾 ВИДАТИ НАКЛАДНУ (PDF)
         </button>
 
     </div>
@@ -1480,9 +1466,7 @@ async function startScanner() {
 }
 
 
-function onScanFailure(error) {
-    // Не показуємо помилку на кожному невдалому кадрі.
-}
+function onScanFailure(error) {}
 
 
 async function closeScanner() {
@@ -2465,7 +2449,7 @@ async function restoreInventory(items) {
 
 
 /* =========================================================
-   INVOICE
+   PDF INVOICE GENERATION
 ========================================================= */
 
 function printInvoice() {
@@ -2624,9 +2608,26 @@ function printInvoice() {
         itemsList.appendChild(row);
     }
 
-    setTimeout(() => {
-        window.print();
-    }, 150);
+    // Тимчасово показуємо блок, щоб html2pdf міг його зчитати
+    const element = document.getElementById('invoice-print-area');
+    element.style.display = 'block';
+
+    const opt = {
+        margin:       5,
+        filename:     `Nakladna_${invoiceNum.replace('#', '')}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+    };
+
+    html2pdf().from(element).set(opt).save().then(() => {
+        element.style.display = 'none';
+        showToast("✅ PDF накладну успішно створено!");
+    }).catch(err => {
+        console.error(err);
+        element.style.display = 'none';
+        showToast("❌ Помилка створення PDF", "var(--danger)");
+    });
 }
 
 
