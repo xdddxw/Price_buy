@@ -18,7 +18,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
-<!-- Підключаємо html2canvas та jspdf для стабільної генерації PDF в PWA -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -467,7 +466,8 @@ background:rgba(0,0,0,.95);
 backdrop-filter:blur(10px);
 flex-direction:column;
 align-items:center;
-justify-content:center
+justify-content:center;
+padding: 20px;
 }
 
 #reader{
@@ -475,10 +475,11 @@ width:100%;
 max-width:400px;
 border-radius:16px;
 overflow:hidden;
-border:2px solid var(--accent-secondary)
+border:2px solid var(--accent-secondary);
+background: #000;
 }
 
-#reader video{border-radius:16px}
+#reader video{border-radius:16px; width: 100% !important; object-fit: cover;}
 
 .close-scanner{
 margin-top:24px;
@@ -488,7 +489,8 @@ border:1px solid rgba(255,255,255,.2);
 border-radius:var(--radius-md);
 color:white;
 font-weight:bold;
-font-size:16px
+font-size:16px;
+cursor: pointer;
 }
 
 .tg-orders-container{
@@ -562,7 +564,6 @@ margin-top:8px;
 text-align:right
 }
 
-/* Прихований шаблон накладної для генерації в PDF */
 #invoice-print-area{
 position: fixed;
 left: -9999px;
@@ -657,7 +658,7 @@ margin-top:15px
 <div id="toast">✅ Операцію збережено!</div>
 
 <div id="scanner-modal">
-    <div style="color:white;font-size:18px;font-weight:bold;margin-bottom:16px">
+    <div style="color:white;font-size:18px;font-weight:bold;margin-bottom:16px;text-align:center;">
         Наведіть камеру на штрих-код
     </div>
 
@@ -1416,94 +1417,64 @@ function toggleOpType() {
 
 
 /* =========================================================
-   SCANNER
+   PWA BARCODE SCANNER
 ========================================================= */
 
 async function startScanner() {
+    const modal = document.getElementById("scanner-modal");
+    modal.style.display = "flex";
 
     try {
-
-        document.getElementById("scanner-modal").style.display = "flex";
-
-        if (html5QrCode) {
-
-            try {
-                await html5QrCode.stop();
-            } catch (e) {}
-
-            try {
-                html5QrCode.clear();
-            } catch (e) {}
+        if (!html5QrCode) {
+            html5QrCode = new Html5Qrcode("reader");
         }
 
-        html5QrCode = new Html5Qrcode("reader");
+        const config = {
+            fps: 15,
+            qrbox: { width: 250, height: 150 },
+            aspectRatio: 1.0
+        };
 
         await html5QrCode.start(
-            {
-                facingMode: "environment"
-            },
-            {
-                fps: 10,
-                qrbox: {
-                    width: 250,
-                    height: 250
-                }
-            },
+            { facingMode: "environment" },
+            config,
             onScanSuccess,
             onScanFailure
         );
 
     } catch (error) {
-
-        console.error("Scanner error:", error);
-
+        console.error("Scanner start error:", error);
         closeScanner();
-
-        showToast(
-            "❌ Немає доступу до камери",
-            "var(--danger)"
-        );
+        showToast("❌ Доступ до камери заборонено або відсутній", "var(--danger)");
     }
 }
 
-
-function onScanFailure(error) {}
-
+function onScanFailure(error) {
+    // Ігноруємо проміжні невдалі кадри сканування
+}
 
 async function closeScanner() {
-
-    document.getElementById("scanner-modal").style.display = "none";
+    const modal = document.getElementById("scanner-modal");
+    modal.style.display = "none";
 
     if (html5QrCode) {
-
         try {
-            await html5QrCode.stop();
+            if (html5QrCode.isScanning) {
+                await html5QrCode.stop();
+            }
         } catch (error) {
-            console.log(error);
+            console.error("Stop scanner error:", error);
         }
-
-        try {
-            html5QrCode.clear();
-        } catch (error) {}
-
-        html5QrCode = null;
     }
 }
 
-
 async function onScanSuccess(decodedText) {
-
     await closeScanner();
 
     const barcode = String(decodedText || "").trim();
 
     if (!barcode) {
-
-        showToast(
-            "❌ Штрихкод не прочитано",
-            "var(--danger)"
-        );
-
+        showToast("❌ Штрихкод не розпізнано", "var(--danger)");
         return;
     }
 
@@ -1514,28 +1485,16 @@ async function onScanSuccess(decodedText) {
     );
 
     if (!existing) {
-
         const barcodeDigits = barcode.replace(/\D/g, "");
-
         if (barcodeDigits) {
-
             existing = inventory.find(item => {
-
-                const dbBarcode =
-                    String(item.barcode || "")
-                        .trim()
-                        .replace(/\D/g, "");
-
-                return (
-                    dbBarcode &&
-                    dbBarcode === barcodeDigits
-                );
+                const dbBarcode = String(item.barcode || "").trim().replace(/\D/g, "");
+                return dbBarcode && dbBarcode === barcodeDigits;
             });
         }
     }
 
     if (existing) {
-
         editFlavor(
             existing.id,
             existing.name,
@@ -1544,19 +1503,10 @@ async function onScanSuccess(decodedText) {
             existing.type || "заливка",
             existing.barcode || ""
         );
-
-        showToast(
-            "📦 Товар знайдено в базі!"
-        );
-
+        showToast("📦 Товар знайдено в базі!");
     } else {
-
         document.getElementById("newFlavorName").focus();
-
-        showToast(
-            "🆕 Новий штрихкод — введіть назву товару",
-            "var(--accent-secondary)"
-        );
+        showToast("🆕 Новий штрихкод — введіть назву", "var(--accent-secondary)");
     }
 }
 
@@ -2629,7 +2579,6 @@ async function printInvoice() {
 
         pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
 
-        // Формуємо файл для завантаження в PWA
         const pdfBlob = pdf.output('blob');
         const fileName = `Nakladna_${invoiceNum.replace('#', '')}.pdf`;
 
