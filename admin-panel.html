@@ -558,8 +558,7 @@
         const id = document.getElementById('tgOrderSelect').value;
         if(cachedTgOrders[id]) {
             let order = cachedTgOrders[id];
-            // Шукаємо точний номер замовлення в полях, які приходять від телеграм бота (order_number, number, orderId, або id)
-            let realNum = order.order_number || order.number || order.orderId || id;
+            let realNum = order.order_number || order.number || order.orderId || order.id || id;
             selectTgOrder(id, order.client_name || "Клієнт", order.items || "Товар", order.total_price || 0, realNum);
         }
     }
@@ -576,8 +575,8 @@
         const tgItems = document.getElementById('activeTgOrderId').getAttribute('data-items');
         const customOrderNum = document.getElementById('activeTgOrderId').getAttribute('data-ordernum');
         
-        // Виводимо точний номер замовлення з Telegram
-        const invoiceNum = customOrderNum ? "#" + customOrderNum : "#SH-" + Math.floor(1000 + Math.random() * 9000);
+        // Виводимо виключно чистий номер замовлення з бази (без обрізань і рандомних генераторів)
+        const invoiceNum = customOrderNum ? "#" + customOrderNum : "#SH-001";
 
         document.getElementById('inv-num').innerText = invoiceNum;
         document.getElementById('inv-date').innerText = formatDate(new Date().getTime());
@@ -678,8 +677,9 @@
                 const client = tg.client_name || "Клієнт";
                 const itemText = tg.items || "Товар";
                 const price = tg.total_price || 0;
-                // Читаємо справжній номер замовлення із бази (перевіряємо різні поширені назви полів)
-                const orderNum = tg.order_number || tg.number || tg.orderId || doc.id.substring(0, 5);
+                
+                // Чітко витягуємо номер замовлення з бази даних (пріоритет полям бота)
+                const orderNum = tg.order_number || tg.number || tg.orderId || tg.id || doc.id;
                 
                 list.innerHTML += `
                 <div class="tg-order-card" id="tg-card-${doc.id}" onclick="selectTgOrder('${doc.id}', '${client}', '${itemText.replace(/'/g, "")}', ${price}, '${orderNum}')">
