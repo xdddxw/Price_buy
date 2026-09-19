@@ -1,226 +1,780 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="SMOKE HUB">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#09090b">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5024/5024445.png">
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/5024/5024445.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
-    <title>SMOKE HUB PRO</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg-main: #09090b;
-            --card-surface: rgba(24, 24, 27, 0.65);
-            --card-solid: #18181b;
-            --accent-primary: #8b5cf6;
-            --accent-glow: rgba(139, 92, 246, 0.4);
-            --accent-secondary: #06b6d4;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --tg-color: #3b82f6;
-            --text-main: #f8fafc;
-            --text-p: #a1a1aa;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --radius-lg: 24px;
-            --radius-md: 16px;
-            --radius-sm: 10px;
-        }
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SMOKE HUB">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#09090b">
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5024/5024445.png">
+<link rel="icon" href="https://cdn-icons-png.flaticon.com/512/5024/5024445.png">
 
-        body {
-            margin: 0; font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--bg-main);
-            background-image: radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.08), transparent 25%), radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.08), transparent 25%);
-            color: var(--text-main);
-            padding: calc(20px + env(safe-area-inset-top)) 16px calc(90px + env(safe-area-inset-bottom));
-            user-select: none; min-height: 100vh;
-        }
+<title>SMOKE HUB PRO</title>
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .tab-content { display: none; animation: fadeIn 0.3s ease-out forwards; }
-        .tab-content.active-tab { display: block; }
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        .dashboard-header { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-        .balance-card { background: linear-gradient(145deg, rgba(39, 39, 42, 0.8), rgba(24, 24, 27, 0.9)); backdrop-filter: blur(10px); padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: 0 8px 32px rgba(0,0,0,0.2); position: relative; overflow: hidden; }
-        .balance-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent-primary), transparent); opacity: 0.5; }
-        .balance-card span { font-size: 11px; color: var(--text-p); font-weight: 600; letter-spacing: 1px; }
-        .balance-card div { font-size: 22px; font-weight: 800; margin-top: 6px; color: #fff; letter-spacing: -0.5px;}
+<style>
+:root {
+    --bg-main:#09090b;
+    --card-surface:rgba(24,24,27,.65);
+    --card-solid:#18181b;
+    --accent-primary:#8b5cf6;
+    --accent-glow:rgba(139,92,246,.4);
+    --accent-secondary:#06b6d4;
+    --success:#10b981;
+    --warning:#f59e0b;
+    --danger:#ef4444;
+    --tg-color:#3b82f6;
+    --text-main:#f8fafc;
+    --text-p:#a1a1aa;
+    --border-color:rgba(255,255,255,.08);
+    --radius-lg:24px;
+    --radius-md:16px;
+    --radius-sm:10px;
+}
 
-        .bottom-nav { display: flex; justify-content: space-around; align-items: center; background: rgba(24, 24, 27, 0.85); backdrop-filter: blur(20px); padding: 12px 8px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border-color); position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; }
-        .tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; flex: 1; border: none; background: transparent; color: var(--text-p); font-weight: 600; font-size: 10px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 8px 0; border-radius: var(--radius-sm); }
-        .tab-btn i { font-size: 20px; font-style: normal; margin-bottom: 2px; transition: 0.3s; }
-        .tab-btn.active { color: var(--accent-primary); }
-        .tab-btn.active i { transform: translateY(-3px) scale(1.1); text-shadow: 0 0 12px var(--accent-glow); }
+* {
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
 
-        .main-form, .admin-panel, .stats-card { background: var(--card-surface); backdrop-filter: blur(12px); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px; border: 1px solid var(--border-color); box-shadow: 0 4px 24px rgba(0,0,0,0.15); }
+body {
+    margin:0;
+    font-family:'Inter',-apple-system,sans-serif;
+    background-color:var(--bg-main);
+    background-image:
+        radial-gradient(circle at 15% 50%,rgba(139,92,246,.08),transparent 25%),
+        radial-gradient(circle at 85% 30%,rgba(6,182,212,.08),transparent 25%);
+    color:var(--text-main);
+    padding:calc(20px + env(safe-area-inset-top))
+            16px
+            calc(90px + env(safe-area-inset-bottom));
+    user-select:none;
+    min-height:100vh;
+}
 
-        .form-row { margin-bottom: 18px; position: relative; }
-        .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        label { display: block; font-size: 11px; color: var(--text-p); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
+@keyframes fadeIn {
+    from {opacity:0;transform:translateY(10px)}
+    to {opacity:1;transform:translateY(0)}
+}
 
-        select, input { width: 100%; height: 56px; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); padding: 0 16px; color: #fff; font-size: 16px; font-family: 'Inter', sans-serif; transition: all 0.2s; outline: none; -webkit-appearance: none; }
-        select:focus, input:focus { border-color: var(--accent-primary); background: rgba(139, 92, 246, 0.05); box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1); }
-        select { background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23a1a1aa%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 16px top 50%; background-size: 12px auto; }
+.tab-content {
+    display:none;
+    animation:fadeIn .3s ease-out forwards;
+}
 
-        .price-tag { text-align: center; font-size: 42px; font-weight: 800; margin: 24px 0; background: linear-gradient(to right, #fff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 4px 24px rgba(255,255,255,0.1); }
+.tab-content.active-tab {
+    display:block;
+}
 
-        .btn-submit { width: 100%; height: 60px; background: linear-gradient(135deg, var(--accent-primary), #6d28d9); border: none; border-radius: var(--radius-md); color: white; font-weight: 700; font-size: 15px; letter-spacing: 1px; cursor: pointer; transition: 0.2s; box-shadow: 0 8px 20px var(--accent-glow); display: flex; align-items: center; justify-content: center; gap: 8px;}
-        .btn-submit:active { transform: scale(0.97); box-shadow: 0 4px 10px var(--accent-glow); }
-        .btn-cancel { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-main); box-shadow: none; margin-top: 12px; }
-        .btn-cancel:active { background: rgba(255,255,255,0.1); box-shadow: none; }
-        .btn-scanner { background: rgba(6, 182, 212, 0.15); border: 1px solid var(--accent-secondary); color: var(--accent-secondary); box-shadow: none; }
-        .btn-invoice { background: linear-gradient(135deg, var(--accent-secondary), #0284c7); box-shadow: 0 8px 20px rgba(6,182,212,0.3); margin-top: 10px; }
+.dashboard-header {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:24px;
+}
 
-        .admin-header { text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .admin-header h3 { margin: 0; font-size: 18px; color: #fff; }
-        .admin-header p { margin: 6px 0 0; font-size: 12px; color: var(--text-p); }
+.balance-card {
+    background:linear-gradient(145deg,rgba(39,39,42,.8),rgba(24,24,27,.9));
+    backdrop-filter:blur(10px);
+    padding:16px;
+    border-radius:var(--radius-lg);
+    border:1px solid var(--border-color);
+    box-shadow:0 8px 32px rgba(0,0,0,.2);
+    position:relative;
+    overflow:hidden;
+}
 
-        .list-item { background: var(--card-solid); padding: 16px; border-radius: var(--radius-md); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); position: relative; overflow: hidden; }
-        .list-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent-secondary); }
-        .item-main b { display: block; font-size: 15px; margin-bottom: 6px; color: #fff; }
-        .item-main span { font-size: 12px; color: var(--text-p); display: flex; align-items: center; gap: 4px;}
-        .item-date { font-size: 10px; color: var(--accent-primary); font-weight: 700; margin-bottom: 4px; display: inline-block; letter-spacing: 0.5px;}
-        .type-badge { font-size: 10px; padding: 3px 6px; border-radius: 6px; background: rgba(255,255,255,0.08); color: #e2e8f0; margin-right: 6px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;}
+.balance-card::before {
+    content:'';
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:2px;
+    background:linear-gradient(90deg,transparent,var(--accent-primary),transparent);
+    opacity:.5;
+}
 
-        .icon-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 10px; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; transition: 0.2s; }
-        .icon-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.9); }
-        .btn-pay { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 700; transition: 0.2s; }
-        .btn-pay:active { transform: scale(0.95); }
+.balance-card span {
+    font-size:11px;
+    color:var(--text-p);
+    font-weight:600;
+    letter-spacing:1px;
+}
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;}
-        .stat-item { background: rgba(0,0,0,0.2); padding: 16px 12px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--border-color); }
-        .stat-val { display: block; font-size: 18px; font-weight: 800; color: var(--success); margin-bottom: 4px; }
-        .stat-label { font-size: 10px; color: var(--text-p); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
-        .day-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border-color); }
-        .day-row:last-child { border-bottom: none; }
-        .day-date { font-weight: 700; font-size: 15px; color: #fff;}
-        .day-totals { text-align: right; }
-        .day-totals div { font-size: 13px; font-weight: 700; margin-bottom: 2px;}
+.balance-card div {
+    font-size:22px;
+    font-weight:800;
+    margin-top:6px;
+    color:#fff;
+    letter-spacing:-.5px;
+}
 
-        #location-box { background: rgba(6, 182, 212, 0.08); padding: 16px; border-radius: var(--radius-md); margin-bottom: 18px; display: none; font-size: 14px; border: 1px solid rgba(6, 182, 212, 0.2); color: #fff; animation: fadeIn 0.2s ease-out; }
+.bottom-nav {
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    background:rgba(24,24,27,.85);
+    backdrop-filter:blur(20px);
+    padding:12px 8px calc(12px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--border-color);
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index:1000;
+}
 
-        #toast { visibility: hidden; min-width: 200px; background-color: var(--success); color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 2000; left: 50%; top: 30px; transform: translateX(-50%) translateY(-20px); font-size: 15px; font-weight: 600; opacity: 0; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3); transition: opacity 0.3s, transform 0.3s; }
-        #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
+.tab-btn {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    flex:1;
+    border:none;
+    background:transparent;
+    color:var(--text-p);
+    font-weight:600;
+    font-size:10px;
+    transition:all .3s;
+    padding:8px 0;
+    border-radius:var(--radius-sm);
+}
 
-        #scanner-modal { display:none; position:fixed; z-index:9999; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); backdrop-filter: blur(10px); flex-direction:column; align-items:center; justify-content:center; }
-        #reader { width: 100%; max-width: 400px; border-radius: 16px; overflow: hidden; border: 2px solid var(--accent-secondary); }
-        #reader video { border-radius: 16px; }
-        .close-scanner { margin-top: 24px; padding: 12px 32px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: var(--radius-md); color: white; font-weight: bold; font-size: 16px; }
+.tab-btn i {
+    font-size:20px;
+    font-style:normal;
+    margin-bottom:2px;
+    transition:.3s;
+}
 
-        /* Telegram Стрічка Замовлень */
-        .tg-orders-container { display: none; margin-bottom: 20px; animation: fadeIn 0.3s ease-out; }
-        .tg-orders-header { font-size: 11px; font-weight: 600; color: var(--tg-color); text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-        .tg-orders-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; }
-        .tg-orders-scroll::-webkit-scrollbar { display: none; }
-        .tg-order-card { background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(30, 58, 138, 0.4)); min-width: 160px; padding: 14px; border-radius: var(--radius-md); scroll-snap-align: start; cursor: pointer; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: 0.2s; border: 1px solid var(--tg-color); }
-        .tg-order-card:active { transform: scale(0.95); }
-        .tg-order-card.selected { background: linear-gradient(135deg, var(--tg-color), #1e3a8a); border-color: #fff; box-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
-        .tg-order-title { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 6px; display:flex; align-items:center; gap:4px; }
-        .tg-order-text { font-size: 13px; font-weight: 600; color: #e2e8f0; word-break: break-word; }
-        .tg-order-price { font-size: 14px; font-weight: 800; color: #fff; margin-top: 6px; text-align: right; }
+.tab-btn.active {
+    color:var(--accent-primary);
+}
 
-        /* ЧИСТИЙ СТИЛЬ ЧЕКА */
-        #invoice-print-area { display: none; }
-        @media print {
-            body * { visibility: hidden; }
-            #invoice-print-area, #invoice-print-area * { visibility: visible; }
-            #invoice-print-area { 
-                display: block !important; 
-                position: absolute; 
-                left: 0; 
-                top: 0; 
-                width: 80mm; 
-                background: #ffffff; 
-                color: #000000; 
-                padding: 12px; 
-                font-family: 'Courier New', Courier, monospace;
-                font-size: 12px;
-                line-height: 1.4;
-            }
-            .inv-header { text-align: center; margin-bottom: 10px; }
-            .inv-header h2 { margin: 0; font-size: 16px; font-weight: bold; }
-            .inv-header p { margin: 2px 0; font-size: 10px; }
-            .inv-divider { border: 0; border-top: 1px dashed #000; margin: 8px 0; }
-            .inv-table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-            .inv-table th { text-align: left; font-size: 11px; border-bottom: 1px solid #000; padding-bottom: 3px; }
-            .inv-table td { font-size: 11px; padding: 4px 0; border-bottom: 1px dotted #ccc; vertical-align: top; }
-            .inv-total { font-size: 14px; font-weight: bold; text-align: right; margin-top: 10px; }
-            .inv-footer { text-align: center; font-size: 10px; margin-top: 15px; }
-        }
-    </style>
+.tab-btn.active i {
+    transform:translateY(-3px) scale(1.1);
+    text-shadow:0 0 12px var(--accent-glow);
+}
+
+.main-form,
+.admin-panel,
+.stats-card {
+    background:var(--card-surface);
+    backdrop-filter:blur(12px);
+    border-radius:var(--radius-lg);
+    padding:20px;
+    margin-bottom:16px;
+    border:1px solid var(--border-color);
+    box-shadow:0 4px 24px rgba(0,0,0,.15);
+}
+
+.form-row {
+    margin-bottom:18px;
+    position:relative;
+}
+
+.grid-2-col {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+label {
+    display:block;
+    font-size:11px;
+    color:var(--text-p);
+    margin-bottom:8px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+
+select,
+input {
+    width:100%;
+    height:56px;
+    background:rgba(0,0,0,.2);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:var(--radius-md);
+    padding:0 16px;
+    color:#fff;
+    font-size:16px;
+    font-family:'Inter',sans-serif;
+    transition:all .2s;
+    outline:none;
+    -webkit-appearance:none;
+}
+
+select:focus,
+input:focus {
+    border-color:var(--accent-primary);
+    background:rgba(139,92,246,.05);
+    box-shadow:0 0 0 4px rgba(139,92,246,.1);
+}
+
+select {
+    background-image:url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='292.4' height='292.4'%3E%3Cpath fill='%23a1a1aa' d='M287 69.4a17.6 17.6 0 0 0-13-5.4H18.4c-5 0-9.3 1.8-12.9 5.4A17.6 17.6 0 0 0 0 82.2c0 5 1.8 9.3 5.4 12.9l128 127.9c3.6 3.6 7.8 5.4 12.8 5.4s9.2-1.8 12.8-5.4L287 95c3.5-3.5 5.4-7.8 5.4-12.8 0-5-1.9-9.2-5.5-12.8z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 16px top 50%;
+    background-size:12px auto;
+}
+
+.price-tag {
+    text-align:center;
+    font-size:42px;
+    font-weight:800;
+    margin:24px 0;
+    background:linear-gradient(to right,#fff,#cbd5e1);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    text-shadow:0 4px 24px rgba(255,255,255,.1);
+}
+
+.btn-submit {
+    width:100%;
+    height:60px;
+    background:linear-gradient(135deg,var(--accent-primary),#6d28d9);
+    border:none;
+    border-radius:var(--radius-md);
+    color:white;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:1px;
+    cursor:pointer;
+    transition:.2s;
+    box-shadow:0 8px 20px var(--accent-glow);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+
+.btn-submit:active {
+    transform:scale(.97);
+}
+
+.btn-submit:disabled {
+    opacity:.5;
+    pointer-events:none;
+}
+
+.btn-cancel {
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.1);
+    color:var(--text-main);
+    box-shadow:none;
+    margin-top:12px;
+}
+
+.btn-scanner {
+    background:rgba(6,182,212,.15);
+    border:1px solid var(--accent-secondary);
+    color:var(--accent-secondary);
+    box-shadow:none;
+}
+
+.btn-invoice {
+    background:linear-gradient(135deg,var(--accent-secondary),#0284c7);
+    box-shadow:0 8px 20px rgba(6,182,212,.3);
+    margin-top:10px;
+}
+
+.admin-header {
+    text-align:center;
+    margin-bottom:24px;
+    padding-bottom:16px;
+    border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+.admin-header h3 {
+    margin:0;
+    font-size:18px;
+    color:#fff;
+}
+
+.admin-header p {
+    margin:6px 0 0;
+    font-size:12px;
+    color:var(--text-p);
+}
+
+.list-item {
+    background:var(--card-solid);
+    padding:16px;
+    border-radius:var(--radius-md);
+    margin-bottom:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border:1px solid var(--border-color);
+    position:relative;
+    overflow:hidden;
+}
+
+.list-item::before {
+    content:'';
+    position:absolute;
+    left:0;
+    top:0;
+    bottom:0;
+    width:4px;
+    background:var(--accent-secondary);
+}
+
+.item-main b {
+    display:block;
+    font-size:15px;
+    margin-bottom:6px;
+    color:#fff;
+}
+
+.item-main span {
+    font-size:12px;
+    color:var(--text-p);
+    display:flex;
+    align-items:center;
+    gap:4px;
+}
+
+.item-date {
+    font-size:10px;
+    color:var(--accent-primary);
+    font-weight:700;
+    margin-bottom:4px;
+    display:inline-block;
+    letter-spacing:.5px;
+}
+
+.type-badge {
+    font-size:10px;
+    padding:3px 6px;
+    border-radius:6px;
+    background:rgba(255,255,255,.08);
+    color:#e2e8f0;
+    margin-right:6px;
+    text-transform:uppercase;
+    font-weight:600;
+    letter-spacing:.5px;
+}
+
+.icon-btn {
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.1);
+    color:white;
+    border-radius:10px;
+    width:36px;
+    height:36px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+    transition:.2s;
+}
+
+.icon-btn:active {
+    background:rgba(255,255,255,.1);
+    transform:scale(.9);
+}
+
+.btn-pay {
+    background:rgba(16,185,129,.15);
+    color:var(--success);
+    border:1px solid rgba(16,185,129,.3);
+    border-radius:8px;
+    padding:6px 12px;
+    font-size:11px;
+    font-weight:700;
+}
+
+.stats-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:24px;
+}
+
+.stat-item {
+    background:rgba(0,0,0,.2);
+    padding:16px 12px;
+    border-radius:var(--radius-md);
+    text-align:center;
+    border:1px solid var(--border-color);
+}
+
+.stat-val {
+    display:block;
+    font-size:18px;
+    font-weight:800;
+    color:var(--success);
+    margin-bottom:4px;
+}
+
+.stat-label {
+    font-size:10px;
+    color:var(--text-p);
+    text-transform:uppercase;
+    font-weight:600;
+    letter-spacing:.5px;
+}
+
+.day-row {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 0;
+    border-bottom:1px solid var(--border-color);
+}
+
+.day-row:last-child {
+    border-bottom:none;
+}
+
+.day-date {
+    font-weight:700;
+    font-size:15px;
+    color:#fff;
+}
+
+.day-totals {
+    text-align:right;
+}
+
+.day-totals div {
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:2px;
+}
+
+#location-box {
+    background:rgba(6,182,212,.08);
+    padding:16px;
+    border-radius:var(--radius-md);
+    margin-bottom:18px;
+    display:none;
+    font-size:14px;
+    border:1px solid rgba(6,182,212,.2);
+    color:#fff;
+    animation:fadeIn .2s ease-out;
+}
+
+#toast {
+    visibility:hidden;
+    min-width:200px;
+    background-color:var(--success);
+    color:#fff;
+    text-align:center;
+    border-radius:12px;
+    padding:16px;
+    position:fixed;
+    z-index:2000;
+    left:50%;
+    top:30px;
+    transform:translateX(-50%) translateY(-20px);
+    font-size:15px;
+    font-weight:600;
+    opacity:0;
+    box-shadow:0 10px 30px rgba(16,185,129,.3);
+    transition:opacity .3s,transform .3s;
+}
+
+#toast.show {
+    visibility:visible;
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}
+
+#scanner-modal {
+    display:none;
+    position:fixed;
+    z-index:9999;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.95);
+    backdrop-filter:blur(10px);
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+
+#reader {
+    width:100%;
+    max-width:400px;
+    border-radius:16px;
+    overflow:hidden;
+    border:2px solid var(--accent-secondary);
+}
+
+#reader video {
+    border-radius:16px;
+}
+
+.close-scanner {
+    margin-top:24px;
+    padding:12px 32px;
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:var(--radius-md);
+    color:white;
+    font-weight:bold;
+    font-size:16px;
+}
+
+.tg-orders-container {
+    display:none;
+    margin-bottom:20px;
+    animation:fadeIn .3s ease-out;
+}
+
+.tg-orders-header {
+    font-size:11px;
+    font-weight:600;
+    color:var(--tg-color);
+    text-transform:uppercase;
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.tg-orders-scroll {
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:8px;
+    scroll-snap-type:x mandatory;
+}
+
+.tg-orders-scroll::-webkit-scrollbar {
+    display:none;
+}
+
+.tg-order-card {
+    background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(30,58,138,.4));
+    min-width:160px;
+    padding:14px;
+    border-radius:var(--radius-md);
+    scroll-snap-align:start;
+    cursor:pointer;
+    position:relative;
+    box-shadow:0 4px 12px rgba(0,0,0,.2);
+    transition:.2s;
+    border:1px solid var(--tg-color);
+}
+
+.tg-order-card:active {
+    transform:scale(.95);
+}
+
+.tg-order-card.selected {
+    background:linear-gradient(135deg,var(--tg-color),#1e3a8a);
+    border-color:#fff;
+    box-shadow:0 0 15px rgba(59,130,246,.6);
+}
+
+.tg-order-title {
+    font-size:12px;
+    font-weight:700;
+    color:#fff;
+    margin-bottom:6px;
+    display:flex;
+    align-items:center;
+    gap:4px;
+}
+
+.tg-order-text {
+    font-size:13px;
+    font-weight:600;
+    color:#e2e8f0;
+    word-break:break-word;
+}
+
+.tg-order-price {
+    font-size:14px;
+    font-weight:800;
+    color:#fff;
+    margin-top:6px;
+    text-align:right;
+}
+
+#invoice-print-area {
+    display:none;
+}
+
+@media print {
+    body * {
+        visibility:hidden;
+    }
+
+    #invoice-print-area,
+    #invoice-print-area * {
+        visibility:visible;
+    }
+
+    #invoice-print-area {
+        display:block !important;
+        position:absolute;
+        left:0;
+        top:0;
+        width:80mm;
+        background:#fff;
+        color:#000;
+        padding:12px;
+        font-family:'Courier New',Courier,monospace;
+        font-size:12px;
+        line-height:1.4;
+    }
+
+    .inv-header {
+        text-align:center;
+        margin-bottom:10px;
+    }
+
+    .inv-header h2 {
+        margin:0;
+        font-size:16px;
+        font-weight:bold;
+    }
+
+    .inv-header p {
+        margin:2px 0;
+        font-size:10px;
+    }
+
+    .inv-divider {
+        border:0;
+        border-top:1px dashed #000;
+        margin:8px 0;
+    }
+
+    .inv-table {
+        width:100%;
+        border-collapse:collapse;
+        margin-top:5px;
+    }
+
+    .inv-table th {
+        text-align:left;
+        font-size:11px;
+        border-bottom:1px solid #000;
+        padding-bottom:3px;
+    }
+
+    .inv-table td {
+        font-size:11px;
+        padding:4px 0;
+        border-bottom:1px dotted #ccc;
+        vertical-align:top;
+    }
+
+    .inv-total {
+        font-size:14px;
+        font-weight:bold;
+        text-align:right;
+        margin-top:10px;
+    }
+
+    .inv-footer {
+        text-align:center;
+        font-size:10px;
+        margin-top:15px;
+    }
+}
+</style>
 </head>
+
 <body>
 
 <div id="toast">✅ Операцію збережено!</div>
 
 <div id="scanner-modal">
-    <div style="color:white; font-size:18px; font-weight:bold; margin-bottom:16px;">Наведіть камеру на штрих-код</div>
+    <div style="color:white;font-size:18px;font-weight:bold;margin-bottom:16px;">
+        Наведіть камеру на штрих-код
+    </div>
     <div id="reader"></div>
     <button class="close-scanner" onclick="closeScanner()">Скасувати</button>
 </div>
 
-<!-- ЧИСТИЙ ШАБЛОН ДРУКУ ЧЕКА -->
 <div id="invoice-print-area">
     <div class="inv-header">
         <h2>SMOKE HUB</h2>
         <p>ТОВАРНА НАКЛАДНА</p>
     </div>
+
     <hr class="inv-divider">
-    <div style="font-size: 11px; margin-bottom: 5px;">
+
+    <div style="font-size:11px;margin-bottom:5px;">
         <div><b>Замовлення:</b> <span id="inv-num">#001</span></div>
         <div><b>Дата:</b> <span id="inv-date"></span></div>
         <div><b>Покупець:</b> <span id="inv-client">Роздрібний клієнт</span></div>
         <div><b>Оплата:</b> <span id="inv-pay-method">Готівка</span></div>
     </div>
+
     <hr class="inv-divider">
+
     <table class="inv-table">
         <thead>
             <tr>
                 <th>Найменування товару</th>
-                <th style="text-align: right;">Сума</th>
+                <th style="text-align:right;">Сума</th>
             </tr>
         </thead>
         <tbody id="inv-items-list"></tbody>
     </table>
+
     <hr class="inv-divider">
+
     <div class="inv-total">
-        ДО СПЛАТИ: <span id="inv-total">0</span> <span id="inv-currency">грн</span>
+        ДО СПЛАТИ:
+        <span id="inv-total">0</span>
+        <span id="inv-currency">грн</span>
     </div>
+
     <div class="inv-footer">
         Дякуємо за покупку!
     </div>
 </div>
 
 <div class="dashboard-header">
-    <div class="balance-card"><span>💰 PLN (КАСА)</span><div id="totalPLN">0</div></div>
-    <div class="balance-card"><span>💳 UAH (КАСА)</span><div id="totalUAH">0</div></div>
+    <div class="balance-card">
+        <span>💰 PLN (КАСА)</span>
+        <div id="totalPLN">0 ZŁ</div>
+    </div>
+
+    <div class="balance-card">
+        <span>💳 UAH (КАСА)</span>
+        <div id="totalUAH">0 ₴</div>
+    </div>
 </div>
 
 <div id="tab-new" class="tab-content active-tab">
-    
+
     <div id="tg-orders-section" class="tg-orders-container">
-        <div class="tg-orders-header">✈️ НОВІ ЗАМОВЛЕННЯ (TELEGRAM)</div>
+        <div class="tg-orders-header">
+            ✈️ НОВІ ЗАМОВЛЕННЯ (TELEGRAM)
+        </div>
+
         <div class="tg-orders-scroll" id="tg-orders-list"></div>
     </div>
+
     <input type="hidden" id="activeTgOrderId">
 
     <div class="main-form">
+
         <div class="form-row">
             <label>Тип операції</label>
+
             <select id="opType" onchange="toggleOpType()">
                 <option value="sale">💳 Продаж товару</option>
                 <option value="expense">💸 Витрата (закупка/інше)</option>
@@ -228,588 +782,2902 @@
         </div>
 
         <div id="sale-fields">
+
             <div class="form-row">
                 <label>📋 Вибрати з нових замовлень Telegram</label>
+
                 <select id="tgOrderSelect" onchange="selectTgOrderFromDropdown()">
-                    <option value="" disabled selected>-- Виберіть замовлення або вкажіть вручну --</option>
+                    <option value="" disabled selected>
+                        -- Виберіть замовлення або вкажіть вручну --
+                    </option>
                 </select>
             </div>
+
             <div class="form-row">
                 <label>Каталог</label>
+
                 <select id="catalog" onchange="updateFlavorList()">
                     <option value="заливка">🧪 Заливка рідини</option>
                     <option value="продаж">📦 Готовий товар</option>
                 </select>
             </div>
+
             <div class="form-row">
                 <label>Пошук та вибір товару</label>
-                <input type="text" id="flavorSearch" placeholder="🔍 Пошук по назві..." oninput="updateFlavorList()">
-                <select id="flavor" onchange="handleFlavor()" style="margin-top:12px;"></select>
+
+                <input
+                    type="text"
+                    id="flavorSearch"
+                    placeholder="🔍 Пошук по назві..."
+                    oninput="updateFlavorList()"
+                >
+
+                <select
+                    id="flavor"
+                    onchange="handleFlavor()"
+                    style="margin-top:12px;"
+                ></select>
             </div>
-            <div id="location-box">📍 <b>Локація:</b> <span id="loc-text" style="color:var(--accent-secondary); font-weight:700; margin-left:4px;"></span></div>
-            <div class="form-row" id="vol-box"><label>Об'єм</label><select id="size" onchange="calc()"><option value="2">2 ml</option><option value="3">3 ml</option></select></div>
+
+            <div id="location-box">
+                📍 <b>Локація:</b>
+                <span
+                    id="loc-text"
+                    style="color:var(--accent-secondary);font-weight:700;margin-left:4px;"
+                ></span>
+            </div>
+
+            <div class="form-row" id="vol-box">
+                <label>Об'єм</label>
+
+                <select id="size" onchange="calc()">
+                    <option value="2">2 ml</option>
+                    <option value="3">3 ml</option>
+                </select>
+            </div>
+
         </div>
 
         <div id="expense-fields" style="display:none">
+
             <div class="form-row">
                 <label>Назва витрати</label>
-                <input type="text" id="expName" placeholder="Наприклад: Закупка жижі">
+
+                <input
+                    type="text"
+                    id="expName"
+                    placeholder="Наприклад: Закупка жижі"
+                >
             </div>
+
         </div>
 
-        <div class="form-row"><label>Валюта та оплата</label><select id="pay" onchange="calc()"><option value="Готівка">💵 Готівка PLN</option><option value="Карта">💳 Карта PLN</option><option value="Монобанк">🐈 Mono UAH</option></select></div>
-        <div class="form-row" id="status-row"><label>Статус</label><select id="status" onchange="toggleDebt()"><option value="paid">✅ Оплачено одразу</option><option value="debt">🚩 В борг</option></select></div>
-        <div id="debtor-row" class="form-row" style="display:none"><label>Ім'я клієнта / боржника</label><input type="text" id="debtorName" placeholder="Введіть ім'я"></div>
-        <div class="form-row"><label>Загальна сума</label><input type="number" id="manualPrice" oninput="calc()" placeholder="Введіть суму вручну"></div>
-        
-        <div class="price-tag" id="total">0</div>
-        <button class="btn-submit" onclick="saveOrder()">ПІДТВЕРДИТИ ТА ЗБЕРЕГТИ</button>
-        <button class="btn-submit btn-invoice" onclick="printInvoice()">🧾 ВИДАТИ НАКЛАДНУ (ДРУК)</button>
+        <div class="form-row">
+            <label>Валюта та оплата</label>
+
+            <select id="pay" onchange="calc()">
+                <option value="Готівка">💵 Готівка PLN</option>
+                <option value="Карта">💳 Карта PLN</option>
+                <option value="Монобанк">🐈 Mono UAH</option>
+            </select>
+        </div>
+
+        <div class="form-row" id="status-row">
+            <label>Статус</label>
+
+            <select id="status" onchange="toggleDebt()">
+                <option value="paid">✅ Оплачено одразу</option>
+                <option value="debt">🚩 В борг</option>
+            </select>
+        </div>
+
+        <div id="debtor-row" class="form-row" style="display:none">
+            <label>Ім'я клієнта / боржника</label>
+
+            <input
+                type="text"
+                id="debtorName"
+                placeholder="Введіть ім'я"
+            >
+        </div>
+
+        <div class="form-row">
+            <label>Загальна сума</label>
+
+            <input
+                type="number"
+                id="manualPrice"
+                oninput="calc()"
+                placeholder="Введіть суму вручну"
+            >
+        </div>
+
+        <div class="price-tag" id="total">0 zł</div>
+
+        <button
+            class="btn-submit"
+            id="saveOrderBtn"
+            onclick="saveOrder()"
+        >
+            ПІДТВЕРДИТИ ТА ЗБЕРЕГТИ
+        </button>
+
+        <button
+            class="btn-submit btn-invoice"
+            onclick="printInvoice()"
+        >
+            🧾 ВИДАТИ НАКЛАДНУ (ДРУК)
+        </button>
+
     </div>
 </div>
 
 <div id="tab-admin" class="tab-content">
+
     <div class="admin-panel">
+
         <div class="admin-header">
             <h3 id="adminFormTitle">📦 Нова поставка / Товар</h3>
             <p id="adminFormSub">Скануйте штрих-код або введіть вручну</p>
         </div>
+
         <input type="hidden" id="editId">
-        
-        <div class="form-row" style="display:flex; gap:10px;">
+
+        <div class="form-row" style="display:flex;gap:10px;">
+
             <div style="flex:1;">
                 <label>Штрих-код</label>
-                <input type="text" id="newBarcode" placeholder="EAN/UPC...">
+
+                <input
+                    type="text"
+                    id="newBarcode"
+                    placeholder="EAN/UPC..."
+                >
             </div>
-            <div style="display:flex; align-items:flex-end;">
-                <button class="btn-submit btn-scanner" style="width:60px; height:56px;" onclick="startScanner()">📷</button>
+
+            <div style="display:flex;align-items:flex-end;">
+                <button
+                    class="btn-submit btn-scanner"
+                    style="width:60px;height:56px;"
+                    onclick="startScanner()"
+                >
+                    📷
+                </button>
             </div>
+
         </div>
 
         <div class="form-row">
             <label>Категорія товару</label>
+
             <select id="newFlavorType">
                 <option value="заливка">🧪 Заливка рідини</option>
                 <option value="продаж">📦 Готовий товар</option>
             </select>
         </div>
+
         <div class="form-row">
             <label>Назва позиції</label>
-            <input type="text" id="newFlavorName" placeholder="Введіть назву...">
+
+            <input
+                type="text"
+                id="newFlavorName"
+                placeholder="Введіть назву..."
+            >
         </div>
-        
+
         <div class="grid-2-col">
+
             <div class="form-row">
                 <label>Локація</label>
-                <input type="text" id="newLoc" placeholder="Де лежить?">
+
+                <input
+                    type="text"
+                    id="newLoc"
+                    placeholder="Де лежить?"
+                >
             </div>
+
             <div class="form-row">
                 <label>Кількість (шт)</label>
-                <input type="number" id="newQty" value="10">
+
+                <input
+                    type="number"
+                    id="newQty"
+                    value="10"
+                >
             </div>
+
         </div>
-        
-        <button class="btn-submit" id="saveFlavorBtn" onclick="addFlavorToInventory()">➕ ЗБЕРЕГТИ ДАНІ</button>
-        <button class="btn-submit btn-cancel" id="cancelEditBtn" style="display:none;" onclick="cancelEdit()">СКАСУВАТИ РЕДАГУВАННЯ</button>
+
+        <button
+            class="btn-submit"
+            id="saveFlavorBtn"
+            onclick="addFlavorToInventory()"
+        >
+            ➕ ЗБЕРЕГТИ ДАНІ
+        </button>
+
+        <button
+            class="btn-submit btn-cancel"
+            id="cancelEditBtn"
+            style="display:none;"
+            onclick="cancelEdit()"
+        >
+            СКАСУВАТИ РЕДАГУВАННЯ
+        </button>
+
     </div>
-    
-    <h3 style="margin:32px 0 12px 4px; font-size:12px; color:var(--text-p); letter-spacing: 1px;">📋 АКТУАЛЬНІ ЗАЛИШКИ</h3>
+
+    <h3 style="margin:32px 0 12px 4px;font-size:12px;color:var(--text-p);letter-spacing:1px;">
+        📋 АКТУАЛЬНІ ЗАЛИШКИ
+    </h3>
+
     <div id="inventoryList"></div>
+
 </div>
 
 <div id="tab-stats" class="tab-content">
+
     <div class="stats-card">
-        <h3 style="margin:0 0 16px 0; font-size:12px; color:var(--text-p); letter-spacing: 1px;">📊 ОГЛЯД ЗА 7 ДНІВ</h3>
+
+        <h3 style="margin:0 0 16px 0;font-size:12px;color:var(--text-p);letter-spacing:1px;">
+            📊 ОГЛЯД ЗА 7 ДНІВ
+        </h3>
+
         <div class="stats-grid">
-            <div class="stat-item"><span class="stat-val" id="st-sales-pln">0</span><span class="stat-label">Продажі PLN</span></div>
-            <div class="stat-item"><span class="stat-val" id="st-sales-uah">0</span><span class="stat-label">Продажі UAH</span></div>
-            <div class="stat-item"><span class="stat-val" style="color:var(--danger)" id="st-exp-pln">0</span><span class="stat-label">Витрати PLN</span></div>
-            <div class="stat-item"><span class="stat-val" style="color:var(--danger)" id="st-exp-uah">0</span><span class="stat-label">Витрати UAH</span></div>
+
+            <div class="stat-item">
+                <span class="stat-val" id="st-sales-pln">0 ZŁ</span>
+                <span class="stat-label">Продажі PLN</span>
+            </div>
+
+            <div class="stat-item">
+                <span class="stat-val" id="st-sales-uah">0 ₴</span>
+                <span class="stat-label">Продажі UAH</span>
+            </div>
+
+            <div class="stat-item">
+                <span
+                    class="stat-val"
+                    style="color:var(--danger)"
+                    id="st-exp-pln"
+                >0 ZŁ</span>
+
+                <span class="stat-label">Витрати PLN</span>
+            </div>
+
+            <div class="stat-item">
+                <span
+                    class="stat-val"
+                    style="color:var(--danger)"
+                    id="st-exp-uah"
+                >0 ₴</span>
+
+                <span class="stat-label">Витрати UAH</span>
+            </div>
+
         </div>
 
-        <h3 style="margin:32px 0 16px 0; font-size:12px; color:var(--text-p); letter-spacing: 1px;">📅 ДЕННА СТАТИСТИКА (ЧИСТИЙ)</h3>
+        <h3 style="margin:32px 0 16px 0;font-size:12px;color:var(--text-p);letter-spacing:1px;">
+            📅 ДЕННА СТАТИСТИКА (ЧИСТИЙ)
+        </h3>
+
         <div id="dailyStatsList"></div>
+
     </div>
 </div>
 
-<div id="tab-debts" class="tab-content"><div id="debtList"></div></div>
-<div id="tab-history" class="tab-content"><div id="logs"></div></div>
+<div id="tab-debts" class="tab-content">
+    <div id="debtList"></div>
+</div>
+
+<div id="tab-history" class="tab-content">
+    <div id="logs"></div>
+</div>
 
 <nav class="bottom-nav">
-    <button class="tab-btn active" onclick="showTab('new', this)"><i>💸</i>КАСА</button>
-    <button class="tab-btn" onclick="showTab('history', this)"><i>📜</i>АРХІВ</button>
-    <button class="tab-btn" onclick="showTab('debts', this)"><i>🚩</i>БОРГИ</button>
-    <button class="tab-btn" onclick="showTab('admin', this)"><i>📦</i>СКЛАД</button>
-    <button class="tab-btn" onclick="showTab('stats', this)"><i>📊</i>ЗВІТ</button>
+
+    <button class="tab-btn active" onclick="showTab('new',this)">
+        <i>💸</i>КАСА
+    </button>
+
+    <button class="tab-btn" onclick="showTab('history',this)">
+        <i>📜</i>АРХІВ
+    </button>
+
+    <button class="tab-btn" onclick="showTab('debts',this)">
+        <i>🚩</i>БОРГИ
+    </button>
+
+    <button class="tab-btn" onclick="showTab('admin',this)">
+        <i>📦</i>СКЛАД
+    </button>
+
+    <button class="tab-btn" onclick="showTab('stats',this)">
+        <i>📊</i>ЗВІТ
+    </button>
+
 </nav>
 
 <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAOW2GEW1McWRAzs4RLVOGHvcoAnRhgRC4",
-      authDomain: "smokehub-7a072.firebaseapp.com",
-      projectId: "smokehub-7a072",
-      storageBucket: "smokehub-7a072.firebasestorage.app",
-      messagingSenderId: "563107040578",
-      appId: "1:563107040578:web:6379a7bc43bb7b58794cdb"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
 
-    let inventory = [];
-    let cachedTgOrders = {}; 
-    let html5QrCode;
+const firebaseConfig = {
+    apiKey:"AIzaSyAOW2GEW1McWRAzs4RLVOGHvcoAnRhgRC4",
+    authDomain:"smokehub-7a072.firebaseapp.com",
+    projectId:"smokehub-7a072",
+    storageBucket:"smokehub-7a072.firebasestorage.app",
+    messagingSenderId:"563107040578",
+    appId:"1:563107040578:web:6379a7bc43bb7b58794cdb"
+};
 
-    function showToast(message, color = 'var(--success)') {
-        const toast = document.getElementById("toast");
-        toast.innerText = message;
-        toast.style.backgroundColor = color;
-        toast.className = "show";
-        if(navigator.vibrate) navigator.vibrate(50);
-        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+
+let inventory = [];
+let cachedTgOrders = {};
+let html5QrCode = null;
+
+let activeOrderCurrency = null;
+let activeOrderData = null;
+let savingOrder = false;
+
+
+/* =========================
+   ДОПОМІЖНІ ФУНКЦІЇ
+========================= */
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+
+function normalizeCurrency(value) {
+
+    if(value === undefined || value === null) {
+        return null;
     }
 
-    function showTab(tabId, btnElement) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('tab-' + tabId).classList.add('active-tab');
-        if(btnElement) btnElement.classList.add('active');
-        else document.querySelector(`.bottom-nav button[onclick*="${tabId}"]`).classList.add('active');
-        window.scrollTo(0,0);
+    const v = String(value)
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g,"");
+
+    if(
+        v === "UAH" ||
+        v === "UA" ||
+        v === "₴" ||
+        v === "ГРН" ||
+        v.includes("UAH") ||
+        v.includes("ГРН") ||
+        v.includes("₴")
+    ) {
+        return "UAH";
     }
 
-    function toggleOpType() {
-        const type = document.getElementById('opType').value;
-        document.getElementById('sale-fields').style.display = type === 'sale' ? 'block' : 'none';
-        document.getElementById('expense-fields').style.display = type === 'expense' ? 'block' : 'none';
-        document.getElementById('status-row').style.display = type === 'sale' ? 'block' : 'none';
-        calc();
+    if(
+        v === "PLN" ||
+        v === "PL" ||
+        v === "ZŁ" ||
+        v === "ZL" ||
+        v === "ZLOTY" ||
+        v === "ZŁOTY" ||
+        v.includes("PLN") ||
+        v.includes("ZŁ")
+    ) {
+        return "PLN";
     }
 
-    function startScanner() {
-        document.getElementById('scanner-modal').style.display = 'flex';
-        html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start(
-            { facingMode: "environment" }, 
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            onScanSuccess
-        ).catch(err => {
-            closeScanner();
-            showToast("Немає доступу до камери", 'var(--danger)');
-        });
+    return null;
+}
+
+
+function currencyLabel(currency) {
+    return currency === "UAH" ? "грн" : "zł";
+}
+
+
+function paymentCurrency(pay) {
+    return pay === "Монобанк" ? "UAH" : "PLN";
+}
+
+
+function formatMoney(value,currency) {
+
+    let num = Number(value);
+
+    if(!Number.isFinite(num)) {
+        num = 0;
     }
 
-    function closeScanner() {
-        document.getElementById('scanner-modal').style.display = 'none';
-        if(html5QrCode) {
-            html5QrCode.stop().catch(err => console.log(err));
+    if(Number.isInteger(num)) {
+        return `${num} ${currencyLabel(currency)}`;
+    }
+
+    return `${num.toFixed(2)} ${currencyLabel(currency)}`;
+}
+
+
+function parsePrice(value) {
+
+    if(value === undefined || value === null || value === "") {
+        return 0;
+    }
+
+    if(typeof value === "number") {
+        return Number.isFinite(value) ? value : 0;
+    }
+
+    let str = String(value)
+        .replace(/\s/g,"")
+        .replace(",",".")
+        .replace(/[^\d.-]/g,"");
+
+    const n = parseFloat(str);
+
+    return Number.isFinite(n) ? n : 0;
+}
+
+
+function getTimestamp(data) {
+
+    if(!data) {
+        return 0;
+    }
+
+    const value =
+        data.date ??
+        data.createdAt ??
+        data.timestamp ??
+        data.created_at ??
+        0;
+
+    if(value && typeof value.toMillis === "function") {
+        return value.toMillis();
+    }
+
+    if(value instanceof Date) {
+        return value.getTime();
+    }
+
+    if(typeof value === "number") {
+        return value;
+    }
+
+    const parsed = new Date(value).getTime();
+
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+
+function getOrderCurrency(order) {
+
+    if(!order) {
+        return null;
+    }
+
+    const possibleFields = [
+        "currency",
+        "currency_code",
+        "currencyCode",
+        "total_currency",
+        "totalCurrency",
+        "price_currency",
+        "priceCurrency",
+        "payment_currency",
+        "paymentCurrency",
+        "valuta",
+        "валюта"
+    ];
+
+    for(const field of possibleFields) {
+
+        const cur = normalizeCurrency(order[field]);
+
+        if(cur) {
+            return cur;
         }
     }
 
-    async function onScanSuccess(decodedText) {
+    const priceFields = [
+        order.total_price,
+        order.price,
+        order.amount,
+        order.total,
+        order.sum
+    ];
+
+    for(const value of priceFields) {
+
+        if(value === undefined || value === null) {
+            continue;
+        }
+
+        const text = String(value).toUpperCase();
+
+        if(
+            text.includes("UAH") ||
+            text.includes("ГРН") ||
+            text.includes("₴")
+        ) {
+            return "UAH";
+        }
+
+        if(
+            text.includes("PLN") ||
+            text.includes("ZŁ") ||
+            text.includes("ZL")
+        ) {
+            return "PLN";
+        }
+    }
+
+    const payment = String(
+        order.payment_method ||
+        order.paymentMethod ||
+        order.pay ||
+        order.payment ||
+        ""
+    ).toLowerCase();
+
+    if(
+        payment.includes("mono") ||
+        payment.includes("монобанк")
+    ) {
+        return "UAH";
+    }
+
+    if(
+        payment.includes("готів") ||
+        payment.includes("нал") ||
+        payment.includes("карта") ||
+        payment.includes("card") ||
+        payment.includes("cash")
+    ) {
+        return "PLN";
+    }
+
+    /*
+      Якщо Telegram-бот старої версії не передавав валюту,
+      залишаємо стару поведінку — UAH.
+    */
+    return "UAH";
+}
+
+
+function getOrderPrice(order) {
+
+    if(!order) {
+        return 0;
+    }
+
+    const fields = [
+        order.total_price,
+        order.price,
+        order.amount,
+        order.total,
+        order.sum
+    ];
+
+    for(const value of fields) {
+
+        if(value !== undefined && value !== null && value !== "") {
+
+            const price = parsePrice(value);
+
+            if(price > 0) {
+                return price;
+            }
+        }
+    }
+
+    return 0;
+}
+
+
+function getOrderPaymentMethod(order,currency) {
+
+    if(!order) {
+        return currency === "UAH" ? "Монобанк" : "Карта";
+    }
+
+    const raw =
+        order.payment_method ||
+        order.paymentMethod ||
+        order.pay ||
+        order.payment ||
+        "";
+
+    const text = String(raw).toLowerCase();
+
+    if(
+        text.includes("mono") ||
+        text.includes("монобанк")
+    ) {
+        return "Монобанк";
+    }
+
+    if(
+        text.includes("карта") ||
+        text.includes("card")
+    ) {
+        return "Карта";
+    }
+
+    if(
+        text.includes("готів") ||
+        text.includes("cash") ||
+        text.includes("нал")
+    ) {
+        return "Готівка";
+    }
+
+    return currency === "UAH" ? "Монобанк" : "Карта";
+}
+
+
+function showToast(message,color="var(--success)") {
+
+    const toast = document.getElementById("toast");
+
+    toast.innerText = message;
+    toast.style.backgroundColor = color;
+    toast.className = "show";
+
+    if(navigator.vibrate) {
+        navigator.vibrate(50);
+    }
+
+    setTimeout(() => {
+        toast.className = toast.className.replace("show","");
+    },3000);
+}
+
+
+/* =========================
+   НАВІГАЦІЯ
+========================= */
+
+function showTab(tabId,btnElement) {
+
+    document.querySelectorAll(".tab-content")
+        .forEach(t => t.classList.remove("active-tab"));
+
+    document.querySelectorAll(".tab-btn")
+        .forEach(b => b.classList.remove("active"));
+
+    const tab = document.getElementById("tab-" + tabId);
+
+    if(tab) {
+        tab.classList.add("active-tab");
+    }
+
+    if(btnElement) {
+        btnElement.classList.add("active");
+    } else {
+
+        const btn = document.querySelector(
+            `.bottom-nav button[onclick*="${tabId}"]`
+        );
+
+        if(btn) {
+            btn.classList.add("active");
+        }
+    }
+
+    window.scrollTo(0,0);
+}
+
+
+/* =========================
+   ТИП ОПЕРАЦІЇ
+========================= */
+
+function toggleOpType() {
+
+    const type = document.getElementById("opType").value;
+
+    document.getElementById("sale-fields").style.display =
+        type === "sale" ? "block" : "none";
+
+    document.getElementById("expense-fields").style.display =
+        type === "expense" ? "block" : "none";
+
+    document.getElementById("status-row").style.display =
+        type === "sale" ? "block" : "none";
+
+    calc();
+}
+
+
+/* =========================
+   СКАНЕР
+========================= */
+
+function startScanner() {
+
+    document.getElementById("scanner-modal").style.display = "flex";
+
+    html5QrCode = new Html5Qrcode("reader");
+
+    html5QrCode.start(
+        {facingMode:"environment"},
+        {
+            fps:10,
+            qrbox:{
+                width:250,
+                height:250
+            }
+        },
+        onScanSuccess
+    ).catch(() => {
+
         closeScanner();
-        document.getElementById('newBarcode').value = decodedText;
-        let existing = inventory.find(i => i.barcode === decodedText);
-        if (existing) {
-            editFlavor(existing.id, existing.name, existing.loc, existing.qty, existing.type, existing.barcode);
-            showToast("📦 Товар знайдено в базі!");
-            return;
-        }
+
+        showToast(
+            "Немає доступу до камери",
+            "var(--danger)"
+        );
+    });
+}
+
+
+function closeScanner() {
+
+    document.getElementById("scanner-modal").style.display = "none";
+
+    if(html5QrCode) {
+
+        html5QrCode.stop()
+            .catch(() => {});
+
+        html5QrCode = null;
+    }
+}
+
+
+async function onScanSuccess(decodedText) {
+
+    closeScanner();
+
+    document.getElementById("newBarcode").value = decodedText;
+
+    const existing = inventory.find(
+        i => String(i.barcode || "") === String(decodedText)
+    );
+
+    if(existing) {
+
+        editFlavor(
+            existing.id,
+            existing.name,
+            existing.loc,
+            existing.qty,
+            existing.type,
+            existing.barcode
+        );
+
+        showToast("📦 Товар знайдено в базі!");
+
+        return;
     }
 
-    async function addFlavorToInventory() {
-        const type = document.getElementById('newFlavorType').value;
-        const name = document.getElementById('newFlavorName').value;
-        const loc = document.getElementById('newLoc').value;
-        const qty = parseInt(document.getElementById('newQty').value) || 0;
-        const barcode = document.getElementById('newBarcode').value || "";
-        const id = document.getElementById('editId').value;
-        const lastDelivery = new Date().getTime();
+    showToast("Штрих-код новий — введіть назву товару","var(--accent-secondary)");
+}
 
-        if(!name) { showToast("Введіть назву!", 'var(--danger)'); return; }
-        
-        if (id) {
-            await db.collection("inventory").doc(id).update({type, name, loc, qty, barcode, lastDelivery});
+
+/* =========================
+   СКЛАД
+========================= */
+
+async function addFlavorToInventory() {
+
+    const type =
+        document.getElementById("newFlavorType").value;
+
+    const name =
+        document.getElementById("newFlavorName").value.trim();
+
+    const loc =
+        document.getElementById("newLoc").value.trim();
+
+    const qty =
+        parseInt(document.getElementById("newQty").value) || 0;
+
+    const barcode =
+        document.getElementById("newBarcode").value.trim();
+
+    const id =
+        document.getElementById("editId").value;
+
+    const lastDelivery = Date.now();
+
+    if(!name) {
+
+        showToast(
+            "Введіть назву!",
+            "var(--danger)"
+        );
+
+        return;
+    }
+
+    try {
+
+        if(id) {
+
+            await db.collection("inventory")
+                .doc(id)
+                .update({
+                    type,
+                    name,
+                    loc,
+                    qty,
+                    barcode,
+                    lastDelivery
+                });
+
             showToast("📦 Залишки оновлено!");
+
         } else {
-            await db.collection("inventory").add({type, name, loc, qty, barcode, lastDelivery});
+
+            await db.collection("inventory")
+                .add({
+                    type,
+                    name,
+                    loc,
+                    qty,
+                    barcode,
+                    lastDelivery
+                });
+
             showToast("📦 Новий товар додано!");
         }
+
         cancelEdit();
-    }
 
-    function editFlavor(id, name, loc, qty, type, barcode = "") {
-        document.getElementById('editId').value = id;
-        document.getElementById('newFlavorName').value = name;
-        document.getElementById('newLoc').value = loc;
-        document.getElementById('newQty').value = qty;
-        document.getElementById('newFlavorType').value = type || 'заливка';
-        document.getElementById('newBarcode').value = barcode;
-        
-        document.getElementById('adminFormTitle').innerText = "✏️ Оновлення залишків";
-        document.getElementById('adminFormSub').innerText = "Внесіть нову кількість товару";
-        document.getElementById('saveFlavorBtn').innerText = "🔄 ОНОВИТИ ДАНІ";
-        document.getElementById('cancelEditBtn').style.display = "block";
-        showTab('admin');
-    }
+    } catch(error) {
 
-    function cancelEdit() {
-        document.getElementById('editId').value = "";
-        document.getElementById('newFlavorName').value = "";
-        document.getElementById('newLoc').value = "";
-        document.getElementById('newQty').value = 10;
-        document.getElementById('newBarcode').value = "";
-        
-        document.getElementById('adminFormTitle').innerText = "📦 Нова поставка / Товар";
-        document.getElementById('adminFormSub').innerText = "Скануйте штрих-код або введіть вручну";
-        document.getElementById('saveFlavorBtn').innerText = "➕ ЗБЕРЕГТИ ДАНІ";
-        document.getElementById('cancelEditBtn').style.display = "none";
-    }
+        console.error(error);
 
-    function updateFlavorList() {
-        const cat = document.getElementById('catalog').value;
-        const query = document.getElementById('flavorSearch').value.toLowerCase();
-        const fs = document.getElementById('flavor');
-        fs.innerHTML = '<option value="" disabled selected>Оберіть позицію...</option>';
-        
-        let filtered = inventory.filter(f => 
-            f.name.toLowerCase().includes(query) && 
-            (f.type === cat || (!f.type && cat === 'заливка'))
+        showToast(
+            "Помилка збереження складу",
+            "var(--danger)"
         );
-        
-        if(cat === 'продаж') {
-            fs.innerHTML += `<option value="ICE SHOT">🧊 ICE SHOT</option>`;
-            filtered.forEach(f => { fs.innerHTML += `<option value="${f.name}">${f.name} (30ml) • [${f.qty}шт]</option>`; });
-            document.getElementById('vol-box').style.display = 'none';
+    }
+}
+
+
+function editFlavor(
+    id,
+    name,
+    loc,
+    qty,
+    type,
+    barcode=""
+) {
+
+    document.getElementById("editId").value = id;
+    document.getElementById("newFlavorName").value = name || "";
+    document.getElementById("newLoc").value = loc || "";
+    document.getElementById("newQty").value = qty || 0;
+    document.getElementById("newFlavorType").value =
+        type || "заливка";
+    document.getElementById("newBarcode").value =
+        barcode || "";
+
+    document.getElementById("adminFormTitle").innerText =
+        "✏️ Оновлення залишків";
+
+    document.getElementById("adminFormSub").innerText =
+        "Внесіть нову кількість товару";
+
+    document.getElementById("saveFlavorBtn").innerText =
+        "🔄 ОНОВИТИ ДАНІ";
+
+    document.getElementById("cancelEditBtn").style.display =
+        "block";
+
+    showTab("admin");
+}
+
+
+function editInventoryById(id) {
+
+    const item = inventory.find(i => i.id === id);
+
+    if(!item) {
+        return;
+    }
+
+    editFlavor(
+        item.id,
+        item.name,
+        item.loc,
+        item.qty,
+        item.type,
+        item.barcode
+    );
+}
+
+
+async function deleteInventoryItem(id) {
+
+    if(!confirm("Видалити товар зі складу?")) {
+        return;
+    }
+
+    try {
+
+        await db.collection("inventory")
+            .doc(id)
+            .delete();
+
+        showToast("🗑 Товар видалено");
+
+    } catch(error) {
+
+        console.error(error);
+
+        showToast(
+            "Не вдалося видалити товар",
+            "var(--danger)"
+        );
+    }
+}
+
+
+function cancelEdit() {
+
+    document.getElementById("editId").value = "";
+    document.getElementById("newFlavorName").value = "";
+    document.getElementById("newLoc").value = "";
+    document.getElementById("newQty").value = 10;
+    document.getElementById("newBarcode").value = "";
+
+    document.getElementById("adminFormTitle").innerText =
+        "📦 Нова поставка / Товар";
+
+    document.getElementById("adminFormSub").innerText =
+        "Скануйте штрих-код або введіть вручну";
+
+    document.getElementById("saveFlavorBtn").innerText =
+        "➕ ЗБЕРЕГТИ ДАНІ";
+
+    document.getElementById("cancelEditBtn").style.display =
+        "none";
+}
+
+
+function updateFlavorList() {
+
+    const cat =
+        document.getElementById("catalog").value;
+
+    const query =
+        document.getElementById("flavorSearch").value
+            .toLowerCase()
+            .trim();
+
+    const fs =
+        document.getElementById("flavor");
+
+    fs.innerHTML =
+        '<option value="" disabled selected>Оберіть позицію...</option>';
+
+    let filtered = inventory.filter(f =>
+        String(f.name || "")
+            .toLowerCase()
+            .includes(query)
+        &&
+        (
+            f.type === cat ||
+            (!f.type && cat === "заливка")
+        )
+    );
+
+    if(cat === "продаж") {
+
+        fs.innerHTML +=
+            '<option value="ICE SHOT">🧊 ICE SHOT</option>';
+
+        filtered.forEach(f => {
+
+            fs.innerHTML += `
+                <option value="${escapeHtml(f.name)}">
+                    ${escapeHtml(f.name)}
+                    (30ml) • [${Number(f.qty) || 0}шт]
+                </option>
+            `;
+        });
+
+        document.getElementById("vol-box")
+            .style.display = "none";
+
+    } else {
+
+        filtered.forEach(f => {
+
+            fs.innerHTML += `
+                <option value="${escapeHtml(f.name)}">
+                    ${escapeHtml(f.name)}
+                </option>
+            `;
+        });
+
+        document.getElementById("vol-box")
+            .style.display = "block";
+    }
+
+    calc();
+}
+
+
+function handleFlavor() {
+
+    const sel =
+        document.getElementById("flavor").value;
+
+    const item =
+        inventory.find(i => i.name === sel);
+
+    const box =
+        document.getElementById("location-box");
+
+    if(item) {
+
+        box.style.display = "block";
+
+        document.getElementById("loc-text").innerText =
+            item.loc || "Не вказано";
+
+    } else if(sel === "ICE SHOT") {
+
+        box.style.display = "block";
+
+        document.getElementById("loc-text").innerText =
+            "Аптечка синя";
+
+    } else {
+
+        box.style.display = "none";
+    }
+
+    calc();
+}
+
+
+/* =========================
+   РОЗРАХУНОК ЦІНИ
+========================= */
+
+function calc() {
+
+    const type =
+        document.getElementById("opType").value;
+
+    const cat =
+        document.getElementById("catalog").value;
+
+    const pay =
+        document.getElementById("pay").value;
+
+    const size =
+        document.getElementById("size").value;
+
+    const flavor =
+        document.getElementById("flavor").value;
+
+    const manualRaw =
+        document.getElementById("manualPrice").value;
+
+    let currency =
+        activeOrderCurrency ||
+        paymentCurrency(pay);
+
+    let price = 0;
+
+    const manual =
+        parsePrice(manualRaw);
+
+    if(manual > 0) {
+
+        price = manual;
+
+    } else if(type === "sale") {
+
+        if(cat === "продаж") {
+
+            if(currency === "UAH") {
+
+                price =
+                    flavor === "ICE SHOT"
+                        ? 180
+                        : 650;
+
+            } else {
+
+                price =
+                    flavor === "ICE SHOT"
+                        ? 15
+                        : 60;
+            }
+
         } else {
-            filtered.forEach(f => { fs.innerHTML += `<option value="${f.name}">${f.name}</option>`; });
-            document.getElementById('vol-box').style.display = 'block';
+
+            if(currency === "UAH") {
+
+                price =
+                    size === "2"
+                        ? 70
+                        : 100;
+
+            } else {
+
+                price =
+                    size === "2"
+                        ? 6
+                        : 9;
+            }
         }
-        calc();
     }
 
-    function handleFlavor() {
-        const sel = document.getElementById('flavor').value;
-        const item = inventory.find(i => i.name === sel);
-        const box = document.getElementById('location-box');
+    document.getElementById("total").innerText =
+        formatMoney(price,currency);
+}
+
+
+function toggleDebt() {
+
+    document.getElementById("debtor-row").style.display =
+        document.getElementById("status").value === "debt"
+            ? "block"
+            : "none";
+}
+
+
+/* =========================
+   ДАТА
+========================= */
+
+function formatDate(ts) {
+
+    if(!ts) {
+        return "Немає даних";
+    }
+
+    let millis = ts;
+
+    if(ts && typeof ts.toMillis === "function") {
+        millis = ts.toMillis();
+    }
+
+    const d = new Date(millis);
+
+    if(Number.isNaN(d.getTime())) {
+        return "Немає даних";
+    }
+
+    const day =
+        String(d.getDate()).padStart(2,"0");
+
+    const month =
+        String(d.getMonth()+1).padStart(2,"0");
+
+    const hours =
+        String(d.getHours()).padStart(2,"0");
+
+    const minutes =
+        String(d.getMinutes()).padStart(2,"0");
+
+    return `${day}.${month} ${hours}:${minutes}`;
+}
+
+
+function formatDateOnly(ts) {
+
+    let millis = ts;
+
+    if(ts && typeof ts.toMillis === "function") {
+        millis = ts.toMillis();
+    }
+
+    const d = new Date(millis);
+
+    return `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}`;
+}
+
+
+/* =========================
+   TELEGRAM
+========================= */
+
+function selectTgOrderById(id) {
+
+    const order = cachedTgOrders[id];
+
+    if(!order) {
+        showToast(
+            "Замовлення вже недоступне",
+            "var(--danger)"
+        );
+        return;
+    }
+
+    const client =
+        order.client_name ||
+        order.client ||
+        order.name ||
+        "Клієнт";
+
+    const itemText =
+        order.items ||
+        order.product ||
+        order.item ||
+        "Товар";
+
+    const price =
+        getOrderPrice(order);
+
+    const orderNum =
+        order.order_number ||
+        order.number ||
+        order.orderId ||
+        order.id ||
+        id;
+
+    selectTgOrder(
+        id,
+        client,
+        itemText,
+        price,
+        orderNum,
+        order
+    );
+}
+
+
+function selectTgOrder(
+    id,
+    client,
+    itemText,
+    price,
+    orderNum,
+    orderData=null
+) {
+
+    document.querySelectorAll(".tg-order-card")
+        .forEach(c => c.classList.remove("selected"));
+
+    const card =
+        document.getElementById(`tg-card-${id}`);
+
+    if(card) {
+        card.classList.add("selected");
+    }
+
+    document.getElementById("activeTgOrderId").value = id;
+
+    document.getElementById("tgOrderSelect").value = id;
+
+    document.getElementById("debtorName").value =
+        client || "";
+
+    activeOrderData =
+        orderData || cachedTgOrders[id] || null;
+
+    activeOrderCurrency =
+        getOrderCurrency(activeOrderData);
+
+    const payment =
+        getOrderPaymentMethod(
+            activeOrderData,
+            activeOrderCurrency
+        );
+
+    document.getElementById("pay").value =
+        payment;
+
+    const numericPrice =
+        parsePrice(price);
+
+    document.getElementById("manualPrice").value =
+        numericPrice || "";
+
+    document.getElementById("total").innerText =
+        formatMoney(
+            numericPrice,
+            activeOrderCurrency
+        );
+
+    document.getElementById("activeTgOrderId")
+        .setAttribute(
+            "data-items",
+            itemText || ""
+        );
+
+    document.getElementById("activeTgOrderId")
+        .setAttribute(
+            "data-ordernum",
+            orderNum || ""
+        );
+
+    showToast(
+        `📦 Замовлення №${orderNum} вибрано!`,
+        "var(--tg-color)"
+    );
+}
+
+
+function selectTgOrderFromDropdown() {
+
+    const id =
+        document.getElementById("tgOrderSelect").value;
+
+    if(cachedTgOrders[id]) {
+
+        selectTgOrderById(id);
+    }
+}
+
+
+/* =========================
+   НАКЛАДНА
+========================= */
+
+function printInvoice() {
+
+    const type =
+        document.getElementById("opType").value;
+
+    if(type !== "sale") {
+
+        showToast(
+            "Накладну можна видати лише на продаж!",
+            "var(--danger)"
+        );
+
+        return;
+    }
+
+    const clientName =
+        document.getElementById("debtorName").value ||
+        "Роздрібний клієнт";
+
+    const activeId =
+        document.getElementById("activeTgOrderId").value;
+
+    const tgItems =
+        document.getElementById("activeTgOrderId")
+            .getAttribute("data-items");
+
+    const customOrderNum =
+        document.getElementById("activeTgOrderId")
+            .getAttribute("data-ordernum");
+
+    const payMethod =
+        document.getElementById("pay").value;
+
+    /*
+      Головне виправлення:
+      якщо це Telegram-замовлення,
+      валюта береться саме з нього.
+    */
+    let currency =
+        activeId && activeOrderCurrency
+            ? activeOrderCurrency
+            : paymentCurrency(payMethod);
+
+    const rawTotal =
+        document.getElementById("manualPrice").value;
+
+    const priceNum =
+        parsePrice(rawTotal) ||
+        parsePrice(
+            document.getElementById("total").innerText
+        );
+
+    const currencyText =
+        currencyLabel(currency);
+
+    const invoiceNum =
+        customOrderNum
+            ? "#" + customOrderNum
+            : activeId
+                ? "#" + activeId.substring(0,6).toUpperCase()
+                : "#SH-" + Math.floor(
+                    1000 + Math.random() * 9000
+                );
+
+    document.getElementById("inv-num").innerText =
+        invoiceNum;
+
+    document.getElementById("inv-date").innerText =
+        formatDate(Date.now());
+
+    document.getElementById("inv-client").innerText =
+        clientName;
+
+    document.getElementById("inv-pay-method").innerText =
+        payMethod;
+
+    document.getElementById("inv-total").innerText =
+        priceNum;
+
+    document.getElementById("inv-currency").innerText =
+        currencyText;
+
+    const itemsListTable =
+        document.getElementById("inv-items-list");
+
+    itemsListTable.innerHTML = "";
+
+    if(tgItems && tgItems.trim() !== "") {
+
+        const goods =
+            tgItems
+                .split(/,|\n|;/)
+                .map(x => x.trim())
+                .filter(Boolean);
+
+        goods.forEach((good,index) => {
+
+            itemsListTable.innerHTML += `
+                <tr>
+                    <td>
+                        ${index + 1}.
+                        ${escapeHtml(good)}
+                    </td>
+
+                    <td style="text-align:right;">
+                        ${
+                            index === 0
+                                ? escapeHtml(
+                                    formatMoney(
+                                        priceNum,
+                                        currency
+                                    )
+                                )
+                                : "-"
+                        }
+                    </td>
+                </tr>
+            `;
+        });
+
+    } else {
+
+        const fName =
+            document.getElementById("flavor").value ||
+            "Товар з каталогу";
+
+        itemsListTable.innerHTML = `
+            <tr>
+                <td>
+                    1. ${escapeHtml(fName)}
+                </td>
+
+                <td style="text-align:right;">
+                    ${escapeHtml(
+                        formatMoney(
+                            priceNum,
+                            currency
+                        )
+                    )}
+                </td>
+            </tr>
+        `;
+    }
+
+    setTimeout(() => {
+        window.print();
+    },150);
+}
+
+
+/* =========================
+   РОЗБІР ТОВАРІВ
+========================= */
+
+function normalizeProductName(name) {
+
+    return String(name || "")
+        .toLowerCase()
+        .replace(/\([^)]*\)/g," ")
+        .replace(/\b\d+(?:[.,]\d+)?\s*(ml|мл|шт|pcs|pc)\b/gi," ")
+        .replace(/\bqty\s*\d+\b/gi," ")
+        .replace(/\bx\s*\d+\b/gi," ")
+        .replace(/^\s*\d+[\.\)]\s*/,"")
+        .replace(/[^\p{L}\p{N}]+/gu," ")
+        .replace(/\s+/g," ")
+        .trim();
+}
+
+
+function getItemQuantity(text) {
+
+    const str = String(text || "");
+
+    let match =
+        str.match(/(?:^|\s)(\d+)\s*[x×*](?:\s|$)/i);
+
+    if(match) {
+        return parseInt(match[1]) || 1;
+    }
+
+    match =
+        str.match(/[x×*]\s*(\d+)/i);
+
+    if(match) {
+        return parseInt(match[1]) || 1;
+    }
+
+    match =
+        str.match(/(?:qty|кількість)\s*[:=]?\s*(\d+)/i);
+
+    if(match) {
+        return parseInt(match[1]) || 1;
+    }
+
+    return 1;
+}
+
+
+function splitOrderItems(text) {
+
+    if(!text) {
+        return [];
+    }
+
+    return String(text)
+        .split(/\n|,|;|\|/)
+        .map(x => x.trim())
+        .filter(Boolean);
+}
+
+
+function findInventoryItemForPart(part) {
+
+    const normalizedPart =
+        normalizeProductName(part);
+
+    if(!normalizedPart) {
+        return null;
+    }
+
+    /*
+      1. Спочатку точний збіг
+    */
+
+    let exact =
+        inventory.find(item =>
+            normalizeProductName(item.name) === normalizedPart
+        );
+
+    if(exact) {
+        return exact;
+    }
+
+    /*
+      2. Потім шукаємо назву товару всередині тексту.
+      Сортуємо по довжині, щоб довша назва мала пріоритет.
+    */
+
+    const matches =
+        inventory
+            .filter(item => {
+
+                const normalizedName =
+                    normalizeProductName(item.name);
+
+                if(!normalizedName) {
+                    return false;
+                }
+
+                return (
+                    normalizedPart.includes(normalizedName) ||
+                    normalizedName.includes(normalizedPart)
+                );
+            })
+            .sort(
+                (a,b) =>
+                    normalizeProductName(b.name).length -
+                    normalizeProductName(a.name).length
+            );
+
+    return matches[0] || null;
+}
+
+
+function buildInventoryDeductions(itemText,manualFlavor="") {
+
+    const deductions = {};
+
+    /*
+      Якщо є Telegram-товари
+    */
+
+    if(itemText && String(itemText).trim()) {
+
+        const parts =
+            splitOrderItems(itemText);
+
+        parts.forEach(part => {
+
+            const item =
+                findInventoryItemForPart(part);
+
+            if(!item) {
+                return;
+            }
+
+            const qty =
+                getItemQuantity(part);
+
+            if(!deductions[item.id]) {
+
+                deductions[item.id] = {
+                    id:item.id,
+                    name:item.name,
+                    qty:0
+                };
+            }
+
+            deductions[item.id].qty += qty;
+        });
+    }
+
+    /*
+      Якщо Telegram товар не знайшовся,
+      використовуємо вибраний товар вручну.
+    */
+
+    if(
+        Object.keys(deductions).length === 0 &&
+        manualFlavor
+    ) {
+
+        const item =
+            inventory.find(
+                i => i.name === manualFlavor
+            );
+
         if(item) {
-            box.style.display = 'block';
-            document.getElementById('loc-text').innerText = item.loc || "Не вказано";
-        } else if(sel === "ICE SHOT") {
-            box.style.display = 'block'; document.getElementById('loc-text').innerText = "Аптечка синя";
-        } else box.style.display = 'none';
-        calc();
-    }
 
-    function calc() {
-        const type = document.getElementById('opType').value;
-        const cat = document.getElementById('catalog').value, p = document.getElementById('pay').value, s = document.getElementById('size').value, f = document.getElementById('flavor').value, manual = document.getElementById('manualPrice').value;
-        let cur = (p === "Монобанк") ? "грн" : "zł", price = 0; 
-
-        if (manual > 0) price = manual;
-        else if (type === 'sale') {
-            if (cat === "продаж") price = (p === "Монобанк") ? (f === "ICE SHOT" ? 180 : 650) : (f === "ICE SHOT" ? 15 : 60);
-            else price = (p === "Монобанк") ? (s === "2" ? 70 : 100) : (s === "2" ? 6 : 9);
-        }
-        
-        document.getElementById('total').innerText = `${price} ${cur}`;
-    }
-
-    function toggleDebt() { document.getElementById('debtor-row').style.display = (document.getElementById('status').value === 'debt') ? 'block' : 'none'; }
-
-    function formatDate(ts) {
-        if(!ts) return "Немає даних";
-        const d = new Date(ts);
-        const day = String(d.getDate()).padStart(2, '0');
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const hours = String(d.getHours()).padStart(2, '0');
-        const minutes = String(d.getMinutes()).padStart(2, '0');
-        return `${day}.${month} ${hours}:${minutes}`;
-    }
-
-    function formatDateOnly(ts) {
-        const d = new Date(ts);
-        return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`;
-    }
-
-    function selectTgOrder(id, client, itemText, price, orderNum) {
-        document.querySelectorAll('.tg-order-card').forEach(c => c.classList.remove('selected'));
-        if(document.getElementById(`tg-card-${id}`)) {
-            document.getElementById(`tg-card-${id}`).classList.add('selected');
-        }
-        document.getElementById('activeTgOrderId').value = id;
-        document.getElementById('tgOrderSelect').value = id;
-
-        document.getElementById('debtorName').value = client;
-        document.getElementById('pay').value = 'Монобанк'; 
-        
-        if(price) {
-            document.getElementById('manualPrice').value = price;
-            document.getElementById('total').innerText = `${price} грн`;
-        }
-        
-        document.getElementById('activeTgOrderId').setAttribute('data-items', itemText);
-        document.getElementById('activeTgOrderId').setAttribute('data-ordernum', orderNum);
-
-        showToast(`📦 Замовлення №${orderNum} вибрано!`, 'var(--tg-color)');
-    }
-
-    function selectTgOrderFromDropdown() {
-        const id = document.getElementById('tgOrderSelect').value;
-        if(cachedTgOrders[id]) {
-            let order = cachedTgOrders[id];
-            let realNum = order.order_number || order.number || order.orderId || order.id || id;
-            selectTgOrder(id, order.client_name || "Клієнт", order.items || "Товар", order.total_price || 0, realNum);
+            deductions[item.id] = {
+                id:item.id,
+                name:item.name,
+                qty:1
+            };
         }
     }
 
-    function printInvoice() {
-        const type = document.getElementById('opType').value;
-        if(type !== 'sale') {
-            showToast("Накладну можна видати лише на продаж!", 'var(--danger)');
+    /*
+      ICE SHOT теж списується,
+      якщо він реально є в inventory.
+    */
+
+    return Object.values(deductions);
+}
+
+
+/* =========================
+   СПИСАННЯ ЗІ СКЛАДУ
+========================= */
+
+async function deductInventory(
+    itemText,
+    manualFlavor=""
+) {
+
+    const deductions =
+        buildInventoryDeductions(
+            itemText,
+            manualFlavor
+        );
+
+    /*
+      Якщо товар не знайдений.
+      Для ICE SHOT, якого немає в inventory,
+      стару поведінку залишаємо.
+    */
+
+    if(deductions.length === 0) {
+
+        if(
+            manualFlavor === "ICE SHOT" &&
+            !inventory.some(i => i.name === "ICE SHOT")
+        ) {
+            return [];
+        }
+
+        throw new Error(
+            "Не вдалося знайти товар у складі"
+        );
+    }
+
+    /*
+      ОДНА транзакція Firestore.
+      Якщо хоча б одного товару недостатньо,
+      жоден товар не списується.
+    */
+
+    const result =
+        await db.runTransaction(async transaction => {
+
+            const snapshots = [];
+
+            for(const item of deductions) {
+
+                const ref =
+                    db.collection("inventory")
+                        .doc(item.id);
+
+                const snap =
+                    await transaction.get(ref);
+
+                snapshots.push({
+                    item,
+                    ref,
+                    snap
+                });
+            }
+
+            for(const entry of snapshots) {
+
+                if(!entry.snap.exists) {
+
+                    throw new Error(
+                        `Товар "${entry.item.name}" не існує`
+                    );
+                }
+
+                const currentQty =
+                    Number(
+                        entry.snap.data().qty
+                    ) || 0;
+
+                if(currentQty < entry.item.qty) {
+
+                    throw new Error(
+                        `Недостатньо "${entry.item.name}". На складі: ${currentQty} шт., потрібно: ${entry.item.qty} шт.`
+                    );
+                }
+            }
+
+            for(const entry of snapshots) {
+
+                const currentQty =
+                    Number(
+                        entry.snap.data().qty
+                    ) || 0;
+
+                transaction.update(
+                    entry.ref,
+                    {
+                        qty:
+                            currentQty -
+                            entry.item.qty
+                    }
+                );
+            }
+
+            return deductions;
+        });
+
+    return result;
+}
+
+
+/* =========================
+   ПОВЕРНЕННЯ НА СКЛАД
+========================= */
+
+async function restoreInventory(items) {
+
+    if(!Array.isArray(items) || items.length === 0) {
+        return;
+    }
+
+    await db.runTransaction(async transaction => {
+
+        const entries = [];
+
+        for(const item of items) {
+
+            if(!item.id) {
+                continue;
+            }
+
+            const ref =
+                db.collection("inventory")
+                    .doc(item.id);
+
+            const snap =
+                await transaction.get(ref);
+
+            if(snap.exists) {
+
+                entries.push({
+                    ref,
+                    snap,
+                    qty:Number(item.qty) || 0
+                });
+            }
+        }
+
+        for(const entry of entries) {
+
+            const currentQty =
+                Number(entry.snap.data().qty) || 0;
+
+            transaction.update(
+                entry.ref,
+                {
+                    qty:
+                        currentQty +
+                        entry.qty
+                }
+            );
+        }
+    });
+}
+
+
+/* =========================
+   ЗБЕРЕЖЕННЯ ЗАМОВЛЕННЯ
+========================= */
+
+async function saveOrder() {
+
+    if(savingOrder) {
+        return;
+    }
+
+    savingOrder = true;
+
+    const button =
+        document.getElementById("saveOrderBtn");
+
+    button.disabled = true;
+
+    try {
+
+        const type =
+            document.getElementById("opType").value;
+
+        const priceStr =
+            document.getElementById("total").innerText;
+
+        const pVal =
+            parsePrice(
+                document.getElementById("manualPrice").value
+            ) ||
+            parsePrice(priceStr);
+
+        /*
+          Для Telegram:
+          валюта тільки з самого замовлення.
+        */
+
+        const tgId =
+            document.getElementById("activeTgOrderId").value;
+
+        const curr =
+            tgId && activeOrderCurrency
+                ? activeOrderCurrency
+                : paymentCurrency(
+                    document.getElementById("pay").value
+                );
+
+        const finalFullPrice =
+            formatMoney(pVal,curr);
+
+        if(pVal <= 0) {
+
+            showToast(
+                "Введіть суму!",
+                "var(--danger)"
+            );
+
             return;
         }
 
-        const clientName = document.getElementById('debtorName').value || "Роздрібний клієнт";
-        const rawTotalText = document.getElementById('total').innerText.trim();
-        const payMethod = document.getElementById('pay').value;
-        
-        let priceNum = parseInt(rawTotalText) || 0;
-        let currencyLabel = payMethod === "Монобанк" ? "грн" : "zł";
 
-        const activeId = document.getElementById('activeTgOrderId').value;
-        const tgItems = document.getElementById('activeTgOrderId').getAttribute('data-items');
-        const customOrderNum = document.getElementById('activeTgOrderId').getAttribute('data-ordernum');
-        
-        const invoiceNum = customOrderNum ? "#" + customOrderNum : (activeId ? "#" + activeId.substring(0, 6).toUpperCase() : "#SH-" + Math.floor(1000 + Math.random() * 9000));
+        /* =========================
+           ПРОДАЖ
+        ========================= */
 
-        document.getElementById('inv-num').innerText = invoiceNum;
-        document.getElementById('inv-date').innerText = formatDate(new Date().getTime());
-        document.getElementById('inv-client').innerText = clientName;
-        document.getElementById('inv-pay-method').innerText = payMethod;
-        document.getElementById('inv-total').innerText = priceNum;
-        document.getElementById('inv-currency').innerText = currencyLabel;
+        if(type === "sale") {
 
-        const itemsListTable = document.getElementById('inv-items-list');
-        itemsListTable.innerHTML = "";
+            const tgItems =
+                document.getElementById("activeTgOrderId")
+                    .getAttribute("data-items") || "";
 
-        if(tgItems && tgItems.trim() !== "") {
-            let goods = tgItems.split(/,|\n/);
-            goods.forEach((good, index) => {
-                if(good.trim()) {
-                    itemsListTable.innerHTML += `
-                        <tr>
-                            <td>${index + 1}. ${good.trim()}</td>
-                            <td style="text-align: right;">${index === 0 ? priceNum + ' ' + currencyLabel : '-'}</td>
-                        </tr>
-                    `;
-                }
-            });
-        } else {
-            const fName = document.getElementById('flavor').value || "Товар з каталогу";
-            itemsListTable.innerHTML += `
-                <tr>
-                    <td>1. ${fName}</td>
-                    <td style="text-align: right;">${priceNum} ${currencyLabel}</td>
-                </tr>
-            `;
-        }
+            const manualFlavor =
+                document.getElementById("flavor").value || "";
 
-        setTimeout(() => {
-            window.print();
-        }, 150);
-    }
+            const fName =
+                tgItems.trim()
+                    ? tgItems
+                    : manualFlavor;
 
-    async function saveOrder() {
-        const type = document.getElementById('opType').value;
-        const priceStr = document.getElementById('total').innerText;
-        const pVal = parseInt(priceStr) || 0;
-        const curr = priceStr.includes("грн") ? "UAH" : "PLN";
+            if(!fName) {
 
-        if (type === 'sale') {
-            const tgItems = document.getElementById('activeTgOrderId').getAttribute('data-items');
-            const fName = tgItems || document.getElementById('flavor').value;
-            if(!fName) { showToast("Оберіть товар!", 'var(--danger)'); return; }
-            
-            await db.collection("orders").add({
-                type: 'sale', catalog: document.getElementById('catalog').value, flavor: fName, 
-                pay: document.getElementById('pay').value, priceVal: pVal, currency: curr,
-                fullPrice: priceStr, status: document.getElementById('status').value, 
-                debtor: document.getElementById('debtorName').value || "", date: new Date().getTime()
-            });
+                showToast(
+                    "Оберіть товар!",
+                    "var(--danger)"
+                );
 
-            const tgId = document.getElementById('activeTgOrderId').value;
-            if (tgId) {
-                await db.collection("tg_orders").doc(tgId).update({ status: "completed" });
-                document.getElementById('activeTgOrderId').value = ""; 
-                document.getElementById('activeTgOrderId').removeAttribute('data-items');
-                document.getElementById('activeTgOrderId').removeAttribute('data-ordernum');
-            }
-
-        } else {
-            const name = document.getElementById('expName').value || "Витрата";
-            await db.collection("orders").add({
-                type: 'expense', flavor: "🔻 " + name, pay: document.getElementById('pay').value,
-                priceVal: pVal, currency: curr, fullPrice: "-" + priceStr, status: 'paid', date: new Date().getTime()
-            });
-        }
-        
-        showToast("✅ Записано успішно!");
-        document.getElementById('manualPrice').value = "";
-        document.getElementById('expName').value = "";
-        document.getElementById('tgOrderSelect').value = "";
-        calc();
-    }
-
-    function sync() {
-        db.collection("tg_orders").where("status", "==", "new").onSnapshot(snap => {
-            const list = document.getElementById('tg-orders-list');
-            const dropdown = document.getElementById('tgOrderSelect');
-            const section = document.getElementById('tg-orders-section');
-            
-            list.innerHTML = "";
-            dropdown.innerHTML = '<option value="" disabled selected>-- Виберіть замовлення або вкажіть вручну --</option>';
-            cachedTgOrders = {}; 
-            
-            if (snap.empty) {
-                section.style.display = "none";
                 return;
             }
-            
-            section.style.display = "block";
-            snap.forEach(doc => {
-                const tg = doc.data();
-                cachedTgOrders[doc.id] = tg; 
 
-                const client = tg.client_name || "Клієнт";
-                const itemText = tg.items || "Товар";
-                const price = tg.total_price || 0;
-                // Чітко визначаємо номер замовлення
-                const orderNum = tg.order_number || tg.number || tg.orderId || tg.id || doc.id.substring(0, 5);
-                
-                list.innerHTML += `
-                <div class="tg-order-card" id="tg-card-${doc.id}" onclick="selectTgOrder('${doc.id}', '${client}', '${itemText.replace(/'/g, "")}', ${price}, '${orderNum}')">
-                    <div class="tg-order-title">👤 ${client} (#${orderNum})</div>
-                    <div class="tg-order-text">${itemText}</div>
-                    <div class="tg-order-price">${price} грн</div>
-                </div>`;
+            /*
+              Спочатку списуємо товар.
+              Якщо склад не дозволяє —
+              замовлення НЕ створюється.
+            */
 
-                dropdown.innerHTML += `<option value="${doc.id}">№${orderNum} | 👤 ${client} — ${price} грн</option>`;
+            let deductedItems = [];
+
+            try {
+
+                deductedItems =
+                    await deductInventory(
+                        tgItems,
+                        manualFlavor
+                    );
+
+            } catch(error) {
+
+                console.error(error);
+
+                showToast(
+                    error.message ||
+                    "Не вдалося списати товар зі складу",
+                    "var(--danger)"
+                );
+
+                return;
+            }
+
+
+            const orderData = {
+
+                type:"sale",
+
+                catalog:
+                    document.getElementById("catalog").value,
+
+                flavor:fName,
+
+                pay:
+                    document.getElementById("pay").value,
+
+                priceVal:pVal,
+
+                currency:curr,
+
+                fullPrice:finalFullPrice,
+
+                status:
+                    document.getElementById("status").value,
+
+                debtor:
+                    document.getElementById("debtorName").value || "",
+
+                date:Date.now(),
+
+                inventoryDeducted:
+                    deductedItems
+            };
+
+
+            const savedOrder =
+                await db.collection("orders")
+                    .add(orderData);
+
+
+            /*
+              Telegram замовлення завершене
+              тільки після успішного запису продажу.
+            */
+
+            if(tgId) {
+
+                await db.collection("tg_orders")
+                    .doc(tgId)
+                    .update({
+                        status:"completed",
+                        processedOrderId:savedOrder.id,
+                        processedAt:Date.now()
+                    });
+            }
+
+
+            clearSelectedTgOrder();
+
+            showToast(
+                "✅ Продаж збережено, товар списано зі складу!"
+            );
+
+
+        } else {
+
+            /* =========================
+               ВИТРАТА
+            ========================= */
+
+            const name =
+                document.getElementById("expName").value ||
+                "Витрата";
+
+            await db.collection("orders")
+                .add({
+
+                    type:"expense",
+
+                    flavor:"🔻 " + name,
+
+                    pay:
+                        document.getElementById("pay").value,
+
+                    priceVal:pVal,
+
+                    currency:curr,
+
+                    fullPrice:"-" + finalFullPrice,
+
+                    status:"paid",
+
+                    date:Date.now()
+                });
+
+            showToast(
+                "✅ Витрату записано!"
+            );
+        }
+
+
+        document.getElementById("manualPrice").value = "";
+        document.getElementById("expName").value = "";
+        document.getElementById("tgOrderSelect").value = "";
+
+        calc();
+
+    } catch(error) {
+
+        console.error(error);
+
+        showToast(
+            "Помилка: " + (error.message || "невідома"),
+            "var(--danger)"
+        );
+
+    } finally {
+
+        savingOrder = false;
+        button.disabled = false;
+    }
+}
+
+
+function clearSelectedTgOrder() {
+
+    document.getElementById("activeTgOrderId").value = "";
+
+    document.getElementById("activeTgOrderId")
+        .removeAttribute("data-items");
+
+    document.getElementById("activeTgOrderId")
+        .removeAttribute("data-ordernum");
+
+    document.getElementById("tgOrderSelect").value = "";
+
+    document.querySelectorAll(".tg-order-card")
+        .forEach(c => c.classList.remove("selected"));
+
+    activeOrderCurrency = null;
+    activeOrderData = null;
+}
+
+
+/* =========================
+   ВИДАЛЕННЯ ТРАНЗАКЦІЇ
+========================= */
+
+async function deleteOrder(id) {
+
+    if(!confirm("Видалити транзакцію?")) {
+        return;
+    }
+
+    try {
+
+        const ref =
+            db.collection("orders").doc(id);
+
+        const snap =
+            await ref.get();
+
+        if(!snap.exists) {
+            return;
+        }
+
+        const order =
+            snap.data();
+
+        /*
+          Якщо товар був списаний,
+          повертаємо його на склад.
+        */
+
+        if(
+            order.inventoryDeducted &&
+            Array.isArray(order.inventoryDeducted)
+        ) {
+
+            await restoreInventory(
+                order.inventoryDeducted
+            );
+        }
+
+        await ref.delete();
+
+        showToast(
+            "🗑 Транзакцію видалено, товар повернуто на склад"
+        );
+
+    } catch(error) {
+
+        console.error(error);
+
+        showToast(
+            "Не вдалося видалити транзакцію",
+            "var(--danger)"
+        );
+    }
+}
+
+
+/* =========================
+   БОРГИ
+========================= */
+
+async function payDebt(id) {
+
+    try {
+
+        await db.collection("orders")
+            .doc(id)
+            .update({
+                status:"paid",
+                paidAt:Date.now()
             });
-        });
 
-        db.collection("inventory").orderBy("name").onSnapshot(snap => {
-            inventory = [];
-            const list = document.getElementById('inventoryList');
+        showToast("💰 Борг оплачено!");
+
+    } catch(error) {
+
+        console.error(error);
+
+        showToast(
+            "Не вдалося закрити борг",
+            "var(--danger)"
+        );
+    }
+}
+
+
+/* =========================
+   СИНХРОНІЗАЦІЯ
+========================= */
+
+function sync() {
+
+
+    /* =========================
+       TELEGRAM
+    ========================= */
+
+    db.collection("tg_orders")
+        .where("status","==","new")
+        .onSnapshot(snap => {
+
+            const list =
+                document.getElementById("tg-orders-list");
+
+            const dropdown =
+                document.getElementById("tgOrderSelect");
+
+            const section =
+                document.getElementById("tg-orders-section");
+
             list.innerHTML = "";
-            snap.forEach(doc => {
-                const i = doc.data();
-                inventory.push({id: doc.id, ...i});
-                const isSale = i.type === 'продаж';
-                const stockColor = i.qty === 0 ? 'var(--danger)' : 'var(--success)';
-                
+
+            dropdown.innerHTML =
+                '<option value="" disabled selected>-- Виберіть замовлення або вкажіть вручну --</option>';
+
+            cachedTgOrders = {};
+
+            if(snap.empty) {
+
+                section.style.display = "none";
+
+                return;
+            }
+
+            section.style.display = "block";
+
+            /*
+              Сортуємо на клієнті,
+              тому Firestore не потребує composite index.
+            */
+
+            const docs =
+                snap.docs.slice().sort((a,b) => {
+
+                    const ta =
+                        getTimestamp(a.data());
+
+                    const tb =
+                        getTimestamp(b.data());
+
+                    return tb - ta;
+                });
+
+
+            docs.forEach(doc => {
+
+                const tg =
+                    doc.data();
+
+                cachedTgOrders[doc.id] =
+                    tg;
+
+                const client =
+                    tg.client_name ||
+                    tg.client ||
+                    tg.name ||
+                    "Клієнт";
+
+                const itemText =
+                    tg.items ||
+                    tg.product ||
+                    tg.item ||
+                    "Товар";
+
+                const price =
+                    getOrderPrice(tg);
+
+                const currency =
+                    getOrderCurrency(tg);
+
+                const curLabel =
+                    currencyLabel(currency);
+
+                const orderNum =
+                    tg.order_number ||
+                    tg.number ||
+                    tg.orderId ||
+                    tg.id ||
+                    doc.id.substring(0,5);
+
+
+                /*
+                  Картка Telegram
+                */
+
                 list.innerHTML += `
-                <div class="list-item" style="border-left-color: ${isSale ? 'var(--accent-primary)' : 'var(--accent-secondary)'}; flex-direction: column; align-items: stretch;">
-                    <div style="display:flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                        <div>
-                            <span class="type-badge">${i.type || 'заливка'}</span>
-                            <b style="display:block; font-size: 16px; margin-top: 6px;">${i.name}</b>
+
+                    <div
+                        class="tg-order-card"
+                        id="tg-card-${escapeHtml(doc.id)}"
+                        onclick="selectTgOrderById('${escapeHtml(doc.id)}')"
+                    >
+
+                        <div class="tg-order-title">
+                            👤
+                            ${escapeHtml(client)}
+                            (#${escapeHtml(orderNum)})
                         </div>
-                        <div style="display:flex; gap:8px;">
-                            <button class="icon-btn" onclick="editFlavor('${doc.id}', '${i.name}', '${i.loc}', ${i.qty}, '${i.type}', '${i.barcode || ''}')">✏️</button>
-                            <button class="icon-btn" style="color:var(--danger)" onclick="if(confirm('Видалити?')) db.collection('inventory').doc('${doc.id}').delete()">🗑</button>
+
+                        <div class="tg-order-text">
+                            ${escapeHtml(itemText)}
                         </div>
+
+                        <div class="tg-order-price">
+                            ${escapeHtml(
+                                formatMoney(
+                                    price,
+                                    currency
+                                )
+                            )}
+                        </div>
+
                     </div>
-                    <div style="display:flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.25); padding: 10px 14px; border-radius: 10px;">
-                        <span style="font-size: 12px; color: var(--text-p);">📍 ${i.loc || 'Немає'}</span>
-                        <span style="font-size: 15px; font-weight: 800; color: ${stockColor};">📦 ${i.qty} шт</span>
-                    </div>
-                </div>`;
+                `;
+
+
+                /*
+                  Dropdown
+                */
+
+                dropdown.innerHTML += `
+
+                    <option value="${escapeHtml(doc.id)}">
+                        №${escapeHtml(orderNum)}
+                        |
+                        👤 ${escapeHtml(client)}
+                        —
+                        ${escapeHtml(
+                            formatMoney(
+                                price,
+                                currency
+                            )
+                        )}
+                    </option>
+                `;
             });
-            updateFlavorList();
+
         });
 
-        db.collection("orders").orderBy("date", "desc").onSnapshot(snap => {
-            const logs = document.getElementById('logs'), debts = document.getElementById('debtList');
-            const dailyList = document.getElementById('dailyStatsList');
-            
-            let pln = 0, uah = 0, sPln = 0, sUah = 0, ePln = 0, eUah = 0;
-            const weekAgo = new Date().getTime() - (7 * 24 * 60 * 60 * 1000);
-            let dayGroups = {};
 
-            logs.innerHTML = ""; debts.innerHTML = "";
+    /* =========================
+       INVENTORY
+    ========================= */
+
+    db.collection("inventory")
+        .orderBy("name")
+        .onSnapshot(snap => {
+
+            inventory = [];
+
+            const list =
+                document.getElementById("inventoryList");
+
+            list.innerHTML = "";
+
+
             snap.forEach(doc => {
-                const item = doc.data(), id = doc.id;
-                const isRecent = item.date > weekAgo;
-                const timeLabel = formatDate(item.date);
-                const dateOnly = formatDateOnly(item.date);
 
-                if(!dayGroups[dateOnly]) dayGroups[dateOnly] = { pln: 0, uah: 0 };
+                const i =
+                    doc.data();
 
-                if(item.status === 'paid') {
-                    const isExp = item.type === 'expense';
-                    const sign = isExp ? -1 : 1;
-                    const val = item.priceVal * sign;
-                    
-                    if(item.currency === "PLN") {
-                        pln += val;
-                        dayGroups[dateOnly].pln += val;
-                        if(isRecent) isExp ? ePln += item.priceVal : sPln += item.priceVal;
-                    } else {
-                        uah += val;
-                        dayGroups[dateOnly].uah += val;
-                        if(isRecent) isExp ? eUah += item.priceVal : sUah += item.priceVal;
-                    }
+                inventory.push({
+                    id:doc.id,
+                    ...i
+                });
 
-                    logs.innerHTML += `<div class="list-item" style="${isExp ? 'border-left-color:var(--danger)' : ''}">
-                        <div class="item-main">
-                            <span class="item-date">${timeLabel}</span>
-                            <b>${item.flavor}</b>
-                            <span>💳 ${item.pay}</span>
-                        </div>
-                        <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
-                            <b style="font-size:16px; color:${isExp ? 'var(--danger)' : 'var(--success)'}">${item.fullPrice}</b>
-                            <button class="icon-btn" style="width:28px; height:28px; font-size:12px; border-color:transparent;" onclick="if(confirm('Видалити транзакцію?')) db.collection('orders').doc('${id}').delete()">🗑</button>
-                        </div>
-                    </div>`;
-                } else {
-                    debts.innerHTML += `<div class="list-item" style="border-left-color:var(--warning)">
-                        <div class="item-main">
-                            <span class="item-date">${timeLabel}</span>
-                            <b>👤 ${item.debtor}</b>
-                            <span>${item.flavor}</span>
-                        </div>
-                        <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
-                            <b style="font-size:16px; color:var(--warning)">${item.fullPrice}</b>
-                            <button class="btn-pay" onclick="db.collection('orders').doc('${id}').update({status:'paid'})">ОПЛАТИВ</button>
-                        </div>
-                    </div>`;
-                }
-            });
+                const isSale =
+                    i.type === "продаж";
 
-            document.getElementById('totalPLN').innerText = pln + " ZŁ";
-            document.getElementById('totalUAH').innerText = uah + " ₴";
-            document.getElementById('st-sales-pln').innerText = sPln + " ZŁ";
-            document.getElementById('st-sales-uah').innerText = sUah + " ₴";
-            document.getElementById('st-exp-pln').innerText = ePln + " ZŁ";
-            document.getElementById('st-exp-uah').innerText = eUah + " ₴";
+                const qty =
+                    Number(i.qty) || 0;
 
-            dailyList.innerHTML = "";
-            Object.keys(dayGroups).forEach(day => {
-                const data = dayGroups[day];
-                dailyList.innerHTML += `
-                    <div class="day-row">
-                        <div class="day-date">${day}</div>
-                        <div class="day-totals">
-                            <div style="color:${data.pln >= 0 ? 'var(--success)' : 'var(--danger)'}">${data.pln > 0 ? '+' : ''}${data.pln} ZŁ</div>
-                            <div style="color:${data.uah >= 0 ? 'var(--success)' : 'var(--danger)'}">${data.uah > 0 ? '+' : ''}${data.uah} ₴</div>
+                const stockColor =
+                    qty === 0
+                        ? "var(--danger)"
+                        : "var(--success)";
+
+
+                list.innerHTML += `
+
+                    <div
+                        class="list-item"
+                        style="
+                            border-left-color:
+                            ${isSale
+                                ? "var(--accent-primary)"
+                                : "var(--accent-secondary)"
+                            };
+                            flex-direction:column;
+                            align-items:stretch;
+                        "
+                    >
+
+                        <div
+                            style="
+                                display:flex;
+                                justify-content:space-between;
+                                align-items:flex-start;
+                                margin-bottom:12px;
+                            "
+                        >
+
+                            <div>
+
+                                <span class="type-badge">
+                                    ${escapeHtml(
+                                        i.type || "заливка"
+                                    )}
+                                </span>
+
+                                <b
+                                    style="
+                                        display:block;
+                                        font-size:16px;
+                                        margin-top:6px;
+                                    "
+                                >
+                                    ${escapeHtml(i.name)}
+                                </b>
+
+                            </div>
+
+
+                            <div
+                                style="
+                                    display:flex;
+                                    gap:8px;
+                                "
+                            >
+
+                                <button
+                                    class="icon-btn"
+                                    onclick="editInventoryById('${escapeHtml(doc.id)}')"
+                                >
+                                    ✏️
+                                </button>
+
+                                <button
+                                    class="icon-btn"
+                                    style="color:var(--danger)"
+                                    onclick="deleteInventoryItem('${escapeHtml(doc.id)}')"
+                                >
+                                    🗑
+                                </button>
+
+                            </div>
+
                         </div>
+
+
+                        <div
+                            style="
+                                display:flex;
+                                justify-content:space-between;
+                                align-items:center;
+                                background:rgba(0,0,0,.25);
+                                padding:10px 14px;
+                                border-radius:10px;
+                            "
+                        >
+
+                            <span
+                                style="
+                                    font-size:12px;
+                                    color:var(--text-p);
+                                "
+                            >
+                                📍 ${escapeHtml(i.loc || "Немає")}
+                            </span>
+
+                            <span
+                                style="
+                                    font-size:15px;
+                                    font-weight:800;
+                                    color:${stockColor};
+                                "
+                            >
+                                📦 ${qty} шт
+                            </span>
+
+                        </div>
+
                     </div>
                 `;
             });
-        });
-    }
 
-    sync();
+            updateFlavorList();
+        });
+
+
+    /* =========================
+       ORDERS / HISTORY / STATS
+    ========================= */
+
+    db.collection("orders")
+        .orderBy("date","desc")
+        .onSnapshot(snap => {
+
+            const logs =
+                document.getElementById("logs");
+
+            const debts =
+                document.getElementById("debtList");
+
+            const dailyList =
+                document.getElementById("dailyStatsList");
+
+            let pln = 0;
+            let uah = 0;
+
+            let sPln = 0;
+            let sUah = 0;
+
+            let ePln = 0;
+            let eUah = 0;
+
+            const weekAgo =
+                Date.now() -
+                (7 * 24 * 60 * 60 * 1000);
+
+            const dayGroups = {};
+
+            logs.innerHTML = "";
+            debts.innerHTML = "";
+
+
+            /*
+              Додаткове JS-сортування.
+              Гарантує нові зверху навіть якщо
+              date у старих записів різного типу.
+            */
+
+            const docs =
+                snap.docs.slice().sort((a,b) =>
+                    getTimestamp(b.data()) -
+                    getTimestamp(a.data())
+                );
+
+
+            docs.forEach(doc => {
+
+                const item =
+                    doc.data();
+
+                const id =
+                    doc.id;
+
+                const timestamp =
+                    getTimestamp(item);
+
+                const isRecent =
+                    timestamp > weekAgo;
+
+                const timeLabel =
+                    formatDate(timestamp);
+
+                const dateOnly =
+                    formatDateOnly(timestamp);
+
+
+                if(!dayGroups[dateOnly]) {
+
+                    dayGroups[dateOnly] = {
+                        pln:0,
+                        uah:0,
+                        timestamp
+                    };
+                }
+
+
+                const value =
+                    Number(item.priceVal) || 0;
+
+
+                if(item.status === "paid") {
+
+                    const isExp =
+                        item.type === "expense";
+
+                    const sign =
+                        isExp ? -1 : 1;
+
+                    const val =
+                        value * sign;
+
+
+                    if(item.currency === "PLN") {
+
+                        pln += val;
+
+                        dayGroups[dateOnly].pln += val;
+
+                        if(isRecent) {
+
+                            if(isExp) {
+                                ePln += value;
+                            } else {
+                                sPln += value;
+                            }
+                        }
+
+                    } else {
+
+                        uah += val;
+
+                        dayGroups[dateOnly].uah += val;
+
+                        if(isRecent) {
+
+                            if(isExp) {
+                                eUah += value;
+                            } else {
+                                sUah += value;
+                            }
+                        }
+                    }
+
+
+                    /*
+                      ІСТОРІЯ
+                    */
+
+                    logs.innerHTML += `
+
+                        <div
+                            class="list-item"
+                            style="
+                                ${isExp
+                                    ? "border-left-color:var(--danger)"
+                                    : ""
+                                }
+                            "
+                        >
+
+                            <div class="item-main">
+
+                                <span class="item-date">
+                                    ${escapeHtml(timeLabel)}
+                                </span>
+
+                                <b>
+                                    ${escapeHtml(
+                                        item.flavor || "Операція"
+                                    )}
+                                </b>
+
+                                <span>
+                                    💳
+                                    ${escapeHtml(
+                                        item.pay || ""
+                                    )}
+                                </span>
+
+                            </div>
+
+
+                            <div
+                                style="
+                                    text-align:right;
+                                    display:flex;
+                                    flex-direction:column;
+                                    align-items:flex-end;
+                                    gap:6px;
+                                "
+                            >
+
+                                <b
+                                    style="
+                                        font-size:16px;
+                                        color:
+                                        ${isExp
+                                            ? "var(--danger)"
+                                            : "var(--success)"
+                                        };
+                                    "
+                                >
+                                    ${escapeHtml(
+                                        item.fullPrice ||
+                                        formatMoney(
+                                            value,
+                                            item.currency || "PLN"
+                                        )
+                                    )}
+                                </b>
+
+
+                                <button
+                                    class="icon-btn"
+                                    style="
+                                        width:28px;
+                                        height:28px;
+                                        font-size:12px;
+                                        border-color:transparent;
+                                    "
+                                    onclick="deleteOrder('${escapeHtml(id)}')"
+                                >
+                                    🗑
+                                </button>
+
+                            </div>
+
+                        </div>
+                    `;
+
+
+                } else {
+
+                    /*
+                      БОРГ
+                    */
+
+                    debts.innerHTML += `
+
+                        <div
+                            class="list-item"
+                            style="border-left-color:var(--warning)"
+                        >
+
+                            <div class="item-main">
+
+                                <span class="item-date">
+                                    ${escapeHtml(timeLabel)}
+                                </span>
+
+                                <b>
+                                    👤
+                                    ${escapeHtml(
+                                        item.debtor || "Без імені"
+                                    )}
+                                </b>
+
+                                <span>
+                                    ${escapeHtml(
+                                        item.flavor || "Товар"
+                                    )}
+                                </span>
+
+                            </div>
+
+
+                            <div
+                                style="
+                                    text-align:right;
+                                    display:flex;
+                                    flex-direction:column;
+                                    align-items:flex-end;
+                                    gap:6px;
+                                "
+                            >
+
+                                <b
+                                    style="
+                                        font-size:16px;
+                                        color:var(--warning);
+                                    "
+                                >
+                                    ${escapeHtml(
+                                        item.fullPrice ||
+                                        formatMoney(
+                                            value,
+                                            item.currency || "PLN"
+                                        )
+                                    )}
+                                </b>
+
+                                <button
+                                    class="btn-pay"
+                                    onclick="payDebt('${escapeHtml(id)}')"
+                                >
+                                    ОПЛАТИВ
+                                </button>
+
+                            </div>
+
+                        </div>
+                    `;
+                }
+
+            });
+
+
+            /*
+              КАСА
+            */
+
+            document.getElementById("totalPLN").innerText =
+                `${Number(pln).toFixed(2)} ZŁ`;
+
+            document.getElementById("totalUAH").innerText =
+                `${Number(uah).toFixed(2)} ₴`;
+
+
+            /*
+              7 ДНІВ
+            */
+
+            document.getElementById("st-sales-pln").innerText =
+                `${Number(sPln).toFixed(2)} ZŁ`;
+
+            document.getElementById("st-sales-uah").innerText =
+                `${Number(sUah).toFixed(2)} ₴`;
+
+            document.getElementById("st-exp-pln").innerText =
+                `${Number(ePln).toFixed(2)} ZŁ`;
+
+            document.getElementById("st-exp-uah").innerText =
+                `${Number(eUah).toFixed(2)} ₴`;
+
+
+            /*
+              ДЕННА СТАТИСТИКА
+              Новіші дні зверху.
+            */
+
+            dailyList.innerHTML = "";
+
+            Object.keys(dayGroups)
+                .sort((a,b) =>
+                    dayGroups[b].timestamp -
+                    dayGroups[a].timestamp
+                )
+                .forEach(day => {
+
+                    const data =
+                        dayGroups[day];
+
+                    dailyList.innerHTML += `
+
+                        <div class="day-row">
+
+                            <div class="day-date">
+                                ${escapeHtml(day)}
+                            </div>
+
+                            <div class="day-totals">
+
+                                <div
+                                    style="
+                                        color:
+                                        ${data.pln >= 0
+                                            ? "var(--success)"
+                                            : "var(--danger)"
+                                        };
+                                    "
+                                >
+                                    ${data.pln > 0 ? "+" : ""}
+                                    ${Number(data.pln).toFixed(2)}
+                                    ZŁ
+                                </div>
+
+                                <div
+                                    style="
+                                        color:
+                                        ${data.uah >= 0
+                                            ? "var(--success)"
+                                            : "var(--danger)"
+                                        };
+                                    "
+                                >
+                                    ${data.uah > 0 ? "+" : ""}
+                                    ${Number(data.uah).toFixed(2)}
+                                    ₴
+                                </div>
+
+                            </div>
+
+                        </div>
+                    `;
+                });
+
+        });
+}
+
+
+/* =========================
+   СТАРТ
+========================= */
+
+sync();
+
+/*
+  Початкове заповнення каталогу,
+  щоб select не був порожнім до
+  першої відповіді Firebase.
+*/
+
+updateFlavorList();
+
 </script>
+
 </body>
 </html>
