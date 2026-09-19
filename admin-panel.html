@@ -83,6 +83,7 @@
         .btn-cancel { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-main); box-shadow: none; margin-top: 12px; }
         .btn-cancel:active { background: rgba(255,255,255,0.1); box-shadow: none; }
         .btn-scanner { background: rgba(6, 182, 212, 0.15); border: 1px solid var(--accent-secondary); color: var(--accent-secondary); box-shadow: none; }
+        .btn-invoice { background: linear-gradient(135deg, var(--accent-secondary), #0284c7); box-shadow: 0 8px 20px rgba(6,182,212,0.3); margin-top: 10px; }
 
         .admin-header { text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .admin-header h3 { margin: 0; font-size: 18px; color: #fff; }
@@ -131,6 +132,14 @@
         .tg-order-title { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 6px; display:flex; align-items:center; gap:4px; }
         .tg-order-text { font-size: 13px; font-weight: 600; color: #e2e8f0; word-break: break-word; }
         .tg-order-price { font-size: 14px; font-weight: 800; color: #fff; margin-top: 6px; text-align: right; }
+
+        /* СТИЛІ ДЛЯ ДРУКУ НАКЛАДНОЇ / ЧЕКА */
+        #invoice-print-area { display: none; }
+        @media print {
+            body * { visibility: hidden; }
+            #invoice-print-area, #invoice-print-area * { visibility: visible; }
+            #invoice-print-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; background: white; color: black; padding: 20px; font-family: monospace; }
+        }
     </style>
 </head>
 <body>
@@ -141,6 +150,39 @@
     <div style="color:white; font-size:18px; font-weight:bold; margin-bottom:16px;">Наведіть камеру на штрих-код</div>
     <div id="reader"></div>
     <button class="close-scanner" onclick="closeScanner()">Скасувати</button>
+</div>
+
+<!-- Прихований контейнер для генерації накладної (багато товарів) -->
+<div id="invoice-print-area">
+    <div style="text-align: center; margin-bottom: 15px;">
+        <h2 style="margin: 0; font-size: 20px;">SMOKE HUB</h2>
+        <p style="margin: 5px 0 0; font-size: 12px;">ТОВАРНА НАКЛАДНА / КВИТАНЦІЯ</p>
+    </div>
+    <hr style="border: 0; border-top: 1px dashed #000; margin: 10px 0;">
+    <div style="font-size: 12px; margin-bottom: 10px;">
+        <div><b>Замовлення:</b> <span id="inv-num">#001</span></div>
+        <div><b>Дата:</b> <span id="inv-date"></span></div>
+        <div><b>Покупець:</b> <span id="inv-client">Роздрібний клієнт</span></div>
+    </div>
+    <hr style="border: 0; border-top: 1px dashed #000; margin: 10px 0;">
+    <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 1px solid #000;">
+                <th style="text-align: left; padding-bottom: 5px;">Товар</th>
+                <th style="text-align: right; padding-bottom: 5px;">Сума</th>
+            </tr>
+        </thead>
+        <tbody id="inv-items-list">
+            <!-- Сюди динамічно підтягнуться всі товари -->
+        </tbody>
+    </table>
+    <hr style="border: 0; border-top: 1px dashed #000; margin: 10px 0;">
+    <div style="font-size: 14px; font-weight: bold; text-align: right;">
+        ДО СПЛАТИ: <span id="inv-total">0</span>
+    </div>
+    <div style="font-size: 10px; text-align: center; margin-top: 25px;">
+        Дякуємо, що обираєте Smoke Hub! 💨<br>Товар обміну та поверненню не підлягає.
+    </div>
 </div>
 
 <div class="dashboard-header">
@@ -168,6 +210,12 @@
 
         <div id="sale-fields">
             <div class="form-row">
+                <label>📋 Вибрати з нових замовлень Telegram</label>
+                <select id="tgOrderSelect" onchange="selectTgOrderFromDropdown()">
+                    <option value="" disabled selected>-- Виберіть замовлення або вкажіть вручну --</option>
+                </select>
+            </div>
+            <div class="form-row">
                 <label>Каталог</label>
                 <select id="catalog" onchange="updateFlavorList()">
                     <option value="заливка">🧪 Заливка рідини</option>
@@ -175,7 +223,7 @@
                 </select>
             </div>
             <div class="form-row">
-                <label>Пошук та вибір</label>
+                <label>Пошук та вибір товару</label>
                 <input type="text" id="flavorSearch" placeholder="🔍 Пошук по назві..." oninput="updateFlavorList()">
                 <select id="flavor" onchange="handleFlavor()" style="margin-top:12px;"></select>
             </div>
@@ -192,11 +240,12 @@
 
         <div class="form-row"><label>Валюта та оплата</label><select id="pay" onchange="calc()"><option value="Готівка">💵 Готівка PLN</option><option value="Карта">💳 Карта PLN</option><option value="Монобанк">🐈 Mono UAH</option></select></div>
         <div class="form-row" id="status-row"><label>Статус</label><select id="status" onchange="toggleDebt()"><option value="paid">✅ Оплачено одразу</option><option value="debt">🚩 В борг</option></select></div>
-        <div id="debtor-row" class="form-row" style="display:none"><label>Хто бере?</label><input type="text" id="debtorName" placeholder="Введіть ім'я боржника"></div>
-        <div class="form-row"><label>Власна сума (Опціонально)</label><input type="number" id="manualPrice" oninput="calc()" placeholder="Введіть суму вручну"></div>
+        <div id="debtor-row" class="form-row" style="display:none"><label>Ім'я клієнта / боржника</label><input type="text" id="debtorName" placeholder="Введіть ім'я"></div>
+        <div class="form-row"><label>Загальна сума</label><input type="number" id="manualPrice" oninput="calc()" placeholder="Введіть суму вручну"></div>
         
         <div class="price-tag" id="total">0</div>
-        <button class="btn-submit" onclick="saveOrder()">ПІДТВЕРДИТИ</button>
+        <button class="btn-submit" onclick="saveOrder()">ПІДТВЕРДИТИ ТА ЗБЕРЕГТИ</button>
+        <button class="btn-submit btn-invoice" onclick="printInvoice()">🧾 ВИДАТИ НАКЛАДНУ (ДРУК УСІХ ТОВАРІВ)</button>
     </div>
 </div>
 
@@ -288,6 +337,7 @@
     const db = firebase.firestore();
 
     let inventory = [];
+    let cachedTgOrders = {}; 
     let html5QrCode;
 
     function showToast(message, color = 'var(--success)') {
@@ -340,33 +390,11 @@
     async function onScanSuccess(decodedText) {
         closeScanner();
         document.getElementById('newBarcode').value = decodedText;
-        
         let existing = inventory.find(i => i.barcode === decodedText);
         if (existing) {
             editFlavor(existing.id, existing.name, existing.loc, existing.qty, existing.type, existing.barcode);
             showToast("📦 Товар знайдено в базі!");
             return;
-        }
-
-        showToast("🔍 Шукаємо назву в мережі...", 'var(--warning)');
-        try {
-            let res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${decodedText}.json`);
-            let data = await res.json();
-            if(data.status === 1 && data.product.product_name) {
-                document.getElementById('newFlavorName').value = data.product.product_name;
-                showToast("✅ Назву знайдено!");
-                return;
-            }
-            let res2 = await fetch(`https://api.upcitemdb.com/prod/trial/lookup?upc=${decodedText}`);
-            let data2 = await res2.json();
-            if(data2.items && data2.items.length > 0) {
-                document.getElementById('newFlavorName').value = data2.items[0].title;
-                showToast("✅ Назву знайдено!");
-                return;
-            }
-            showToast("ℹ️ Не знайдено. Введіть назву вручну.", 'var(--accent-secondary)');
-        } catch(e) {
-            showToast("ℹ️ Помилка пошуку. Введіть вручну.", 'var(--accent-secondary)');
         }
     }
 
@@ -486,20 +514,78 @@
         return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`;
     }
 
-    /* --- ЛОГІКА ВИБОРУ TELEGRAM ЗАМОВЛЕННЯ --- */
+    /* --- ВИБІР ЗАМОВЛЕННЯ ІЗ ВИПАДАЮЧОГО СПИСКУ АБО СТРІЧКИ --- */
     function selectTgOrder(id, client, itemText, price) {
         document.querySelectorAll('.tg-order-card').forEach(c => c.classList.remove('selected'));
-        document.getElementById(`tg-card-${id}`).classList.add('selected');
+        if(document.getElementById(`tg-card-${id}`)) {
+            document.getElementById(`tg-card-${id}`).classList.add('selected');
+        }
         document.getElementById('activeTgOrderId').value = id;
+        document.getElementById('tgOrderSelect').value = id;
 
-        document.getElementById('catalog').value = 'продаж';
-        document.getElementById('flavorSearch').value = itemText; 
-        updateFlavorList(); 
+        document.getElementById('debtorName').value = client;
         document.getElementById('pay').value = 'Монобанк'; 
         if(price) document.getElementById('manualPrice').value = price;
         
+        document.getElementById('activeTgOrderId').setAttribute('data-items', itemText);
+
         calc();
-        showToast("Замовлення застосовано. Оберіть товар!", 'var(--tg-color)');
+        showToast(`📦 Замовлення для ${client} вибрано!`, 'var(--tg-color)');
+    }
+
+    function selectTgOrderFromDropdown() {
+        const id = document.getElementById('tgOrderSelect').value;
+        if(cachedTgOrders[id]) {
+            let order = cachedTgOrders[id];
+            selectTgOrder(id, order.client_name || "Клієнт", order.items || "Товар", order.total_price || 0);
+        }
+    }
+
+    /* --- ФУНКЦІЯ ДРУКУ НАКЛАДНОЇ --- */
+    function printInvoice() {
+        const type = document.getElementById('opType').value;
+        if(type !== 'sale') {
+            showToast("Накладну можна видати лише на продаж!", 'var(--danger)');
+            return;
+        }
+
+        const clientName = document.getElementById('debtorName').value || "Роздрібний клієнт";
+        const priceStr = document.getElementById('total').innerText;
+        const tgItems = document.getElementById('activeTgOrderId').getAttribute('data-items');
+        const activeId = document.getElementById('activeTgOrderId').value;
+        const invoiceNum = activeId ? "#" + activeId.substring(0, 6).toUpperCase() : "#SH-" + Math.floor(1000 + Math.random() * 9000);
+
+        document.getElementById('inv-num').innerText = invoiceNum;
+        document.getElementById('inv-date').innerText = formatDate(new Date().getTime());
+        document.getElementById('inv-client').innerText = clientName;
+        document.getElementById('inv-total').innerText = priceStr;
+
+        const itemsListTable = document.getElementById('inv-items-list');
+        itemsListTable.innerHTML = "";
+
+        if(tgItems) {
+            let goods = tgItems.split(/,|\n/);
+            goods.forEach(good => {
+                if(good.trim()) {
+                    itemsListTable.innerHTML += `
+                        <tr>
+                            <td style="padding-top: 5px; padding-bottom: 5px;">• ${good.trim()}</td>
+                            <td style="text-align: right; padding-top: 5px;">-</td>
+                        </tr>
+                    `;
+                }
+            });
+        } else {
+            const fName = document.getElementById('flavor').value || "Товар";
+            itemsListTable.innerHTML += `
+                <tr>
+                    <td style="padding-top: 5px; padding-bottom: 5px;">• ${fName}</td>
+                    <td style="text-align: right; padding-top: 5px;">${priceStr}</td>
+                </tr>
+            `;
+        }
+
+        window.print();
     }
 
     async function saveOrder() {
@@ -509,25 +595,22 @@
         const curr = priceStr.includes("грн") ? "UAH" : "PLN";
 
         if (type === 'sale') {
-            const fName = document.getElementById('flavor').value;
+            const tgItems = document.getElementById('activeTgOrderId').getAttribute('data-items');
+            const fName = tgItems || document.getElementById('flavor').value;
             if(!fName) { showToast("Оберіть товар!", 'var(--danger)'); return; }
-            const cat = document.getElementById('catalog').value;
-            const item = inventory.find(i => i.name === fName);
-            if(cat === 'продаж' && item && item.id) {
-                await db.collection("inventory").doc(item.id).update({ qty: firebase.firestore.FieldValue.increment(-1) });
-            }
+            
             await db.collection("orders").add({
-                type: 'sale', catalog: cat, flavor: fName + (cat === 'продаж' ? " (30ml)" : ""), 
+                type: 'sale', catalog: document.getElementById('catalog').value, flavor: fName, 
                 pay: document.getElementById('pay').value, priceVal: pVal, currency: curr,
                 fullPrice: priceStr, status: document.getElementById('status').value, 
                 debtor: document.getElementById('debtorName').value || "", date: new Date().getTime()
             });
 
-            // Закриваємо ТГ замовлення, якщо воно було вибране
             const tgId = document.getElementById('activeTgOrderId').value;
             if (tgId) {
                 await db.collection("tg_orders").doc(tgId).update({ status: "completed" });
                 document.getElementById('activeTgOrderId').value = ""; 
+                document.getElementById('activeTgOrderId').removeAttribute('data-items');
             }
 
         } else {
@@ -541,6 +624,7 @@
         showToast("✅ Записано успішно!");
         document.getElementById('manualPrice').value = "";
         document.getElementById('expName').value = "";
+        document.getElementById('tgOrderSelect').value = "";
         calc();
     }
 
@@ -548,8 +632,12 @@
         // Синхронізація Telegram замовлень
         db.collection("tg_orders").where("status", "==", "new").onSnapshot(snap => {
             const list = document.getElementById('tg-orders-list');
+            const dropdown = document.getElementById('tgOrderSelect');
             const section = document.getElementById('tg-orders-section');
+            
             list.innerHTML = "";
+            dropdown.innerHTML = '<option value="" disabled selected>-- Виберіть замовлення або вкажіть вручну --</option>';
+            cachedTgOrders = {}; 
             
             if (snap.empty) {
                 section.style.display = "none";
@@ -559,17 +647,22 @@
             section.style.display = "block";
             snap.forEach(doc => {
                 const tg = doc.data();
-                // Очікуємо, що бот пише поля: client_name, items, total_price
+                cachedTgOrders[doc.id] = tg; 
+
                 const client = tg.client_name || "Клієнт";
                 const itemText = tg.items || "Товар";
                 const price = tg.total_price || 0;
                 
+                // Додаємо картку у стрічку
                 list.innerHTML += `
-                <div class="tg-order-card" id="tg-card-${doc.id}" onclick="selectTgOrder('${doc.id}', '${client}', '${itemText}', ${price})">
+                <div class="tg-order-card" id="tg-card-${doc.id}" onclick="selectTgOrder('${doc.id}', '${client}', '${itemText.replace(/'/g, "")}', ${price})">
                     <div class="tg-order-title">👤 ${client}</div>
                     <div class="tg-order-text">${itemText}</div>
                     <div class="tg-order-price">${price} грн</div>
                 </div>`;
+
+                // Додаємо пункт у випадаючий список замість потворного інпуту
+                dropdown.innerHTML += `<option value="${doc.id}">👤 ${client} — ${itemText} (${price} грн)</option>`;
             });
         });
 
@@ -582,9 +675,7 @@
                 const i = doc.data();
                 inventory.push({id: doc.id, ...i});
                 const isSale = i.type === 'продаж';
-                
                 const stockColor = i.qty === 0 ? 'var(--danger)' : 'var(--success)';
-                const lastDeliveryText = formatDate(i.lastDelivery);
                 
                 list.innerHTML += `
                 <div class="list-item" style="border-left-color: ${isSale ? 'var(--accent-primary)' : 'var(--accent-secondary)'}; flex-direction: column; align-items: stretch;">
@@ -592,19 +683,15 @@
                         <div>
                             <span class="type-badge">${i.type || 'заливка'}</span>
                             <b style="display:block; font-size: 16px; margin-top: 6px;">${i.name}</b>
-                            ${i.barcode ? `<span style="font-size:10px; color:var(--text-p); margin-top:2px;">🛒 ${i.barcode}</span>` : ''}
                         </div>
                         <div style="display:flex; gap:8px;">
                             <button class="icon-btn" onclick="editFlavor('${doc.id}', '${i.name}', '${i.loc}', ${i.qty}, '${i.type}', '${i.barcode || ''}')">✏️</button>
                             <button class="icon-btn" style="color:var(--danger)" onclick="if(confirm('Видалити?')) db.collection('inventory').doc('${doc.id}').delete()">🗑</button>
                         </div>
                     </div>
-                    <div style="display:flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.25); padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.03);">
+                    <div style="display:flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.25); padding: 10px 14px; border-radius: 10px;">
                         <span style="font-size: 12px; color: var(--text-p);">📍 ${i.loc || 'Немає'}</span>
                         <span style="font-size: 15px; font-weight: 800; color: ${stockColor};">📦 ${i.qty} шт</span>
-                    </div>
-                    <div style="font-size: 10px; color: var(--text-p); margin-top: 8px; text-align: right;">
-                        🚚 Ост. поставка: <span style="color:var(--accent-secondary)">${lastDeliveryText}</span>
                     </div>
                 </div>`;
             });
