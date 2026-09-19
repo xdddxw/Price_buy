@@ -133,12 +133,33 @@
         .tg-order-text { font-size: 13px; font-weight: 600; color: #e2e8f0; word-break: break-word; }
         .tg-order-price { font-size: 14px; font-weight: 800; color: #fff; margin-top: 6px; text-align: right; }
 
-        /* СТИЛІ ДЛЯ ДРУКУ НАКЛАДНОЇ / ЧЕКА */
+        /* СТИЛЬ ДРУКУ ЧЕКА */
         #invoice-print-area { display: none; }
         @media print {
             body * { visibility: hidden; }
             #invoice-print-area, #invoice-print-area * { visibility: visible; }
-            #invoice-print-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; background: white; color: black; padding: 20px; font-family: monospace; }
+            #invoice-print-area { 
+                display: block !important; 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                width: 80mm; 
+                background: #ffffff; 
+                color: #000000; 
+                padding: 10px; 
+                font-family: 'Courier New', Courier, monospace;
+                font-size: 12px;
+                line-height: 1.4;
+            }
+            .inv-header { text-align: center; margin-bottom: 10px; }
+            .inv-header h2 { margin: 0; font-size: 16px; font-weight: bold; }
+            .inv-header p { margin: 2px 0; font-size: 10px; }
+            .inv-divider { border: 0; border-top: 1px dashed #000; margin: 8px 0; }
+            .inv-table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+            .inv-table th { text-align: left; font-size: 11px; border-bottom: 1px solid #000; padding-bottom: 3px; }
+            .inv-table td { font-size: 11px; padding: 4px 0; border-bottom: 1px dotted #ccc; vertical-align: top; }
+            .inv-total { font-size: 14px; font-weight: bold; text-align: right; margin-top: 10px; }
+            .inv-footer { text-align: center; font-size: 9px; margin-top: 15px; }
         }
     </style>
 </head>
@@ -152,36 +173,36 @@
     <button class="close-scanner" onclick="closeScanner()">Скасувати</button>
 </div>
 
-<!-- Прихований контейнер для генерації накладної (багато товарів) -->
+<!-- ШАБЛОН ДРУКУ ЧЕКА -->
 <div id="invoice-print-area">
-    <div style="text-align: center; margin-bottom: 15px;">
-        <h2 style="margin: 0; font-size: 20px;">SMOKE HUB</h2>
-        <p style="margin: 5px 0 0; font-size: 12px;">ТОВАРНА НАКЛАДНА / КВИТАНЦІЯ</p>
+    <div class="inv-header">
+        <h2>SMOKE HUB</h2>
+        <p>ТОВАРНА НАКЛАДНА / КВИТАНЦІЯ</p>
     </div>
-    <hr style="border: 0; border-top: 1px dashed #000; margin: 10px 0;">
-    <div style="font-size: 12px; margin-bottom: 10px;">
+    <hr class="inv-divider">
+    <div style="font-size: 11px; margin-bottom: 5px;">
         <div><b>Замовлення:</b> <span id="inv-num">#001</span></div>
         <div><b>Дата:</b> <span id="inv-date"></span></div>
         <div><b>Покупець:</b> <span id="inv-client">Роздрібний клієнт</span></div>
     </div>
-    <hr style="border: 0; border-top: 1px dashed #000; margin: 10px 0;">
-    <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
+    <hr class="inv-divider">
+    <table class="inv-table">
         <thead>
-            <tr style="border-bottom: 1px solid #000;">
-                <th style="text-align: left; padding-bottom: 5px;">Товар</th>
-                <th style="text-align: right; padding-bottom: 5px;">Сума</th>
+            <tr>
+                <th>Найменування товару</th>
+                <th style="text-align: right;">Сума</th>
             </tr>
         </thead>
-        <tbody id="inv-items-list">
-            <!-- Сюди динамічно підтягнуться всі товари -->
-        </tbody>
+        <tbody id="inv-items-list"></tbody>
     </table>
-    <hr style="border: 0; border-top: 1px dashed #000; margin: 10px 0;">
-    <div style="font-size: 14px; font-weight: bold; text-align: right;">
+    <hr class="inv-divider">
+    <div class="inv-total">
         ДО СПЛАТИ: <span id="inv-total">0</span>
     </div>
-    <div style="font-size: 10px; text-align: center; margin-top: 25px;">
-        Дякуємо, що обираєте Smoke Hub! 💨<br>Товар обміну та поверненню не підлягає.
+    <div class="inv-footer">
+        Дякуємо, що обираєте Smoke Hub! 💨<br>
+        Товар обміну та поверненню не підлягає.<br>
+        Слава Україні! 🇺🇦
     </div>
 </div>
 
@@ -192,7 +213,6 @@
 
 <div id="tab-new" class="tab-content active-tab">
     
-    <!-- Стрічка Telegram Замовлень -->
     <div id="tg-orders-section" class="tg-orders-container">
         <div class="tg-orders-header">✈️ НОВІ ЗАМОВЛЕННЯ (TELEGRAM)</div>
         <div class="tg-orders-scroll" id="tg-orders-list"></div>
@@ -245,7 +265,7 @@
         
         <div class="price-tag" id="total">0</div>
         <button class="btn-submit" onclick="saveOrder()">ПІДТВЕРДИТИ ТА ЗБЕРЕГТИ</button>
-        <button class="btn-submit btn-invoice" onclick="printInvoice()">🧾 ВИДАТИ НАКЛАДНУ (ДРУК УСІХ ТОВАРІВ)</button>
+        <button class="btn-submit btn-invoice" onclick="printInvoice()">🧾 ВИДАТИ НАКЛАДНУ (ДРУК)</button>
     </div>
 </div>
 
@@ -366,7 +386,6 @@
         calc();
     }
 
-    /* --- ЛОГІКА СКАНЕРА --- */
     function startScanner() {
         document.getElementById('scanner-modal').style.display = 'flex';
         html5QrCode = new Html5Qrcode("reader");
@@ -398,7 +417,6 @@
         }
     }
 
-    /* --- РОБОТА ЗІ СКЛАДОМ --- */
     async function addFlavorToInventory() {
         const type = document.getElementById('newFlavorType').value;
         const name = document.getElementById('newFlavorName').value;
@@ -514,8 +532,7 @@
         return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`;
     }
 
-    /* --- ВИБІР ЗАМОВЛЕННЯ --- */
-    function selectTgOrder(id, client, itemText, price) {
+    function selectTgOrder(id, client, itemText, price, orderNum) {
         document.querySelectorAll('.tg-order-card').forEach(c => c.classList.remove('selected'));
         if(document.getElementById(`tg-card-${id}`)) {
             document.getElementById(`tg-card-${id}`).classList.add('selected');
@@ -525,23 +542,28 @@
 
         document.getElementById('debtorName').value = client;
         document.getElementById('pay').value = 'Монобанк'; 
-        if(price) document.getElementById('manualPrice').value = price;
+        
+        if(price) {
+            document.getElementById('manualPrice').value = price;
+            document.getElementById('total').innerText = `${price} грн`;
+        }
         
         document.getElementById('activeTgOrderId').setAttribute('data-items', itemText);
+        document.getElementById('activeTgOrderId').setAttribute('data-ordernum', orderNum);
 
-        calc();
-        showToast(`📦 Замовлення для ${client} вибрано!`, 'var(--tg-color)');
+        showToast(`📦 Замовлення №${orderNum} вибрано!`, 'var(--tg-color)');
     }
 
     function selectTgOrderFromDropdown() {
         const id = document.getElementById('tgOrderSelect').value;
         if(cachedTgOrders[id]) {
             let order = cachedTgOrders[id];
-            selectTgOrder(id, order.client_name || "Клієнт", order.items || "Товар", order.total_price || 0);
+            // Шукаємо точний номер замовлення в полях, які приходять від телеграм бота (order_number, number, orderId, або id)
+            let realNum = order.order_number || order.number || order.orderId || id;
+            selectTgOrder(id, order.client_name || "Клієнт", order.items || "Товар", order.total_price || 0, realNum);
         }
     }
 
-    /* --- ДРУК НАКЛАДНОЇ --- */
     function printInvoice() {
         const type = document.getElementById('opType').value;
         if(type !== 'sale') {
@@ -551,10 +573,11 @@
 
         const clientName = document.getElementById('debtorName').value || "Роздрібний клієнт";
         const priceStr = document.getElementById('total').innerText;
-        const activeId = document.getElementById('activeTgOrderId').value;
         const tgItems = document.getElementById('activeTgOrderId').getAttribute('data-items');
+        const customOrderNum = document.getElementById('activeTgOrderId').getAttribute('data-ordernum');
         
-        const invoiceNum = activeId ? "#" + activeId.substring(0, 6).toUpperCase() : "#SH-" + Math.floor(1000 + Math.random() * 9000);
+        // Виводимо точний номер замовлення з Telegram
+        const invoiceNum = customOrderNum ? "#" + customOrderNum : "#SH-" + Math.floor(1000 + Math.random() * 9000);
 
         document.getElementById('inv-num').innerText = invoiceNum;
         document.getElementById('inv-date').innerText = formatDate(new Date().getTime());
@@ -566,12 +589,12 @@
 
         if(tgItems && tgItems.trim() !== "") {
             let goods = tgItems.split(/,|\n/);
-            goods.forEach(good => {
+            goods.forEach((good, index) => {
                 if(good.trim()) {
                     itemsListTable.innerHTML += `
                         <tr>
-                            <td style="padding-top: 6px; padding-bottom: 6px; border-bottom: 1px dotted #ccc;">• ${good.trim()}</td>
-                            <td style="text-align: right; padding-top: 6px; padding-bottom: 6px; border-bottom: 1px dotted #ccc;">-</td>
+                            <td>${index + 1}. ${good.trim()}</td>
+                            <td style="text-align: right;">${index === 0 ? priceStr : '-'}</td>
                         </tr>
                     `;
                 }
@@ -580,15 +603,15 @@
             const fName = document.getElementById('flavor').value || "Товар з каталогу";
             itemsListTable.innerHTML += `
                 <tr>
-                    <td style="padding-top: 6px; padding-bottom: 6px; border-bottom: 1px dotted #ccc;">• ${fName}</td>
-                    <td style="text-align: right; padding-top: 6px; padding-bottom: 6px; border-bottom: 1px dotted #ccc;">${priceStr}</td>
+                    <td>1. ${fName}</td>
+                    <td style="text-align: right;">${priceStr}</td>
                 </tr>
             `;
         }
 
         setTimeout(() => {
             window.print();
-        }, 100);
+        }, 150);
     }
 
     async function saveOrder() {
@@ -614,6 +637,7 @@
                 await db.collection("tg_orders").doc(tgId).update({ status: "completed" });
                 document.getElementById('activeTgOrderId').value = ""; 
                 document.getElementById('activeTgOrderId').removeAttribute('data-items');
+                document.getElementById('activeTgOrderId').removeAttribute('data-ordernum');
             }
 
         } else {
@@ -654,15 +678,17 @@
                 const client = tg.client_name || "Клієнт";
                 const itemText = tg.items || "Товар";
                 const price = tg.total_price || 0;
+                // Читаємо справжній номер замовлення із бази (перевіряємо різні поширені назви полів)
+                const orderNum = tg.order_number || tg.number || tg.orderId || doc.id.substring(0, 5);
                 
                 list.innerHTML += `
-                <div class="tg-order-card" id="tg-card-${doc.id}" onclick="selectTgOrder('${doc.id}', '${client}', '${itemText.replace(/'/g, "")}', ${price})">
-                    <div class="tg-order-title">👤 ${client}</div>
+                <div class="tg-order-card" id="tg-card-${doc.id}" onclick="selectTgOrder('${doc.id}', '${client}', '${itemText.replace(/'/g, "")}', ${price}, '${orderNum}')">
+                    <div class="tg-order-title">👤 ${client} (#${orderNum})</div>
                     <div class="tg-order-text">${itemText}</div>
                     <div class="tg-order-price">${price} грн</div>
                 </div>`;
 
-                dropdown.innerHTML += `<option value="${doc.id}">👤 ${client} — ${itemText} (${price} грн)</option>`;
+                dropdown.innerHTML += `<option value="${doc.id}">№${orderNum} | 👤 ${client} — ${price} грн</option>`;
             });
         });
 
