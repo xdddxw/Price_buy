@@ -573,33 +573,35 @@ position:absolute;
 left:0;
 top:0;
 width:80mm;
-background:#fff;
-color:#000;
+background:#fff !important;
+color:#000 !important;
 padding:12px;
 font-family:'Courier New',Courier,monospace;
 font-size:12px;
 line-height:1.4;
-/* Стилі для водяного знака */
-background-image: url('https://firebasestorage.googleapis.com/v0/b/smokehub-7a072.firebasestorage.app/o/logo.png?alt=media&token=placeholder'); /* Або пряме посилання на ваше лого */
-background-repeat: no-repeat;
-background-position: center center;
-background-size: 60% auto;
+/* Водяний знак у вигляді логотипу позаду */
+background-image: url('https://i.ibb.co/3ykX12L/logo.png') !important; /* Можете замінити на своє пряме посилання на картинку логотипу */
+background-repeat: no-repeat !important;
+background-position: center center !important;
+background-size: 65% auto !important;
 -webkit-print-color-adjust: exact;
 print-color-adjust: exact;
 }
 
-/* Напівпрозорий шар поверх фону для читабельності тексту */
+/* Напівпрозорий білий шар поверх водяного знаку, щоб текст був ідеально читабельним */
 #invoice-print-area::before {
 content: "";
 position: absolute;
 top: 0; left: 0; right: 0; bottom: 0;
-background: rgba(255, 255, 255, 0.92);
+background: rgba(255, 255, 255, 0.90);
 z-index: -1;
 }
 
 .inv-header{
 text-align:center;
-margin-bottom:10px
+margin-bottom:10px;
+position: relative;
+z-index: 1;
 }
 
 .inv-header h2{
@@ -616,13 +618,17 @@ font-size:10px
 .inv-divider{
 border:0;
 border-top:1px dashed #000;
-margin:8px 0
+margin:8px 0;
+position: relative;
+z-index: 1;
 }
 
 .inv-table{
 width:100%;
 border-collapse:collapse;
-margin-top:5px
+margin-top:5px;
+position: relative;
+z-index: 1;
 }
 
 .inv-table th{
@@ -643,13 +649,17 @@ vertical-align:top
 font-size:14px;
 font-weight:bold;
 text-align:right;
-margin-top:10px
+margin-top:10px;
+position: relative;
+z-index: 1;
 }
 
 .inv-footer{
 text-align:center;
 font-size:10px;
-margin-top:15px
+margin-top:15px;
+position: relative;
+z-index: 1;
 }
 }
 </style>
@@ -679,7 +689,7 @@ margin-top:15px
 
     <hr class="inv-divider">
 
-    <div style="font-size:11px;margin-bottom:5px">
+    <div style="font-size:11px;margin-bottom:5px;position:relative;z-index:1;">
         <div><b>Замовлення:</b> <span id="inv-num">#001</span></div>
         <div><b>Дата:</b> <span id="inv-date"></span></div>
         <div><b>Покупець:</b> <span id="inv-client">Роздрібний клієнт</span></div>
