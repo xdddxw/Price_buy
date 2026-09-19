@@ -133,7 +133,7 @@
         .tg-order-text { font-size: 13px; font-weight: 600; color: #e2e8f0; word-break: break-word; }
         .tg-order-price { font-size: 14px; font-weight: 800; color: #fff; margin-top: 6px; text-align: right; }
 
-        /* СТИЛЬ ДРУКУ ЧЕКА */
+        /* ЧИСТИЙ СТИЛЬ ЧЕКА */
         #invoice-print-area { display: none; }
         @media print {
             body * { visibility: hidden; }
@@ -146,7 +146,7 @@
                 width: 80mm; 
                 background: #ffffff; 
                 color: #000000; 
-                padding: 10px; 
+                padding: 12px; 
                 font-family: 'Courier New', Courier, monospace;
                 font-size: 12px;
                 line-height: 1.4;
@@ -159,7 +159,7 @@
             .inv-table th { text-align: left; font-size: 11px; border-bottom: 1px solid #000; padding-bottom: 3px; }
             .inv-table td { font-size: 11px; padding: 4px 0; border-bottom: 1px dotted #ccc; vertical-align: top; }
             .inv-total { font-size: 14px; font-weight: bold; text-align: right; margin-top: 10px; }
-            .inv-footer { text-align: center; font-size: 9px; margin-top: 15px; }
+            .inv-footer { text-align: center; font-size: 10px; margin-top: 15px; }
         }
     </style>
 </head>
@@ -173,17 +173,18 @@
     <button class="close-scanner" onclick="closeScanner()">Скасувати</button>
 </div>
 
-<!-- ШАБЛОН ДРУКУ ЧЕКА -->
+<!-- ЧИСТИЙ ШАБЛОН ДРУКУ ЧЕКА -->
 <div id="invoice-print-area">
     <div class="inv-header">
         <h2>SMOKE HUB</h2>
-        <p>ТОВАРНА НАКЛАДНА / КВИТАНЦІЯ</p>
+        <p>ТОВАРНА НАКЛАДНА</p>
     </div>
     <hr class="inv-divider">
     <div style="font-size: 11px; margin-bottom: 5px;">
         <div><b>Замовлення:</b> <span id="inv-num">#001</span></div>
         <div><b>Дата:</b> <span id="inv-date"></span></div>
         <div><b>Покупець:</b> <span id="inv-client">Роздрібний клієнт</span></div>
+        <div><b>Оплата:</b> <span id="inv-pay-method">Готівка</span></div>
     </div>
     <hr class="inv-divider">
     <table class="inv-table">
@@ -197,12 +198,10 @@
     </table>
     <hr class="inv-divider">
     <div class="inv-total">
-        ДО СПЛАТИ: <span id="inv-total">0</span>
+        ДО СПЛАТИ: <span id="inv-total">0</span> <span id="inv-currency">грн</span>
     </div>
     <div class="inv-footer">
-        Дякуємо, що обираєте Smoke Hub! 💨<br>
-        Товар обміну та поверненню не підлягає.<br>
-        Слава Україні! 🇺🇦
+        Дякуємо за покупку!
     </div>
 </div>
 
@@ -504,15 +503,15 @@
     function calc() {
         const type = document.getElementById('opType').value;
         const cat = document.getElementById('catalog').value, p = document.getElementById('pay').value, s = document.getElementById('size').value, f = document.getElementById('flavor').value, manual = document.getElementById('manualPrice').value;
-        let cur = (p === "Монобанк") ? "₴" : "zł", price = 0; 
+        let cur = (p === "Монобанк") ? "грн" : "zł", price = 0; 
 
         if (manual > 0) price = manual;
         else if (type === 'sale') {
-            if (cat === "продаж") price = (f === "ICE SHOT") ? (p === "Монобанк" ? 180 : 15) : (p === "Монобанк" ? 650 : 60);
+            if (cat === "продаж") price = (p === "Монобанк") ? (f === "ICE SHOT" ? 180 : 650) : (f === "ICE SHOT" ? 15 : 60);
             else price = (p === "Монобанк") ? (s === "2" ? 70 : 100) : (s === "2" ? 6 : 9);
         }
         
-        document.getElementById('total').innerText = `${price} ${cur === '₴' ? 'грн' : 'зл'}`;
+        document.getElementById('total').innerText = `${price} ${cur}`;
     }
 
     function toggleDebt() { document.getElementById('debtor-row').style.display = (document.getElementById('status').value === 'debt') ? 'block' : 'none'; }
@@ -571,17 +570,24 @@
         }
 
         const clientName = document.getElementById('debtorName').value || "Роздрібний клієнт";
-        const priceStr = document.getElementById('total').innerText;
+        const rawTotalText = document.getElementById('total').innerText.trim();
+        const payMethod = document.getElementById('pay').value;
+        
+        let priceNum = parseInt(rawTotalText) || 0;
+        let currencyLabel = payMethod === "Монобанк" ? "грн" : "zł";
+
+        const activeId = document.getElementById('activeTgOrderId').value;
         const tgItems = document.getElementById('activeTgOrderId').getAttribute('data-items');
         const customOrderNum = document.getElementById('activeTgOrderId').getAttribute('data-ordernum');
         
-        // Виводимо виключно чистий номер замовлення з бази (без обрізань і рандомних генераторів)
-        const invoiceNum = customOrderNum ? "#" + customOrderNum : "#SH-001";
+        const invoiceNum = customOrderNum ? "#" + customOrderNum : (activeId ? "#" + activeId.substring(0, 6).toUpperCase() : "#SH-" + Math.floor(1000 + Math.random() * 9000));
 
         document.getElementById('inv-num').innerText = invoiceNum;
         document.getElementById('inv-date').innerText = formatDate(new Date().getTime());
         document.getElementById('inv-client').innerText = clientName;
-        document.getElementById('inv-total').innerText = priceStr;
+        document.getElementById('inv-pay-method').innerText = payMethod;
+        document.getElementById('inv-total').innerText = priceNum;
+        document.getElementById('inv-currency').innerText = currencyLabel;
 
         const itemsListTable = document.getElementById('inv-items-list');
         itemsListTable.innerHTML = "";
@@ -593,7 +599,7 @@
                     itemsListTable.innerHTML += `
                         <tr>
                             <td>${index + 1}. ${good.trim()}</td>
-                            <td style="text-align: right;">${index === 0 ? priceStr : '-'}</td>
+                            <td style="text-align: right;">${index === 0 ? priceNum + ' ' + currencyLabel : '-'}</td>
                         </tr>
                     `;
                 }
@@ -603,7 +609,7 @@
             itemsListTable.innerHTML += `
                 <tr>
                     <td>1. ${fName}</td>
-                    <td style="text-align: right;">${priceStr}</td>
+                    <td style="text-align: right;">${priceNum} ${currencyLabel}</td>
                 </tr>
             `;
         }
@@ -677,9 +683,8 @@
                 const client = tg.client_name || "Клієнт";
                 const itemText = tg.items || "Товар";
                 const price = tg.total_price || 0;
-                
-                // Чітко витягуємо номер замовлення з бази даних (пріоритет полям бота)
-                const orderNum = tg.order_number || tg.number || tg.orderId || tg.id || doc.id;
+                // Чітко визначаємо номер замовлення
+                const orderNum = tg.order_number || tg.number || tg.orderId || tg.id || doc.id.substring(0, 5);
                 
                 list.innerHTML += `
                 <div class="tg-order-card" id="tg-card-${doc.id}" onclick="selectTgOrder('${doc.id}', '${client}', '${itemText.replace(/'/g, "")}', ${price}, '${orderNum}')">
