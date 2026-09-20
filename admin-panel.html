@@ -599,9 +599,7 @@ margin-top:8px;
 text-align:right
 }
 
-/* =========================================================
-   НОВИЙ БЛОК ЗАГАЛЬНИХ ЗАЛИШКІВ
-========================================================= */
+/* ЗАГАЛЬНІ ЗАЛИШКИ */
 
 .stock-summary-card{
 background:linear-gradient(
@@ -1064,10 +1062,6 @@ margin-top:15px
 
 <script>
 
-/* =========================================================
-   FIREBASE
-========================================================= */
-
 const firebaseConfig={
 apiKey:"AIzaSyAOW2GEW1McWRAzs4RLVOGHvCoAnRhgRC4",
 authDomain:"smokehub-7a072.firebaseapp.com",
@@ -1080,20 +1074,12 @@ appId:"1:563107040578:web:6379a7bc43bb7b58794cdb"
 firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
-/* =========================================================
-   GLOBALS
-========================================================= */
-
 let inventory=[];
 let cachedTgOrders={};
 let html5QrCode=null;
 let activeOrderCurrency=null;
 let activeOrderData=null;
 let savingOrder=false;
-
-/* =========================================================
-   HELPERS
-========================================================= */
 
 function escapeHtml(value){
 return String(value??"")
@@ -1147,10 +1133,6 @@ function formatMoney(value,currency){
 const number=getNumericPrice(value);
 return`${number} ${currency==="UAH"?"грн":"zł"}`;
 }
-
-/* =========================================================
-   CURRENCY
-========================================================= */
 
 function normalizeCurrency(value){
 const v=String(value??"").trim().toUpperCase();
@@ -1210,10 +1192,6 @@ if(raw.includes("карта")||raw.includes("card"))return"Карта";
 return currency==="UAH"?"Монобанк":"Карта";
 }
 
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
 function showTab(tabId,btnElement){
 document.querySelectorAll(".tab-content").forEach(t=>t.classList.remove("active-tab"));
 document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
@@ -1225,10 +1203,6 @@ if(btnElement)btnElement.classList.add("active");
 window.scrollTo(0,0);
 }
 
-/* =========================================================
-   OPERATION
-========================================================= */
-
 function toggleOpType(){
 const type=document.getElementById("opType").value;
 
@@ -1238,10 +1212,6 @@ document.getElementById("status-row").style.display=type==="sale"?"block":"none"
 
 calc();
 }
-
-/* =========================================================
-   SCANNER
-========================================================= */
 
 async function startScanner(){
 const modal=document.getElementById("scanner-modal");
@@ -1314,10 +1284,6 @@ document.getElementById("newFlavorName").focus();
 showToast("🆕 Новий штрихкод — введіть назву","var(--accent-secondary)");
 }
 }
-
-/* =========================================================
-   INVENTORY CRUD
-========================================================= */
 
 async function addFlavorToInventory(){
 try{
@@ -1417,10 +1383,6 @@ document.getElementById("saveFlavorBtn").innerText="➕ ЗБЕРЕГТИ ДАН�
 document.getElementById("cancelEditBtn").style.display="none";
 }
 
-/* =========================================================
-   CATALOG
-========================================================= */
-
 function updateFlavorList(){
 const cat=document.getElementById("catalog").value;
 const query=document.getElementById("flavorSearch").value.toLowerCase().trim();
@@ -1477,10 +1439,6 @@ box.style.display="none";
 calc();
 }
 
-/* =========================================================
-   PRICE
-========================================================= */
-
 function calc(){
 const type=document.getElementById("opType").value;
 const cat=document.getElementById("catalog").value;
@@ -1517,10 +1475,6 @@ function toggleDebt(){
 document.getElementById("debtor-row").style.display=
 document.getElementById("status").value==="debt"?"block":"none";
 }
-
-/* =========================================================
-   TELEGRAM ORDERS
-========================================================= */
 
 function selectTgOrder(id,client,itemText,price,orderNum){
 const order=cachedTgOrders[id];
@@ -1584,10 +1538,6 @@ function selectTgOrderFromDropdown(){
 const id=document.getElementById("tgOrderSelect").value;
 if(id)selectTgOrderById(id);
 }
-
-/* =========================================================
-   PRODUCT MATCHING
-========================================================= */
 
 function normalizeProductName(text){
 return String(text||"")
@@ -1677,10 +1627,6 @@ qty:1
 return Object.values(deductions);
 }
 
-/* =========================================================
-   INVENTORY DEDUCTION
-========================================================= */
-
 async function deductInventoryForSale(tgItems,manualFlavor){
 
 const deductions=buildInventoryDeductions(tgItems,manualFlavor);
@@ -1730,10 +1676,6 @@ lastSale:Date.now()
 return deductions;
 }
 
-/* =========================================================
-   RESTORE
-========================================================= */
-
 async function restoreInventory(items){
 if(!Array.isArray(items)||!items.length)return;
 
@@ -1777,23 +1719,21 @@ const n=String(name||"")
 
 /*
 ВАЖЛИВО:
-спочатку перевіряємо конкретні групи Chaser,
-а вже потім "поди", щоб "Chaser For Pods"
-не потрапив у групу "Поди".
+Спочатку конкретні Chaser,
+потім Поди,
+і тільки після цього ElfLiq.
 */
 
 if(
-n.includes("chaser lux")||
-n.includes("elfliq lux")
+n.includes("chaser black")
 ){
-return"Elfliq Chaser Lux";
+return"Chaser Black";
 }
 
 if(
-n.includes("chaser black")||
-n.includes("elfliq black")
+n.includes("chaser lux")
 ){
-return"Elfliq Chaser Black";
+return"Chaser Lux";
 }
 
 if(
@@ -1801,14 +1741,13 @@ n.includes("chaser for pods")||
 n.includes("chaser for pod")||
 n.includes("for pods")
 ){
-return"Elfliq Chaser For Pods";
+return"Chaser For pods";
 }
 
 if(
-n.includes("chaser special")||
-n.includes("elfliq special")
+n.includes("chaser special")
 ){
-return"Elfliq Chaser Special";
+return"Chaser special";
 }
 
 if(
@@ -1818,11 +1757,12 @@ n.includes("chaser you and me")||
 n.includes("you&me")||
 n.includes("you & me")
 ){
-return"Elfliq Chaser You&Me";
+return"Chaser you&me";
 }
 
 if(
 n.includes("pod")||
+n.includes("pods")||
 n.includes("под")||
 n.includes("поди")
 ){
@@ -1830,46 +1770,64 @@ return"Поди";
 }
 
 if(
-n.includes("картридж")||
-n.includes("cartridge")
+n.includes("elfliq")||
+n.includes("elf liq")
 ){
-return"Картриджі";
+return"ElfLiq";
 }
 
-return"Інше";
+return null;
 }
 
 function renderStockSummary(){
 
 const summary=document.getElementById("stockSummary");
+
 if(!summary)return;
 
+/*
+РІВНО 7 КАТЕГОРІЙ
+*/
+
 const groups={
-"Elfliq Chaser Lux":0,
-"Elfliq Chaser Black":0,
-"Elfliq Chaser For Pods":0,
-"Elfliq Chaser Special":0,
-"Elfliq Chaser You&Me":0,
-"Поди":0,
-"Картриджі":0,
-"Інше":0
+"ElfLiq":0,
+"Chaser Black":0,
+"Chaser Lux":0,
+"Chaser For pods":0,
+"Chaser special":0,
+"Chaser you&me":0,
+"Поди":0
 };
 
+/*
+Додаємо ВСІ SKU до відповідної категорії.
+Наприклад:
+Lux Blue 5
+Lux Strawberry 8
+Lux Ice 12
+=
+Chaser Lux 25
+*/
+
 inventory.forEach(item=>{
+
 const qty=parseInt(item.qty)||0;
 const group=getStockGroup(item.name);
+
+if(group&&Object.prototype.hasOwnProperty.call(groups,group)){
 groups[group]+=qty;
+}
+
 });
 
 const icons={
-"Elfliq Chaser Lux":"🧪",
-"Elfliq Chaser Black":"🧪",
-"Elfliq Chaser For Pods":"🧪",
-"Elfliq Chaser Special":"🧪",
-"Elfliq Chaser You&Me":"🧪",
-"Поди":"🔋",
-"Картриджі":"🔄",
-"Інше":"📦"
+"ElfLiq":"🧪",
+"Chaser Black":"🧪",
+"Chaser Lux":"🧪",
+"Chaser For pods":"🧪",
+"Chaser special":"🧪",
+"Chaser you&me":"🧪",
+"Поди":"🔋"
 };
 
 summary.innerHTML="";
@@ -1885,6 +1843,7 @@ quantityClass="stock-low";
 }
 
 const card=document.createElement("div");
+
 card.className="stock-summary-card";
 
 card.innerHTML=`
@@ -1895,6 +1854,7 @@ ${icons[name]}
 </div>
 
 <div>
+
 <div class="stock-summary-name">
 ${escapeHtml(name)}
 </div>
@@ -1902,6 +1862,7 @@ ${escapeHtml(name)}
 <div class="stock-summary-sub">
 Загальний залишок
 </div>
+
 </div>
 
 </div>
@@ -1913,12 +1874,9 @@ ${qty}
 `;
 
 summary.appendChild(card);
+
 });
 }
-
-/* =========================================================
-   PDF INVOICE
-========================================================= */
 
 async function printInvoice(){
 
@@ -2044,10 +2002,6 @@ console.error(err);
 showToast("❌ Помилка створення PDF","var(--danger)");
 }
 }
-
-/* =========================================================
-   SAVE ORDER
-========================================================= */
 
 async function saveOrder(){
 
@@ -2194,10 +2148,6 @@ button.disabled=false;
 }
 }
 
-/* =========================================================
-   DELETE ORDER
-========================================================= */
-
 async function deleteOrder(id){
 
 if(!confirm("Видалити транзакцію?"))return;
@@ -2231,10 +2181,6 @@ showToast("❌ Не вдалося видалити транзакцію","var(-
 }
 }
 
-/* =========================================================
-   DEBT
-========================================================= */
-
 async function payDebt(id){
 
 try{
@@ -2249,18 +2195,12 @@ showToast("✅ Борг оплачено");
 }catch(error){
 
 console.error(error);
-showToast("❌ Помилка","var(--danger)");
+showToast("❌ Помилка","var(--danger");
 
 }
 }
-
-/* =========================================================
-   FIREBASE SYNC
-========================================================= */
 
 function sync(){
-
-/* TELEGRAM */
 
 db.collection("tg_orders")
 .where("status","==","new")
@@ -2356,8 +2296,6 @@ showToast("❌ Помилка Telegram-замовлень","var(--danger)");
 
 });
 
-/* INVENTORY */
-
 db.collection("inventory")
 .orderBy("name")
 .onSnapshot(snap=>{
@@ -2381,7 +2319,11 @@ inventory.push(prepared);
 const isSale=item.type==="продаж";
 const qty=parseInt(item.qty)||0;
 
-const stockColor=qty<=0?"var(--danger)":qty<=5?"var(--warning)":"var(--success)";
+const stockColor=qty<=0
+?"var(--danger)"
+:qty<=5
+?"var(--warning)"
+:"var(--success)";
 
 const wrapper=document.createElement("div");
 
@@ -2474,10 +2416,10 @@ list.appendChild(wrapper);
 });
 
 /*
-ВАЖЛИВО:
-спочатку будуємо загальний підсумок,
-потім звичайний список.
+ОНОВЛЮЄМО ЗАГАЛЬНИЙ ЗАЛИШОК
+КОЖНОГО РАЗУ, КОЛИ FIREBASE ЗМІНЮЄ inventory.
 */
+
 renderStockSummary();
 updateFlavorList();
 
@@ -2488,8 +2430,6 @@ console.error("Inventory listener:",error);
 showToast("❌ Помилка завантаження складу","var(--danger)");
 
 });
-
-/* ORDERS */
 
 db.collection("orders")
 .orderBy("date","desc")
@@ -2735,10 +2675,6 @@ showToast("❌ Помилка завантаження архіву","var(--dang
 });
 
 }
-
-/* =========================================================
-   START
-========================================================= */
 
 document.addEventListener("DOMContentLoaded",()=>{
 
