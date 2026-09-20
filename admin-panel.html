@@ -43,7 +43,10 @@
 --radius-sm:10px
 }
 
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+*{
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent
+}
 
 body{
 margin:0;
@@ -63,8 +66,14 @@ from{opacity:0;transform:translateY(10px)}
 to{opacity:1;transform:translateY(0)}
 }
 
-.tab-content{display:none;animation:fadeIn .3s ease-out forwards}
-.tab-content.active-tab{display:block}
+.tab-content{
+display:none;
+animation:fadeIn .3s ease-out forwards
+}
+
+.tab-content.active-tab{
+display:block
+}
 
 .dashboard-header{
 display:grid;
@@ -149,7 +158,10 @@ margin-bottom:2px;
 transition:.3s
 }
 
-.tab-btn.active{color:var(--accent-primary)}
+.tab-btn.active{
+color:var(--accent-primary)
+}
+
 .tab-btn.active i{
 transform:translateY(-3px) scale(1.1);
 text-shadow:0 0 12px var(--accent-glow)
@@ -165,8 +177,16 @@ border:1px solid var(--border-color);
 box-shadow:0 4px 24px rgba(0,0,0,.15)
 }
 
-.form-row{margin-bottom:18px;position:relative}
-.grid-2-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-row{
+margin-bottom:18px;
+position:relative
+}
+
+.grid-2-col{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px
+}
 
 label{
 display:block;
@@ -213,8 +233,7 @@ font-weight:800;
 margin:24px 0;
 background:linear-gradient(to right,#fff,#cbd5e1);
 -webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-text-shadow:0 4px 24px rgba(255,255,255,.1)
+-webkit-text-fill-color:transparent
 }
 
 .btn-submit{
@@ -237,8 +256,7 @@ gap:8px
 }
 
 .btn-submit:active{
-transform:scale(.97);
-box-shadow:0 4px 10px var(--accent-glow)
+transform:scale(.97)
 }
 
 .btn-submit:disabled{
@@ -274,8 +292,17 @@ padding-bottom:16px;
 border-bottom:1px solid rgba(255,255,255,.05)
 }
 
-.admin-header h3{margin:0;font-size:18px;color:#fff}
-.admin-header p{margin:6px 0 0;font-size:12px;color:var(--text-p)}
+.admin-header h3{
+margin:0;
+font-size:18px;
+color:#fff
+}
+
+.admin-header p{
+margin:6px 0 0;
+font-size:12px;
+color:var(--text-p)
+}
 
 .list-item{
 background:var(--card-solid);
@@ -410,7 +437,10 @@ font-size:15px;
 color:#fff
 }
 
-.day-totals{text-align:right}
+.day-totals{
+text-align:right
+}
+
 .day-totals div{
 font-size:13px;
 font-weight:700;
@@ -467,7 +497,7 @@ backdrop-filter:blur(10px);
 flex-direction:column;
 align-items:center;
 justify-content:center;
-padding: 20px;
+padding:20px
 }
 
 #reader{
@@ -476,10 +506,14 @@ max-width:400px;
 border-radius:16px;
 overflow:hidden;
 border:2px solid var(--accent-secondary);
-background: #000;
+background:#000
 }
 
-#reader video{border-radius:16px; width: 100% !important; object-fit: cover;}
+#reader video{
+border-radius:16px;
+width:100%!important;
+object-fit:cover
+}
 
 .close-scanner{
 margin-top:24px;
@@ -489,8 +523,7 @@ border:1px solid rgba(255,255,255,.2);
 border-radius:var(--radius-md);
 color:white;
 font-weight:bold;
-font-size:16px;
-cursor: pointer;
+font-size:16px
 }
 
 .tg-orders-container{
@@ -518,7 +551,9 @@ padding-bottom:8px;
 scroll-snap-type:x mandatory
 }
 
-.tg-orders-scroll::-webkit-scrollbar{display:none}
+.tg-orders-scroll::-webkit-scrollbar{
+display:none
+}
 
 .tg-order-card{
 background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(30,58,138,.4));
@@ -564,36 +599,116 @@ margin-top:8px;
 text-align:right
 }
 
+/* =========================================================
+   НОВИЙ БЛОК ЗАГАЛЬНИХ ЗАЛИШКІВ
+========================================================= */
+
+.stock-summary-card{
+background:linear-gradient(
+145deg,
+rgba(39,39,42,.9),
+rgba(24,24,27,.95)
+);
+border:1px solid var(--border-color);
+border-radius:var(--radius-md);
+padding:14px;
+margin-bottom:10px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+box-shadow:0 4px 18px rgba(0,0,0,.15)
+}
+
+.stock-summary-left{
+display:flex;
+align-items:center;
+gap:12px;
+min-width:0
+}
+
+.stock-summary-icon{
+width:42px;
+height:42px;
+border-radius:12px;
+background:rgba(139,92,246,.12);
+border:1px solid rgba(139,92,246,.2);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:20px;
+flex-shrink:0
+}
+
+.stock-summary-name{
+color:#fff;
+font-size:14px;
+font-weight:700
+}
+
+.stock-summary-sub{
+color:var(--text-p);
+font-size:10px;
+margin-top:4px
+}
+
+.stock-summary-qty{
+font-size:20px;
+font-weight:800;
+white-space:nowrap
+}
+
+.stock-summary-qty span{
+font-size:10px;
+font-weight:600;
+color:var(--text-p);
+margin-left:2px
+}
+
+.stock-good{
+color:var(--success)
+}
+
+.stock-low{
+color:var(--warning)
+}
+
+.stock-empty{
+color:var(--danger)
+}
+
 #invoice-print-area{
-position: fixed;
-left: -9999px;
-top: 0;
-width: 80mm;
-background: #fff;
-color: #000;
-padding: 16px;
-font-family: 'Courier New', Courier, monospace;
-font-size: 12px;
-line-height: 1.4;
-z-index: -9999;
+position:fixed;
+left:-9999px;
+top:0;
+width:80mm;
+background:#fff;
+color:#000;
+padding:16px;
+font-family:'Courier New',Courier,monospace;
+font-size:12px;
+line-height:1.4;
+z-index:-9999
 }
 
-#invoice-print-area::before {
-content: "";
-position: absolute;
-top: 0; left: 0; right: 0; bottom: 0;
-background-image: url('https://i.ibb.co/3ykX12L/logo.png');
-background-repeat: no-repeat;
-background-position: center center;
-background-size: 60% auto;
-opacity: 0.12;
-z-index: 0;
-pointer-events: none;
+#invoice-print-area::before{
+content:"";
+position:absolute;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background-image:url('https://i.ibb.co/3ykX12L/logo.png');
+background-repeat:no-repeat;
+background-position:center center;
+background-size:60% auto;
+opacity:.12;
+z-index:0;
+pointer-events:none
 }
 
-.inv-header, .inv-divider, .inv-table, .inv-total, .inv-footer {
-position: relative;
-z-index: 1;
+.inv-header,.inv-divider,.inv-table,.inv-total,.inv-footer{
+position:relative;
+z-index:1
 }
 
 .inv-header{
@@ -658,411 +773,292 @@ margin-top:15px
 <div id="toast">✅ Операцію збережено!</div>
 
 <div id="scanner-modal">
-    <div style="color:white;font-size:18px;font-weight:bold;margin-bottom:16px;text-align:center;">
-        Наведіть камеру на штрих-код
-    </div>
-
-    <div id="reader"></div>
-
-    <button class="close-scanner" onclick="closeScanner()">
-        Скасувати
-    </button>
+<div style="color:white;font-size:18px;font-weight:bold;margin-bottom:16px;text-align:center">
+Наведіть камеру на штрих-код
+</div>
+<div id="reader"></div>
+<button class="close-scanner" onclick="closeScanner()">Скасувати</button>
 </div>
 
 <div id="invoice-print-area">
-    <div class="inv-header">
-        <h2>SMOKE HUB</h2>
-        <p>ТОВАРНА НАКЛАДНА</p>
-    </div>
-
-    <hr class="inv-divider">
-
-    <div style="font-size:11px;margin-bottom:5px">
-        <div><b>Замовлення:</b> <span id="inv-num">#001</span></div>
-        <div><b>Дата:</b> <span id="inv-date"></span></div>
-        <div><b>Покупець:</b> <span id="inv-client">Роздрібний клієнт</span></div>
-        <div><b>Оплата:</b> <span id="inv-pay-method">Готівка</span></div>
-    </div>
-
-    <hr class="inv-divider">
-
-    <table class="inv-table">
-        <thead>
-            <tr>
-                <th>Найменування товару</th>
-                <th style="text-align:right">Сума</th>
-            </tr>
-        </thead>
-
-        <tbody id="inv-items-list"></tbody>
-    </table>
-
-    <hr class="inv-divider">
-
-    <div class="inv-total">
-        ДО СПЛАТИ:
-        <span id="inv-total">0</span>
-        <span id="inv-currency">грн</span>
-    </div>
-
-    <div class="inv-footer">
-        Дякуємо за покупку!
-    </div>
+<div class="inv-header">
+<h2>SMOKE HUB</h2>
+<p>ТОВАРНА НАКЛАДНА</p>
+</div>
+<hr class="inv-divider">
+<div style="font-size:11px;margin-bottom:5px">
+<div><b>Замовлення:</b> <span id="inv-num">#001</span></div>
+<div><b>Дата:</b> <span id="inv-date"></span></div>
+<div><b>Покупець:</b> <span id="inv-client">Роздрібний клієнт</span></div>
+<div><b>Оплата:</b> <span id="inv-pay-method">Готівка</span></div>
+</div>
+<hr class="inv-divider">
+<table class="inv-table">
+<thead>
+<tr>
+<th>Найменування товару</th>
+<th style="text-align:right">Сума</th>
+</tr>
+</thead>
+<tbody id="inv-items-list"></tbody>
+</table>
+<hr class="inv-divider">
+<div class="inv-total">
+ДО СПЛАТИ:
+<span id="inv-total">0</span>
+<span id="inv-currency">грн</span>
+</div>
+<div class="inv-footer">Дякуємо за покупку!</div>
 </div>
 
 <div class="dashboard-header">
-    <div class="balance-card">
-        <span>💰 PLN (КАСА)</span>
-        <div id="totalPLN">0 ZŁ</div>
-    </div>
-
-    <div class="balance-card">
-        <span>💳 UAH (КАСА)</span>
-        <div id="totalUAH">0 ₴</div>
-    </div>
+<div class="balance-card">
+<span>💰 PLN (КАСА)</span>
+<div id="totalPLN">0 ZŁ</div>
+</div>
+<div class="balance-card">
+<span>💳 UAH (КАСА)</span>
+<div id="totalUAH">0 ₴</div>
+</div>
 </div>
 
 <div id="tab-new" class="tab-content active-tab">
 
-    <div id="tg-orders-section" class="tg-orders-container">
-        <div class="tg-orders-header">
-            ✈️ НОВІ ЗАМОВЛЕННЯ (TELEGRAM)
-        </div>
+<div id="tg-orders-section" class="tg-orders-container">
+<div class="tg-orders-header">✈️ НОВІ ЗАМОВЛЕННЯ (TELEGRAM)</div>
+<div class="tg-orders-scroll" id="tg-orders-list"></div>
+</div>
 
-        <div class="tg-orders-scroll" id="tg-orders-list"></div>
-    </div>
+<input type="hidden" id="activeTgOrderId">
 
-    <input type="hidden" id="activeTgOrderId">
+<div class="main-form">
 
-    <div class="main-form">
+<div class="form-row">
+<label>Тип операції</label>
+<select id="opType" onchange="toggleOpType()">
+<option value="sale">💳 Продаж товару</option>
+<option value="expense">💸 Витрата (закупка/інше)</option>
+</select>
+</div>
 
-        <div class="form-row">
-            <label>Тип операції</label>
+<div id="sale-fields">
 
-            <select id="opType" onchange="toggleOpType()">
-                <option value="sale">💳 Продаж товару</option>
-                <option value="expense">💸 Витрата (закупка/інше)</option>
-            </select>
-        </div>
+<div class="form-row">
+<label>📋 Вибрати з нових замовлень Telegram</label>
+<select id="tgOrderSelect" onchange="selectTgOrderFromDropdown()">
+<option value="" disabled selected>-- Виберіть замовлення або вкажіть вручну --</option>
+</select>
+</div>
 
-        <div id="sale-fields">
+<div class="form-row">
+<label>Каталог</label>
+<select id="catalog" onchange="updateFlavorList()">
+<option value="заливка">🧪 Заливка рідини</option>
+<option value="продаж">📦 Готовий товар</option>
+</select>
+</div>
 
-            <div class="form-row">
-                <label>📋 Вибрати з нових замовлень Telegram</label>
+<div class="form-row">
+<label>Пошук та вибір товару</label>
+<input type="text" id="flavorSearch" placeholder="🔍 Пошук по назві..." oninput="updateFlavorList()">
+<select id="flavor" onchange="handleFlavor()" style="margin-top:12px"></select>
+</div>
 
-                <select id="tgOrderSelect" onchange="selectTgOrderFromDropdown()">
-                    <option value="" disabled selected>
-                        -- Виберіть замовлення або вкажіть вручну --
-                    </option>
-                </select>
-            </div>
+<div id="location-box">
+📍 <b>Локація:</b>
+<span id="loc-text" style="color:var(--accent-secondary);font-weight:700;margin-left:4px"></span>
+</div>
 
-            <div class="form-row">
-                <label>Каталог</label>
+<div class="form-row" id="vol-box">
+<label>Об'єм</label>
+<select id="size" onchange="calc()">
+<option value="2">2 ml</option>
+<option value="3">3 ml</option>
+</select>
+</div>
 
-                <select id="catalog" onchange="updateFlavorList()">
-                    <option value="заливка">🧪 Заливка рідини</option>
-                    <option value="продаж">📦 Готовий товар</option>
-                </select>
-            </div>
+</div>
 
-            <div class="form-row">
-                <label>Пошук та вибір товару</label>
+<div id="expense-fields" style="display:none">
+<div class="form-row">
+<label>Назва витрати</label>
+<input type="text" id="expName" placeholder="Наприклад: Закупка жижі">
+</div>
+</div>
 
-                <input
-                    type="text"
-                    id="flavorSearch"
-                    placeholder="🔍 Пошук по назві..."
-                    oninput="updateFlavorList()"
-                >
+<div class="form-row">
+<label>Валюта та оплата</label>
+<select id="pay" onchange="calc()">
+<option value="Готівка">💵 Готівка PLN</option>
+<option value="Карта">💳 Карта PLN</option>
+<option value="Монобанк">🐈 Mono UAH</option>
+</select>
+</div>
 
-                <select
-                    id="flavor"
-                    onchange="handleFlavor()"
-                    style="margin-top:12px"
-                ></select>
-            </div>
+<div class="form-row" id="status-row">
+<label>Статус</label>
+<select id="status" onchange="toggleDebt()">
+<option value="paid">✅ Оплачено одразу</option>
+<option value="debt">🚩 В борг</option>
+</select>
+</div>
 
-            <div id="location-box">
-                📍 <b>Локація:</b>
-                <span
-                    id="loc-text"
-                    style="color:var(--accent-secondary);font-weight:700;margin-left:4px"
-                ></span>
-            </div>
+<div id="debtor-row" class="form-row" style="display:none">
+<label>Ім'я клієнта / боржника</label>
+<input type="text" id="debtorName" placeholder="Введіть ім'я">
+</div>
 
-            <div class="form-row" id="vol-box">
-                <label>Об'єм</label>
+<div class="form-row">
+<label>Загальна сума</label>
+<input type="number" id="manualPrice" oninput="calc()" placeholder="Введіть суму вручну">
+</div>
 
-                <select id="size" onchange="calc()">
-                    <option value="2">2 ml</option>
-                    <option value="3">3 ml</option>
-                </select>
-            </div>
+<div class="price-tag" id="total">0 zł</div>
 
-        </div>
+<button class="btn-submit" id="saveOrderBtn" onclick="saveOrder()">
+ПІДТВЕРДИТИ ТА ЗБЕРЕГТИ
+</button>
 
-        <div id="expense-fields" style="display:none">
+<button class="btn-submit btn-invoice" onclick="printInvoice()">
+🧾 ЗБЕРЕГТИ НАКЛАДНУ (PDF)
+</button>
 
-            <div class="form-row">
-                <label>Назва витрати</label>
-
-                <input
-                    type="text"
-                    id="expName"
-                    placeholder="Наприклад: Закупка жижі"
-                >
-            </div>
-
-        </div>
-
-        <div class="form-row">
-            <label>Валюта та оплата</label>
-
-            <select id="pay" onchange="calc()">
-                <option value="Готівка">💵 Готівка PLN</option>
-                <option value="Карта">💳 Карта PLN</option>
-                <option value="Монобанк">🐈 Mono UAH</option>
-            </select>
-        </div>
-
-        <div class="form-row" id="status-row">
-            <label>Статус</label>
-
-            <select id="status" onchange="toggleDebt()">
-                <option value="paid">✅ Оплачено одразу</option>
-                <option value="debt">🚩 В борг</option>
-            </select>
-        </div>
-
-        <div id="debtor-row" class="form-row" style="display:none">
-            <label>Ім'я клієнта / боржника</label>
-
-            <input
-                type="text"
-                id="debtorName"
-                placeholder="Введіть ім'я"
-            >
-        </div>
-
-        <div class="form-row">
-            <label>Загальна сума</label>
-
-            <input
-                type="number"
-                id="manualPrice"
-                oninput="calc()"
-                placeholder="Введіть суму вручну"
-            >
-        </div>
-
-        <div class="price-tag" id="total">0 zł</div>
-
-        <button
-            class="btn-submit"
-            id="saveOrderBtn"
-            onclick="saveOrder()"
-        >
-            ПІДТВЕРДИТИ ТА ЗБЕРЕГТИ
-        </button>
-
-        <button
-            class="btn-submit btn-invoice"
-            onclick="printInvoice()"
-        >
-            🧾 ЗБЕРЕГТИ НАКЛАДНУ (PDF)
-        </button>
-
-    </div>
+</div>
 </div>
 
 <div id="tab-admin" class="tab-content">
 
-    <div class="admin-panel">
+<div class="admin-panel">
 
-        <div class="admin-header">
-            <h3 id="adminFormTitle">📦 Нова поставка / Товар</h3>
-            <p id="adminFormSub">
-                Скануйте штрих-код або введіть вручну
-            </p>
-        </div>
+<div class="admin-header">
+<h3 id="adminFormTitle">📦 Нова поставка / Товар</h3>
+<p id="adminFormSub">Скануйте штрих-код або введіть вручну</p>
+</div>
 
-        <input type="hidden" id="editId">
+<input type="hidden" id="editId">
 
-        <div class="form-row" style="display:flex;gap:10px">
+<div class="form-row" style="display:flex;gap:10px">
+<div style="flex:1">
+<label>Штрих-код</label>
+<input type="text" id="newBarcode" placeholder="EAN/UPC...">
+</div>
+<div style="display:flex;align-items:flex-end">
+<button class="btn-submit btn-scanner" style="width:60px;height:56px" onclick="startScanner()">📷</button>
+</div>
+</div>
 
-            <div style="flex:1">
-                <label>Штрих-код</label>
+<div class="form-row">
+<label>Категорія товару</label>
+<select id="newFlavorType">
+<option value="заливка">🧪 Заливка рідини</option>
+<option value="продаж">📦 Готовий товар</option>
+</select>
+</div>
 
-                <input
-                    type="text"
-                    id="newBarcode"
-                    placeholder="EAN/UPC..."
-                >
-            </div>
+<div class="form-row">
+<label>Назва позиції</label>
+<input type="text" id="newFlavorName" placeholder="Введіть назву...">
+</div>
 
-            <div style="display:flex;align-items:flex-end">
-                <button
-                    class="btn-submit btn-scanner"
-                    style="width:60px;height:56px"
-                    onclick="startScanner()"
-                >
-                    📷
-                </button>
-            </div>
+<div class="grid-2-col">
+<div class="form-row">
+<label>Локація</label>
+<input type="text" id="newLoc" placeholder="Де лежить?">
+</div>
+<div class="form-row">
+<label>Кількість (шт)</label>
+<input type="number" id="newQty" value="10">
+</div>
+</div>
 
-        </div>
+<button class="btn-submit" id="saveFlavorBtn" onclick="addFlavorToInventory()">
+➕ ЗБЕРЕГТИ ДАНІ
+</button>
 
-        <div class="form-row">
-            <label>Категорія товару</label>
+<button class="btn-submit btn-cancel" id="cancelEditBtn" style="display:none" onclick="cancelEdit()">
+СКАСУВАТИ РЕДАГУВАННЯ
+</button>
 
-            <select id="newFlavorType">
-                <option value="заливка">🧪 Заливка рідини</option>
-                <option value="продаж">📦 Готовий товар</option>
-            </select>
-        </div>
+</div>
 
-        <div class="form-row">
-            <label>Назва позиції</label>
+<h3 style="margin:32px 0 12px 4px;font-size:12px;color:var(--text-p);letter-spacing:1px">
+📦 ЗАЛИШКИ ПО ВИДАХ
+</h3>
 
-            <input
-                type="text"
-                id="newFlavorName"
-                placeholder="Введіть назву..."
-            >
-        </div>
+<div id="stockSummary"></div>
 
-        <div class="grid-2-col">
+<h3 style="margin:32px 0 12px 4px;font-size:12px;color:var(--text-p);letter-spacing:1px">
+📋 УСІ ПОЗИЦІЇ
+</h3>
 
-            <div class="form-row">
-                <label>Локація</label>
-
-                <input
-                    type="text"
-                    id="newLoc"
-                    placeholder="Де лежить?"
-                >
-            </div>
-
-            <div class="form-row">
-                <label>Кількість (шт)</label>
-
-                <input
-                    type="number"
-                    id="newQty"
-                    value="10"
-                >
-            </div>
-
-        </div>
-
-        <button
-            class="btn-submit"
-            id="saveFlavorBtn"
-            onclick="addFlavorToInventory()"
-        >
-            ➕ ЗБЕРЕГТИ ДАНІ
-        </button>
-
-        <button
-            class="btn-submit btn-cancel"
-            id="cancelEditBtn"
-            style="display:none"
-            onclick="cancelEdit()"
-        >
-            СКАСУВАТИ РЕДАГУВАННЯ
-        </button>
-
-    </div>
-
-    <h3 style="margin:32px 0 12px 4px;font-size:12px;color:var(--text-p);letter-spacing:1px">
-        📋 АКТУАЛЬНІ ЗАЛИШКИ
-    </h3>
-
-    <div id="inventoryList"></div>
+<div id="inventoryList"></div>
 
 </div>
 
 <div id="tab-stats" class="tab-content">
+<div class="stats-card">
 
-    <div class="stats-card">
+<h3 style="margin:0 0 16px;font-size:12px;color:var(--text-p);letter-spacing:1px">
+📊 ОГЛЯД ЗА 7 ДНІВ
+</h3>
 
-        <h3 style="margin:0 0 16px;font-size:12px;color:var(--text-p);letter-spacing:1px">
-            📊 ОГЛЯД ЗА 7 ДНІВ
-        </h3>
+<div class="stats-grid">
+<div class="stat-item">
+<span class="stat-val" id="st-sales-pln">0</span>
+<span class="stat-label">Продажі PLN</span>
+</div>
+<div class="stat-item">
+<span class="stat-val" id="st-sales-uah">0</span>
+<span class="stat-label">Продажі UAH</span>
+</div>
+<div class="stat-item">
+<span class="stat-val" style="color:var(--danger)" id="st-exp-pln">0</span>
+<span class="stat-label">Витрати PLN</span>
+</div>
+<div class="stat-item">
+<span class="stat-val" style="color:var(--danger)" id="st-exp-uah">0</span>
+<span class="stat-label">Витрати UAH</span>
+</div>
+</div>
 
-        <div class="stats-grid">
+<h3 style="margin:32px 0 16px;font-size:12px;color:var(--text-p);letter-spacing:1px">
+📅 ДЕННА СТАТИСТИКА
+</h3>
 
-            <div class="stat-item">
-                <span class="stat-val" id="st-sales-pln">0</span>
-                <span class="stat-label">Продажі PLN</span>
-            </div>
+<div id="dailyStatsList"></div>
 
-            <div class="stat-item">
-                <span class="stat-val" id="st-sales-uah">0</span>
-                <span class="stat-label">Продажі UAH</span>
-            </div>
-
-            <div class="stat-item">
-                <span
-                    class="stat-val"
-                    style="color:var(--danger)"
-                    id="st-exp-pln"
-                >0</span>
-
-                <span class="stat-label">Витрати PLN</span>
-            </div>
-
-            <div class="stat-item">
-                <span
-                    class="stat-val"
-                    style="color:var(--danger)"
-                    id="st-exp-uah"
-                >0</span>
-
-                <span class="stat-label">Витрати UAH</span>
-            </div>
-
-        </div>
-
-        <h3 style="margin:32px 0 16px;font-size:12px;color:var(--text-p);letter-spacing:1px">
-            📅 ДЕННА СТАТИСТИКА
-        </h3>
-
-        <div id="dailyStatsList"></div>
-
-    </div>
+</div>
 </div>
 
 <div id="tab-debts" class="tab-content">
-    <div id="debtList"></div>
+<div id="debtList"></div>
 </div>
 
 <div id="tab-history" class="tab-content">
-    <div id="logs"></div>
+<div id="logs"></div>
 </div>
 
 <nav class="bottom-nav">
 
-    <button class="tab-btn active" onclick="showTab('new',this)">
-        <i>💸</i>КАСА
-    </button>
+<button class="tab-btn active" onclick="showTab('new',this)">
+<i>💸</i>КАСА
+</button>
 
-    <button class="tab-btn" onclick="showTab('history',this)">
-        <i>📜</i>АРХІВ
-    </button>
+<button class="tab-btn" onclick="showTab('history',this)">
+<i>📜</i>АРХІВ
+</button>
 
-    <button class="tab-btn" onclick="showTab('debts',this)">
-        <i>🚩</i>БОРГИ
-    </button>
+<button class="tab-btn" onclick="showTab('debts',this)">
+<i>🚩</i>БОРГИ
+</button>
 
-    <button class="tab-btn" onclick="showTab('admin',this)">
-        <i>📦</i>СКЛАД
-    </button>
+<button class="tab-btn" onclick="showTab('admin',this)">
+<i>📦</i>СКЛАД
+</button>
 
-    <button class="tab-btn" onclick="showTab('stats',this)">
-        <i>📊</i>ЗВІТ
-    </button>
+<button class="tab-btn" onclick="showTab('stats',this)">
+<i>📊</i>ЗВІТ
+</button>
 
 </nav>
 
@@ -1072,2620 +1068,1686 @@ margin-top:15px
    FIREBASE
 ========================================================= */
 
-const firebaseConfig = {
-    apiKey: "AIzaSyAOW2GEW1McWRAzs4RLVOGHvcoAnRhgRC4",
-    authDomain: "smokehub-7a072.firebaseapp.com",
-    projectId: "smokehub-7a072",
-    storageBucket: "smokehub-7a072.firebasestorage.app",
-    messagingSenderId: "563107040578",
-    appId: "1:563107040578:web:6379a7bc43bb7b58794cdb"
+const firebaseConfig={
+apiKey:"AIzaSyAOW2GEW1McWRAzs4RLVOGHvCoAnRhgRC4",
+authDomain:"smokehub-7a072.firebaseapp.com",
+projectId:"smokehub-7a072",
+storageBucket:"smokehub-7a072.firebasestorage.app",
+messagingSenderId:"563107040578",
+appId:"1:563107040578:web:6379a7bc43bb7b58794cdb"
 };
 
 firebase.initializeApp(firebaseConfig);
-
-const db = firebase.firestore();
-
+const db=firebase.firestore();
 
 /* =========================================================
-   GLOBAL VARIABLES
+   GLOBALS
 ========================================================= */
 
-let inventory = [];
-let cachedTgOrders = {};
-let html5QrCode = null;
-
-let activeOrderCurrency = null;
-let activeOrderData = null;
-
-let savingOrder = false;
-
+let inventory=[];
+let cachedTgOrders={};
+let html5QrCode=null;
+let activeOrderCurrency=null;
+let activeOrderData=null;
+let savingOrder=false;
 
 /* =========================================================
-   BASIC HELPERS
+   HELPERS
 ========================================================= */
 
-function escapeHtml(value) {
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+function escapeHtml(value){
+return String(value??"")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 }
 
-
-function showToast(message, color = "var(--success)") {
-
-    const toast = document.getElementById("toast");
-
-    toast.innerText = message;
-    toast.style.backgroundColor = color;
-
-    toast.className = "show";
-
-    if (navigator.vibrate) {
-        navigator.vibrate(50);
-    }
-
-    setTimeout(() => {
-        toast.className = toast.className.replace("show", "");
-    }, 3000);
+function showToast(message,color="var(--success)"){
+const toast=document.getElementById("toast");
+toast.innerText=message;
+toast.style.backgroundColor=color;
+toast.className="show";
+if(navigator.vibrate)navigator.vibrate(50);
+setTimeout(()=>toast.className="",3000);
 }
 
-
-function getTimestamp(value) {
-
-    if (!value) return 0;
-
-    if (typeof value === "number") {
-        return value;
-    }
-
-    if (value && typeof value.toMillis === "function") {
-        return value.toMillis();
-    }
-
-    if (value instanceof Date) {
-        return value.getTime();
-    }
-
-    const parsed = new Date(value).getTime();
-
-    return isNaN(parsed) ? 0 : parsed;
+function getTimestamp(value){
+if(!value)return 0;
+if(typeof value==="number")return value;
+if(value&&typeof value.toMillis==="function")return value.toMillis();
+if(value instanceof Date)return value.getTime();
+const parsed=new Date(value).getTime();
+return isNaN(parsed)?0:parsed;
 }
 
-
-function formatDate(ts) {
-
-    const timestamp = getTimestamp(ts);
-
-    if (!timestamp) {
-        return "Немає даних";
-    }
-
-    const d = new Date(timestamp);
-
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
-
-    return `${day}.${month} ${hours}:${minutes}`;
+function formatDate(ts){
+const timestamp=getTimestamp(ts);
+if(!timestamp)return"Немає даних";
+const d=new Date(timestamp);
+return`${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
 }
 
-
-function formatDateOnly(ts) {
-
-    const timestamp = getTimestamp(ts);
-
-    if (!timestamp) return "--.--";
-
-    const d = new Date(timestamp);
-
-    return `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}`;
+function formatDateOnly(ts){
+const timestamp=getTimestamp(ts);
+if(!timestamp)return"--.--";
+const d=new Date(timestamp);
+return`${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}`;
 }
 
-
-function getNumericPrice(value) {
-
-    if (typeof value === "number") {
-        return value;
-    }
-
-    const text = String(value ?? "")
-        .replace(/\s/g, "")
-        .replace(",", ".");
-
-    const match = text.match(/-?\d+(?:\.\d+)?/);
-
-    return match ? parseFloat(match[0]) : 0;
+function getNumericPrice(value){
+if(typeof value==="number")return value;
+const text=String(value??"").replace(/\s/g,"").replace(",",".");
+const match=text.match(/-?\d+(?:\.\d+)?/);
+return match?parseFloat(match[0]):0;
 }
 
-
-function formatMoney(value, currency) {
-
-    const number = getNumericPrice(value);
-
-    const symbol = currency === "UAH" ? "грн" : "zł";
-
-    return `${number} ${symbol}`;
+function formatMoney(value,currency){
+const number=getNumericPrice(value);
+return`${number} ${currency==="UAH"?"грн":"zł"}`;
 }
-
 
 /* =========================================================
    CURRENCY
 ========================================================= */
 
-function normalizeCurrency(value) {
+function normalizeCurrency(value){
+const v=String(value??"").trim().toUpperCase();
 
-    const v = String(value ?? "")
-        .trim()
-        .toUpperCase();
+if(v==="UAH"||v==="UA"||v==="₴"||v.includes("ГРН")||v.includes("UAH"))return"UAH";
+if(v==="PLN"||v==="ZŁ"||v==="ZL"||v==="PL"||v.includes("PLN")||v.includes("ZŁ"))return"PLN";
 
-    if (
-        v === "UAH" ||
-        v === "UA" ||
-        v === "₴" ||
-        v.includes("ГРН") ||
-        v.includes("UAH")
-    ) {
-        return "UAH";
-    }
-
-    if (
-        v === "PLN" ||
-        v === "ZŁ" ||
-        v === "ZL" ||
-        v === "PL" ||
-        v.includes("PLN") ||
-        v.includes("ZŁ")
-    ) {
-        return "PLN";
-    }
-
-    return null;
+return null;
 }
 
+function getOrderCurrency(order){
+if(!order)return"UAH";
 
-function getOrderCurrency(order) {
+const fields=[
+order.currency,
+order.currency_code,
+order.currencyCode,
+order.total_currency,
+order.price_currency,
+order.payment_currency,
+order.valuta,
+order.currency_type
+];
 
-    if (!order) {
-        return "UAH";
-    }
-
-    const fields = [
-        order.currency,
-        order.currency_code,
-        order.currencyCode,
-        order.total_currency,
-        order.price_currency,
-        order.payment_currency,
-        order.valuta,
-        order.currency_type
-    ];
-
-    for (const value of fields) {
-
-        const currency = normalizeCurrency(value);
-
-        if (currency) {
-            return currency;
-        }
-    }
-
-    const rawPrice =
-        order.total_price ??
-        order.price ??
-        order.amount ??
-        "";
-
-    const priceText = String(rawPrice).toUpperCase();
-
-    if (
-        priceText.includes("₴") ||
-        priceText.includes("ГРН") ||
-        priceText.includes("UAH")
-    ) {
-        return "UAH";
-    }
-
-    if (
-        priceText.includes("ZŁ") ||
-        priceText.includes("ZL") ||
-        priceText.includes("PLN")
-    ) {
-        return "PLN";
-    }
-
-    const payment = String(
-        order.payment_method ??
-        order.payment ??
-        order.pay ??
-        ""
-    ).toLowerCase();
-
-    if (
-        payment.includes("mono") ||
-        payment.includes("монобанк")
-    ) {
-        return "UAH";
-    }
-
-    if (
-        payment.includes("готів") ||
-        payment.includes("нал") ||
-        payment.includes("карта") ||
-        payment.includes("card")
-    ) {
-        return "PLN";
-    }
-
-    return "UAH";
+for(const value of fields){
+const currency=normalizeCurrency(value);
+if(currency)return currency;
 }
 
+const rawPrice=order.total_price??order.price??order.amount??"";
+const priceText=String(rawPrice).toUpperCase();
 
-function currencyLabel(currency) {
-    return currency === "UAH" ? "грн" : "zł";
+if(priceText.includes("₴")||priceText.includes("ГРН")||priceText.includes("UAH"))return"UAH";
+if(priceText.includes("ZŁ")||priceText.includes("ZL")||priceText.includes("PLN"))return"PLN";
+
+const payment=String(order.payment_method??order.payment??order.pay??"").toLowerCase();
+
+if(payment.includes("mono")||payment.includes("монобанк"))return"UAH";
+if(payment.includes("готів")||payment.includes("нал")||payment.includes("карта")||payment.includes("card"))return"PLN";
+
+return"UAH";
 }
 
-
-function getPaymentMethod(order, currency) {
-
-    if (!order) {
-        return currency === "UAH" ? "Монобанк" : "Карта";
-    }
-
-    const raw = String(
-        order.payment_method ??
-        order.payment ??
-        order.pay ??
-        ""
-    ).toLowerCase();
-
-    if (
-        raw.includes("mono") ||
-        raw.includes("монобанк")
-    ) {
-        return "Монобанк";
-    }
-
-    if (
-        raw.includes("готів") ||
-        raw.includes("нал")
-    ) {
-        return "Готівка";
-    }
-
-    if (
-        raw.includes("карта") ||
-        raw.includes("card")
-    ) {
-        return "Карта";
-    }
-
-    return currency === "UAH" ? "Монобанк" : "Карта";
+function currencyLabel(currency){
+return currency==="UAH"?"грн":"zł";
 }
 
+function getPaymentMethod(order,currency){
+if(!order)return currency==="UAH"?"Монобанк":"Карта";
+
+const raw=String(order.payment_method??order.payment??order.pay??"").toLowerCase();
+
+if(raw.includes("mono")||raw.includes("монобанк"))return"Монобанк";
+if(raw.includes("готів")||raw.includes("нал"))return"Готівка";
+if(raw.includes("карта")||raw.includes("card"))return"Карта";
+
+return currency==="UAH"?"Монобанк":"Карта";
+}
 
 /* =========================================================
    NAVIGATION
 ========================================================= */
 
-function showTab(tabId, btnElement) {
+function showTab(tabId,btnElement){
+document.querySelectorAll(".tab-content").forEach(t=>t.classList.remove("active-tab"));
+document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
 
-    document
-        .querySelectorAll(".tab-content")
-        .forEach(t => t.classList.remove("active-tab"));
+const target=document.getElementById("tab-"+tabId);
+if(target)target.classList.add("active-tab");
+if(btnElement)btnElement.classList.add("active");
 
-    document
-        .querySelectorAll(".tab-btn")
-        .forEach(b => b.classList.remove("active"));
-
-    const target = document.getElementById("tab-" + tabId);
-
-    if (target) {
-        target.classList.add("active-tab");
-    }
-
-    if (btnElement) {
-        btnElement.classList.add("active");
-    }
-
-    window.scrollTo(0, 0);
+window.scrollTo(0,0);
 }
-
 
 /* =========================================================
-   OPERATION TYPE
+   OPERATION
 ========================================================= */
 
-function toggleOpType() {
+function toggleOpType(){
+const type=document.getElementById("opType").value;
 
-    const type = document.getElementById("opType").value;
+document.getElementById("sale-fields").style.display=type==="sale"?"block":"none";
+document.getElementById("expense-fields").style.display=type==="expense"?"block":"none";
+document.getElementById("status-row").style.display=type==="sale"?"block":"none";
 
-    document.getElementById("sale-fields").style.display =
-        type === "sale" ? "block" : "none";
-
-    document.getElementById("expense-fields").style.display =
-        type === "expense" ? "block" : "none";
-
-    document.getElementById("status-row").style.display =
-        type === "sale" ? "block" : "none";
-
-    calc();
+calc();
 }
-
 
 /* =========================================================
-   PWA BARCODE SCANNER
+   SCANNER
 ========================================================= */
 
-async function startScanner() {
-    const modal = document.getElementById("scanner-modal");
-    modal.style.display = "flex";
+async function startScanner(){
+const modal=document.getElementById("scanner-modal");
+modal.style.display="flex";
 
-    try {
-        if (!html5QrCode) {
-            html5QrCode = new Html5Qrcode("reader");
-        }
+try{
+if(!html5QrCode)html5QrCode=new Html5Qrcode("reader");
 
-        const config = {
-            fps: 15,
-            qrbox: { width: 250, height: 150 },
-            aspectRatio: 1.0
-        };
+await html5QrCode.start(
+{facingMode:"environment"},
+{
+fps:15,
+qrbox:{width:250,height:150},
+aspectRatio:1
+},
+onScanSuccess,
+onScanFailure
+);
 
-        await html5QrCode.start(
-            { facingMode: "environment" },
-            config,
-            onScanSuccess,
-            onScanFailure
-        );
-
-    } catch (error) {
-        console.error("Scanner start error:", error);
-        closeScanner();
-        showToast("❌ Доступ до камери заборонено або відсутній", "var(--danger)");
-    }
+}catch(error){
+console.error(error);
+closeScanner();
+showToast("❌ Доступ до камери заборонено або відсутній","var(--danger)");
+}
 }
 
-function onScanFailure(error) {
-    // Ігноруємо проміжні невдалі кадри сканування
+function onScanFailure(){}
+
+async function closeScanner(){
+document.getElementById("scanner-modal").style.display="none";
+
+if(html5QrCode){
+try{
+if(html5QrCode.isScanning)await html5QrCode.stop();
+}catch(error){
+console.error(error);
+}
+}
 }
 
-async function closeScanner() {
-    const modal = document.getElementById("scanner-modal");
-    modal.style.display = "none";
+async function onScanSuccess(decodedText){
+await closeScanner();
 
-    if (html5QrCode) {
-        try {
-            if (html5QrCode.isScanning) {
-                await html5QrCode.stop();
-            }
-        } catch (error) {
-            console.error("Stop scanner error:", error);
-        }
-    }
+const barcode=String(decodedText||"").trim();
+
+if(!barcode){
+showToast("❌ Штрихкод не розпізнано","var(--danger)");
+return;
 }
 
-async function onScanSuccess(decodedText) {
-    await closeScanner();
+document.getElementById("newBarcode").value=barcode;
 
-    const barcode = String(decodedText || "").trim();
+let existing=inventory.find(item=>String(item.barcode||"").trim()===barcode);
 
-    if (!barcode) {
-        showToast("❌ Штрихкод не розпізнано", "var(--danger)");
-        return;
-    }
-
-    document.getElementById("newBarcode").value = barcode;
-
-    let existing = inventory.find(item =>
-        String(item.barcode || "").trim() === barcode
-    );
-
-    if (!existing) {
-        const barcodeDigits = barcode.replace(/\D/g, "");
-        if (barcodeDigits) {
-            existing = inventory.find(item => {
-                const dbBarcode = String(item.barcode || "").trim().replace(/\D/g, "");
-                return dbBarcode && dbBarcode === barcodeDigits;
-            });
-        }
-    }
-
-    if (existing) {
-        editFlavor(
-            existing.id,
-            existing.name,
-            existing.loc || "",
-            existing.qty || 0,
-            existing.type || "заливка",
-            existing.barcode || ""
-        );
-        showToast("📦 Товар знайдено в базі!");
-    } else {
-        document.getElementById("newFlavorName").focus();
-        showToast("🆕 Новий штрихкод — введіть назву", "var(--accent-secondary)");
-    }
+if(!existing){
+const digits=barcode.replace(/\D/g,"");
+if(digits){
+existing=inventory.find(item=>{
+const dbBarcode=String(item.barcode||"").trim().replace(/\D/g,"");
+return dbBarcode&&dbBarcode===digits;
+});
+}
 }
 
+if(existing){
+editFlavor(existing.id,existing.name,existing.loc||"",existing.qty||0,existing.type||"заливка",existing.barcode||"");
+showToast("📦 Товар знайдено в базі!");
+}else{
+document.getElementById("newFlavorName").focus();
+showToast("🆕 Новий штрихкод — введіть назву","var(--accent-secondary)");
+}
+}
 
 /* =========================================================
-   INVENTORY
+   INVENTORY CRUD
 ========================================================= */
 
-async function addFlavorToInventory() {
+async function addFlavorToInventory(){
+try{
+const type=document.getElementById("newFlavorType").value;
+const name=document.getElementById("newFlavorName").value.trim();
+const loc=document.getElementById("newLoc").value.trim();
+const qty=parseInt(document.getElementById("newQty").value)||0;
+const barcode=document.getElementById("newBarcode").value.trim();
+const id=document.getElementById("editId").value;
 
-    try {
-
-        const type =
-            document.getElementById("newFlavorType").value;
-
-        const name =
-            document.getElementById("newFlavorName").value.trim();
-
-        const loc =
-            document.getElementById("newLoc").value.trim();
-
-        const qty =
-            parseInt(document.getElementById("newQty").value) || 0;
-
-        const barcode =
-            document.getElementById("newBarcode").value.trim();
-
-        const id =
-            document.getElementById("editId").value;
-
-        const lastDelivery = Date.now();
-
-        if (!name) {
-
-            showToast(
-                "Введіть назву!",
-                "var(--danger)"
-            );
-
-            return;
-        }
-
-        if (id) {
-
-            await db
-                .collection("inventory")
-                .doc(id)
-                .update({
-                    type,
-                    name,
-                    loc,
-                    qty,
-                    barcode,
-                    lastDelivery
-                });
-
-            showToast("📦 Залишки оновлено!");
-
-        } else {
-
-            await db
-                .collection("inventory")
-                .add({
-                    type,
-                    name,
-                    loc,
-                    qty,
-                    barcode,
-                    lastDelivery
-                });
-
-            showToast("📦 Новий товар додано!");
-        }
-
-        cancelEdit();
-
-    } catch (error) {
-
-        console.error(error);
-
-        showToast(
-            "❌ Помилка збереження товару",
-            "var(--danger)"
-        );
-    }
+if(!name){
+showToast("Введіть назву!","var(--danger)");
+return;
 }
 
+const data={
+type,
+name,
+loc,
+qty,
+barcode,
+lastDelivery:Date.now()
+};
 
-function editFlavor(
-    id,
-    name,
-    loc,
-    qty,
-    type,
-    barcode = ""
-) {
-
-    document.getElementById("editId").value = id;
-    document.getElementById("newFlavorName").value = name || "";
-    document.getElementById("newLoc").value = loc || "";
-    document.getElementById("newQty").value = qty || 0;
-    document.getElementById("newFlavorType").value =
-        type || "заливка";
-    document.getElementById("newBarcode").value =
-        barcode || "";
-
-    document.getElementById("adminFormTitle").innerText =
-        "✏️ Оновлення залишків";
-
-    document.getElementById("adminFormSub").innerText =
-        "Внесіть нову кількість товару";
-
-    document.getElementById("saveFlavorBtn").innerText =
-        "🔄 ОНОВИТИ ДАНІ";
-
-    document.getElementById("cancelEditBtn").style.display =
-        "block";
-
-    showTab("admin");
+if(id){
+await db.collection("inventory").doc(id).update(data);
+showToast("📦 Залишки оновлено!");
+}else{
+await db.collection("inventory").add(data);
+showToast("📦 Новий товар додано!");
 }
 
+cancelEdit();
 
-function editInventoryById(id) {
-
-    const item = inventory.find(i => i.id === id);
-
-    if (!item) {
-
-        showToast(
-            "❌ Товар не знайдено",
-            "var(--danger)"
-        );
-
-        return;
-    }
-
-    editFlavor(
-        item.id,
-        item.name,
-        item.loc || "",
-        item.qty || 0,
-        item.type || "заливка",
-        item.barcode || ""
-    );
+}catch(error){
+console.error(error);
+showToast("❌ Помилка збереження товару","var(--danger)");
+}
 }
 
+function editFlavor(id,name,loc,qty,type,barcode=""){
+document.getElementById("editId").value=id;
+document.getElementById("newFlavorName").value=name||"";
+document.getElementById("newLoc").value=loc||"";
+document.getElementById("newQty").value=qty||0;
+document.getElementById("newFlavorType").value=type||"заливка";
+document.getElementById("newBarcode").value=barcode||"";
 
-async function deleteInventoryItem(id) {
+document.getElementById("adminFormTitle").innerText="✏️ Оновлення залишків";
+document.getElementById("adminFormSub").innerText="Внесіть нову кількість товару";
+document.getElementById("saveFlavorBtn").innerText="🔄 ОНОВИТИ ДАНІ";
+document.getElementById("cancelEditBtn").style.display="block";
 
-    if (!confirm("Видалити товар зі складу?")) {
-        return;
-    }
-
-    try {
-
-        await db
-            .collection("inventory")
-            .doc(id)
-            .delete();
-
-        showToast("🗑 Товар видалено");
-
-    } catch (error) {
-
-        console.error(error);
-
-        showToast(
-            "❌ Не вдалося видалити товар",
-            "var(--danger)"
-        );
-    }
+showTab("admin");
 }
 
+function editInventoryById(id){
+const item=inventory.find(i=>i.id===id);
 
-function cancelEdit() {
-
-    document.getElementById("editId").value = "";
-    document.getElementById("newFlavorName").value = "";
-    document.getElementById("newLoc").value = "";
-    document.getElementById("newQty").value = 10;
-    document.getElementById("newBarcode").value = "";
-
-    document.getElementById("adminFormTitle").innerText =
-        "📦 Нова поставка / Товар";
-
-    document.getElementById("adminFormSub").innerText =
-        "Скануйте штрих-код або введіть вручну";
-
-    document.getElementById("saveFlavorBtn").innerText =
-        "➕ ЗБЕРЕГТИ ДАНІ";
-
-    document.getElementById("cancelEditBtn").style.display =
-        "none";
+if(!item){
+showToast("❌ Товар не знайдено","var(--danger)");
+return;
 }
 
-
-function updateFlavorList() {
-
-    const cat =
-        document.getElementById("catalog").value;
-
-    const query =
-        document
-            .getElementById("flavorSearch")
-            .value
-            .toLowerCase()
-            .trim();
-
-    const fs =
-        document.getElementById("flavor");
-
-    fs.innerHTML =
-        '<option value="" disabled selected>Оберіть позицію...</option>';
-
-    const filtered = inventory.filter(item => {
-
-        const name =
-            String(item.name || "").toLowerCase();
-
-        const correctType =
-            item.type === cat ||
-            (!item.type && cat === "заливка");
-
-        return name.includes(query) && correctType;
-    });
-
-    if (cat === "продаж") {
-
-        fs.innerHTML +=
-            '<option value="ICE SHOT">🧊 ICE SHOT</option>';
-
-        filtered.forEach(item => {
-
-            fs.innerHTML += `
-                <option value="${escapeHtml(item.name)}">
-                    ${escapeHtml(item.name)}
-                    (30ml) • [${item.qty || 0}шт]
-                </option>
-            `;
-        });
-
-        document.getElementById("vol-box").style.display =
-            "none";
-
-    } else {
-
-        filtered.forEach(item => {
-
-            fs.innerHTML += `
-                <option value="${escapeHtml(item.name)}">
-                    ${escapeHtml(item.name)}
-                </option>
-            `;
-        });
-
-        document.getElementById("vol-box").style.display =
-            "block";
-    }
-
-    calc();
+editFlavor(
+item.id,
+item.name,
+item.loc||"",
+item.qty||0,
+item.type||"заливка",
+item.barcode||""
+);
 }
 
+async function deleteInventoryItem(id){
+if(!confirm("Видалити товар зі складу?"))return;
 
-function handleFlavor() {
-
-    const selected =
-        document.getElementById("flavor").value;
-
-    const item =
-        inventory.find(i => i.name === selected);
-
-    const box =
-        document.getElementById("location-box");
-
-    if (item) {
-
-        box.style.display = "block";
-
-        document.getElementById("loc-text").innerText =
-            item.loc || "Не вказано";
-
-    } else if (selected === "ICE SHOT") {
-
-        box.style.display = "block";
-
-        document.getElementById("loc-text").innerText =
-            "Аптечка синя";
-
-    } else {
-
-        box.style.display = "none";
-    }
-
-    calc();
+try{
+await db.collection("inventory").doc(id).delete();
+showToast("🗑 Товар видалено");
+}catch(error){
+console.error(error);
+showToast("❌ Не вдалося видалити товар","var(--danger)");
+}
 }
 
+function cancelEdit(){
+document.getElementById("editId").value="";
+document.getElementById("newFlavorName").value="";
+document.getElementById("newLoc").value="";
+document.getElementById("newQty").value=10;
+document.getElementById("newBarcode").value="";
+
+document.getElementById("adminFormTitle").innerText="📦 Нова поставка / Товар";
+document.getElementById("adminFormSub").innerText="Скануйте штрих-код або введіть вручну";
+document.getElementById("saveFlavorBtn").innerText="➕ ЗБЕРЕГТИ ДАНІ";
+document.getElementById("cancelEditBtn").style.display="none";
+}
 
 /* =========================================================
-   PRICE CALCULATION
+   CATALOG
 ========================================================= */
 
-function calc() {
+function updateFlavorList(){
+const cat=document.getElementById("catalog").value;
+const query=document.getElementById("flavorSearch").value.toLowerCase().trim();
+const fs=document.getElementById("flavor");
 
-    const type =
-        document.getElementById("opType").value;
+fs.innerHTML='<option value="" disabled selected>Оберіть позицію...</option>';
 
-    const cat =
-        document.getElementById("catalog").value;
+const filtered=inventory.filter(item=>{
+const name=String(item.name||"").toLowerCase();
+const correctType=item.type===cat||(!item.type&&cat==="заливка");
+return name.includes(query)&&correctType;
+});
 
-    const pay =
-        document.getElementById("pay").value;
+if(cat==="продаж"){
+fs.innerHTML+='<option value="ICE SHOT">🧊 ICE SHOT</option>';
 
-    const size =
-        document.getElementById("size").value;
+filtered.forEach(item=>{
+fs.innerHTML+=`
+<option value="${escapeHtml(item.name)}">
+${escapeHtml(item.name)} (30ml) • [${parseInt(item.qty)||0}шт]
+</option>`;
+});
 
-    const flavor =
-        document.getElementById("flavor").value;
+document.getElementById("vol-box").style.display="none";
+}else{
+filtered.forEach(item=>{
+fs.innerHTML+=`
+<option value="${escapeHtml(item.name)}">
+${escapeHtml(item.name)}
+</option>`;
+});
 
-    const manual =
-        document.getElementById("manualPrice").value;
-
-    let currency =
-        activeOrderCurrency ||
-        (pay === "Монобанк" ? "UAH" : "PLN");
-
-    let price = 0;
-
-    if (manual !== "" && getNumericPrice(manual) > 0) {
-
-        price = getNumericPrice(manual);
-
-    } else if (type === "sale") {
-
-        if (cat === "продаж") {
-
-            if (currency === "UAH") {
-
-                price =
-                    flavor === "ICE SHOT"
-                        ? 180
-                        : 650;
-
-            } else {
-
-                price =
-                    flavor === "ICE SHOT"
-                        ? 15
-                        : 60;
-            }
-
-        } else {
-
-            if (currency === "UAH") {
-
-                price =
-                    size === "2"
-                        ? 70
-                        : 100;
-
-            } else {
-
-                price =
-                    size === "2"
-                        ? 6
-                        : 9;
-            }
-        }
-    }
-
-    document.getElementById("total").innerText =
-        `${price} ${currencyLabel(currency)}`;
+document.getElementById("vol-box").style.display="block";
 }
 
+calc();
+}
+
+function handleFlavor(){
+const selected=document.getElementById("flavor").value;
+const item=inventory.find(i=>i.name===selected);
+const box=document.getElementById("location-box");
+
+if(item){
+box.style.display="block";
+document.getElementById("loc-text").innerText=item.loc||"Не вказано";
+}else if(selected==="ICE SHOT"){
+box.style.display="block";
+document.getElementById("loc-text").innerText="Аптечка синя";
+}else{
+box.style.display="none";
+}
+
+calc();
+}
 
 /* =========================================================
-   DEBT
+   PRICE
 ========================================================= */
 
-function toggleDebt() {
+function calc(){
+const type=document.getElementById("opType").value;
+const cat=document.getElementById("catalog").value;
+const pay=document.getElementById("pay").value;
+const size=document.getElementById("size").value;
+const flavor=document.getElementById("flavor").value;
+const manual=document.getElementById("manualPrice").value;
 
-    document.getElementById("debtor-row").style.display =
-        document.getElementById("status").value === "debt"
-            ? "block"
-            : "none";
+let currency=activeOrderCurrency||(pay==="Монобанк"?"UAH":"PLN");
+let price=0;
+
+if(manual!==""&&getNumericPrice(manual)>0){
+price=getNumericPrice(manual);
+}else if(type==="sale"){
+if(cat==="продаж"){
+if(currency==="UAH"){
+price=flavor==="ICE SHOT"?180:650;
+}else{
+price=flavor==="ICE SHOT"?15:60;
+}
+}else{
+if(currency==="UAH"){
+price=size==="2"?70:100;
+}else{
+price=size==="2"?6:9;
+}
+}
 }
 
+document.getElementById("total").innerText=`${price} ${currencyLabel(currency)}`;
+}
+
+function toggleDebt(){
+document.getElementById("debtor-row").style.display=
+document.getElementById("status").value==="debt"?"block":"none";
+}
 
 /* =========================================================
    TELEGRAM ORDERS
 ========================================================= */
 
-function selectTgOrder(
-    id,
-    client,
-    itemText,
-    price,
-    orderNum
-) {
+function selectTgOrder(id,client,itemText,price,orderNum){
+const order=cachedTgOrders[id];
 
-    const order = cachedTgOrders[id];
-
-    if (order) {
-
-        activeOrderData = {
-            ...order,
-            id
-        };
-
-        activeOrderCurrency =
-            getOrderCurrency(order);
-
-    } else {
-
-        activeOrderData = {
-            id,
-            client_name: client,
-            items: itemText,
-            total_price: price,
-            order_number: orderNum
-        };
-
-        activeOrderCurrency =
-            getOrderCurrency(activeOrderData);
-    }
-
-    document
-        .querySelectorAll(".tg-order-card")
-        .forEach(card =>
-            card.classList.remove("selected")
-        );
-
-    const card =
-        document.getElementById(`tg-card-${id}`);
-
-    if (card) {
-        card.classList.add("selected");
-    }
-
-    document.getElementById("activeTgOrderId").value =
-        id;
-
-    document.getElementById("tgOrderSelect").value =
-        id;
-
-    document.getElementById("debtorName").value =
-        client || "Клієнт";
-
-    const paymentMethod =
-        getPaymentMethod(
-            activeOrderData,
-            activeOrderCurrency
-        );
-
-    document.getElementById("pay").value =
-        paymentMethod;
-
-    const numericPrice =
-        getNumericPrice(price);
-
-    if (numericPrice > 0) {
-
-        document.getElementById("manualPrice").value =
-            numericPrice;
-    }
-
-    const active =
-        document.getElementById("activeTgOrderId");
-
-    active.setAttribute(
-        "data-items",
-        itemText || ""
-    );
-
-    active.setAttribute(
-        "data-ordernum",
-        orderNum || ""
-    );
-
-    calc();
-
-    showToast(
-        `📦 Замовлення №${orderNum} вибрано!`,
-        "var(--tg-color)"
-    );
+if(order){
+activeOrderData={...order,id};
+activeOrderCurrency=getOrderCurrency(order);
+}else{
+activeOrderData={
+id,
+client_name:client,
+items:itemText,
+total_price:price,
+order_number:orderNum
+};
+activeOrderCurrency=getOrderCurrency(activeOrderData);
 }
 
+document.querySelectorAll(".tg-order-card").forEach(card=>card.classList.remove("selected"));
 
-function selectTgOrderById(id) {
+const card=document.getElementById(`tg-card-${id}`);
+if(card)card.classList.add("selected");
 
-    const order = cachedTgOrders[id];
+document.getElementById("activeTgOrderId").value=id;
+document.getElementById("tgOrderSelect").value=id;
+document.getElementById("debtorName").value=client||"Клієнт";
 
-    if (!order) {
+document.getElementById("pay").value=getPaymentMethod(activeOrderData,activeOrderCurrency);
 
-        showToast(
-            "❌ Замовлення не знайдено",
-            "var(--danger)"
-        );
+const numericPrice=getNumericPrice(price);
+if(numericPrice>0)document.getElementById("manualPrice").value=numericPrice;
 
-        return;
-    }
+const active=document.getElementById("activeTgOrderId");
 
-    const client =
-        order.client_name ||
-        order.client ||
-        order.name ||
-        "Клієнт";
+active.setAttribute("data-items",itemText||"");
+active.setAttribute("data-ordernum",orderNum||"");
 
-    const itemText =
-        order.items ||
-        order.products ||
-        order.product ||
-        "Товар";
+calc();
 
-    const rawPrice =
-        order.total_price ??
-        order.price ??
-        order.amount ??
-        0;
-
-    const price =
-        getNumericPrice(rawPrice);
-
-    const orderNum =
-        order.order_number ||
-        order.number ||
-        order.orderId ||
-        order.id ||
-        id.substring(0, 5);
-
-    selectTgOrder(
-        id,
-        client,
-        itemText,
-        price,
-        orderNum
-    );
+showToast(`📦 Замовлення №${orderNum} вибрано!`,"var(--tg-color)");
 }
 
+function selectTgOrderById(id){
+const order=cachedTgOrders[id];
 
-function selectTgOrderFromDropdown() {
-
-    const id =
-        document.getElementById("tgOrderSelect").value;
-
-    if (!id) return;
-
-    selectTgOrderById(id);
+if(!order){
+showToast("❌ Замовлення не знайдено","var(--danger)");
+return;
 }
 
+const client=order.client_name||order.client||order.name||"Клієнт";
+const itemText=order.items||order.products||order.product||"Товар";
+const rawPrice=order.total_price??order.price??order.amount??0;
+const price=getNumericPrice(rawPrice);
+const orderNum=order.order_number||order.number||order.orderId||order.id||id.substring(0,5);
+
+selectTgOrder(id,client,itemText,price,orderNum);
+}
+
+function selectTgOrderFromDropdown(){
+const id=document.getElementById("tgOrderSelect").value;
+if(id)selectTgOrderById(id);
+}
 
 /* =========================================================
    PRODUCT MATCHING
 ========================================================= */
 
-function normalizeProductName(text) {
-
-    return String(text || "")
-        .toLowerCase()
-        .replace(/[\r\n]+/g, " ")
-        .replace(/\([^)]*\)/g, " ")
-        .replace(/\b\d+(?:[.,]\d+)?\s*(ml|мл|шт|pcs)\b/gi, " ")
-        .replace(/^\s*\d+[\.\)]\s*/, "")
-        .replace(/\b(?:x|х|×)\s*\d+\b/gi, " ")
-        .replace(/\bqty\s*\d+\b/gi, " ")
-        .replace(/[^\p{L}\p{N}]+/gu, " ")
-        .replace(/\s+/g, " ")
-        .trim();
+function normalizeProductName(text){
+return String(text||"")
+.toLowerCase()
+.replace(/[\r\n]+/g," ")
+.replace(/\([^)]*\)/g," ")
+.replace(/\b\d+(?:[.,]\d+)?\s*(ml|мл|шт|pcs)\b/gi," ")
+.replace(/^\s*\d+[\.\)]\s*/,"")
+.replace(/\b(?:x|х|×)\s*\d+\b/gi," ")
+.replace(/\bqty\s*\d+\b/gi," ")
+.replace(/[^\p{L}\p{N}&]+/gu," ")
+.replace(/\s+/g," ")
+.trim();
 }
 
+function getQuantityFromItem(text){
+const value=String(text||"");
 
-function getQuantityFromItem(text) {
+let match=value.match(/(?:x|х|×|\*)\s*(\d+)/i);
+if(match)return Math.max(1,parseInt(match[1]));
 
-    const value = String(text || "");
+match=value.match(/(?:qty|quantity|кількість)\s*[:=]?\s*(\d+)/i);
+if(match)return Math.max(1,parseInt(match[1]));
 
-    let match =
-        value.match(/(?:x|х|×|\*)\s*(\d+)/i);
+match=value.match(/^\s*(\d+)\s*(?:x|х|×|\*)/i);
+if(match)return Math.max(1,parseInt(match[1]));
 
-    if (match) {
-        return Math.max(1, parseInt(match[1]));
-    }
-
-    match =
-        value.match(/(?:qty|quantity|кількість)\s*[:=]?\s*(\d+)/i);
-
-    if (match) {
-        return Math.max(1, parseInt(match[1]));
-    }
-
-    match =
-        value.match(/^\s*(\d+)\s*(?:x|х|×|\*)/i);
-
-    if (match) {
-        return Math.max(1, parseInt(match[1]));
-    }
-
-    return 1;
+return 1;
 }
 
+function splitOrderItems(text){
+const value=String(text||"").trim();
+if(!value)return[];
 
-function splitOrderItems(text) {
-
-    const value = String(text || "").trim();
-
-    if (!value) {
-        return [];
-    }
-
-    const result =
-        value
-            .split(/\n|,|;/)
-            .map(x => x.trim())
-            .filter(Boolean);
-
-    return result.length ? result : [value];
+const result=value.split(/\n|,|;/).map(x=>x.trim()).filter(Boolean);
+return result.length?result:[value];
 }
 
+function findInventoryMatch(text){
+const normalizedPart=normalizeProductName(text);
+if(!normalizedPart)return null;
 
-function findInventoryMatch(text) {
+let exact=inventory.find(item=>normalizeProductName(item.name)===normalizedPart);
+if(exact)return exact;
 
-    const normalizedPart =
-        normalizeProductName(text);
+const candidates=inventory.filter(item=>{
+const normalizedName=normalizeProductName(item.name);
+if(!normalizedName)return false;
+return normalizedPart.includes(normalizedName)||normalizedName.includes(normalizedPart);
+}).sort((a,b)=>normalizeProductName(b.name).length-normalizeProductName(a.name).length);
 
-    if (!normalizedPart) {
-        return null;
-    }
-
-    let exact = inventory.find(item =>
-        normalizeProductName(item.name) === normalizedPart
-    );
-
-    if (exact) {
-        return exact;
-    }
-
-    const candidates = inventory
-        .filter(item => {
-
-            const normalizedName =
-                normalizeProductName(item.name);
-
-            if (!normalizedName) {
-                return false;
-            }
-
-            return (
-                normalizedPart.includes(normalizedName) ||
-                normalizedName.includes(normalizedPart)
-            );
-        })
-        .sort((a, b) =>
-            normalizeProductName(b.name).length -
-            normalizeProductName(a.name).length
-        );
-
-    return candidates[0] || null;
+return candidates[0]||null;
 }
 
+function buildInventoryDeductions(tgItems,manualFlavor){
+const deductions={};
 
-function buildInventoryDeductions(
-    tgItems,
-    manualFlavor
-) {
+if(tgItems&&String(tgItems).trim()){
+splitOrderItems(tgItems).forEach(part=>{
+const item=findInventoryMatch(part);
+if(!item)return;
 
-    const deductions = {};
+const qty=getQuantityFromItem(part);
 
-    if (tgItems && String(tgItems).trim()) {
-
-        const parts =
-            splitOrderItems(tgItems);
-
-        parts.forEach(part => {
-
-            const item =
-                findInventoryMatch(part);
-
-            if (!item) {
-                return;
-            }
-
-            const qty =
-                getQuantityFromItem(part);
-
-            if (!deductions[item.id]) {
-
-                deductions[item.id] = {
-                    id: item.id,
-                    name: item.name,
-                    qty: 0
-                };
-            }
-
-            deductions[item.id].qty += qty;
-        });
-    }
-
-    if (
-        !tgItems &&
-        manualFlavor &&
-        manualFlavor !== "ICE SHOT"
-    ) {
-
-        const item =
-            inventory.find(i =>
-                normalizeProductName(i.name) ===
-                normalizeProductName(manualFlavor)
-            );
-
-        if (item) {
-
-            deductions[item.id] = {
-                id: item.id,
-                name: item.name,
-                qty: 1
-            };
-        }
-    }
-
-    if (
-        !tgItems &&
-        manualFlavor === "ICE SHOT"
-    ) {
-
-        const item =
-            inventory.find(i =>
-                normalizeProductName(i.name) ===
-                normalizeProductName("ICE SHOT")
-            );
-
-        if (item) {
-
-            deductions[item.id] = {
-                id: item.id,
-                name: item.name,
-                qty: 1
-            };
-        }
-    }
-
-    return Object.values(deductions);
+if(!deductions[item.id]){
+deductions[item.id]={id:item.id,name:item.name,qty:0};
 }
 
+deductions[item.id].qty+=qty;
+});
+}
+
+if(!tgItems&&manualFlavor){
+const item=inventory.find(i=>
+normalizeProductName(i.name)===normalizeProductName(manualFlavor)
+);
+
+if(item){
+deductions[item.id]={
+id:item.id,
+name:item.name,
+qty:1
+};
+}
+}
+
+return Object.values(deductions);
+}
 
 /* =========================================================
    INVENTORY DEDUCTION
 ========================================================= */
 
-async function deductInventoryForSale(
-    tgItems,
-    manualFlavor
-) {
+async function deductInventoryForSale(tgItems,manualFlavor){
 
-    const deductions =
-        buildInventoryDeductions(
-            tgItems,
-            manualFlavor
-        );
+const deductions=buildInventoryDeductions(tgItems,manualFlavor);
 
-    if (!deductions.length) {
-
-        if (
-            tgItems &&
-            String(tgItems).trim()
-        ) {
-
-            throw new Error(
-                "Не вдалося знайти товар Telegram-замовлення на складі."
-            );
-        }
-
-        return [];
-    }
-
-    const refs =
-        deductions.map(item =>
-            db.collection("inventory").doc(item.id)
-        );
-
-    await db.runTransaction(async transaction => {
-
-        const snapshots = [];
-
-        for (const ref of refs) {
-
-            const snap =
-                await transaction.get(ref);
-
-            snapshots.push(snap);
-        }
-
-        snapshots.forEach((snap, index) => {
-
-            if (!snap.exists) {
-
-                throw new Error(
-                    `Товар "${deductions[index].name}" більше не існує.`
-                );
-            }
-
-            const current =
-                parseInt(snap.data().qty) || 0;
-
-            const needed =
-                deductions[index].qty;
-
-            if (current < needed) {
-
-                throw new Error(
-                    `Недостатньо "${deductions[index].name}". Є ${current} шт., потрібно ${needed} шт.`
-                );
-            }
-        });
-
-        snapshots.forEach((snap, index) => {
-
-            const current =
-                parseInt(snap.data().qty) || 0;
-
-            const needed =
-                deductions[index].qty;
-
-            transaction.update(
-                refs[index],
-                {
-                    qty: current - needed,
-                    lastSale: Date.now()
-                }
-            );
-        });
-    });
-
-    return deductions;
+if(!deductions.length){
+if(tgItems&&String(tgItems).trim()){
+throw new Error("Не вдалося знайти товар Telegram-замовлення на складі.");
+}
+return[];
 }
 
+const refs=deductions.map(item=>db.collection("inventory").doc(item.id));
+
+await db.runTransaction(async transaction=>{
+
+const snapshots=[];
+
+for(const ref of refs){
+snapshots.push(await transaction.get(ref));
+}
+
+snapshots.forEach((snap,index)=>{
+if(!snap.exists){
+throw new Error(`Товар "${deductions[index].name}" більше не існує.`);
+}
+
+const current=parseInt(snap.data().qty)||0;
+const needed=deductions[index].qty;
+
+if(current<needed){
+throw new Error(`Недостатньо "${deductions[index].name}". Є ${current} шт., потрібно ${needed} шт.`);
+}
+});
+
+snapshots.forEach((snap,index)=>{
+const current=parseInt(snap.data().qty)||0;
+const needed=deductions[index].qty;
+
+transaction.update(refs[index],{
+qty:current-needed,
+lastSale:Date.now()
+});
+});
+
+});
+
+return deductions;
+}
 
 /* =========================================================
-   INVENTORY RESTORE
+   RESTORE
 ========================================================= */
 
-async function restoreInventory(items) {
+async function restoreInventory(items){
+if(!Array.isArray(items)||!items.length)return;
 
-    if (!Array.isArray(items) || !items.length) {
-        return;
-    }
+try{
+await db.runTransaction(async transaction=>{
 
-    try {
+const refs=items.map(item=>db.collection("inventory").doc(item.id));
+const snapshots=[];
 
-        await db.runTransaction(async transaction => {
-
-            const refs =
-                items.map(item =>
-                    db.collection("inventory").doc(item.id)
-                );
-
-            const snapshots = [];
-
-            for (const ref of refs) {
-                snapshots.push(
-                    await transaction.get(ref)
-                );
-            }
-
-            snapshots.forEach((snap, index) => {
-
-                if (!snap.exists) {
-                    return;
-                }
-
-                const current =
-                    parseInt(snap.data().qty) || 0;
-
-                const add =
-                    parseInt(items[index].qty) || 0;
-
-                transaction.update(
-                    refs[index],
-                    {
-                        qty: current + add
-                    }
-                );
-            });
-        });
-
-    } catch (error) {
-
-        console.error(
-            "Restore inventory error:",
-            error
-        );
-    }
+for(const ref of refs){
+snapshots.push(await transaction.get(ref));
 }
 
+snapshots.forEach((snap,index)=>{
+if(!snap.exists)return;
+
+const current=parseInt(snap.data().qty)||0;
+const add=parseInt(items[index].qty)||0;
+
+transaction.update(refs[index],{
+qty:current+add
+});
+});
+
+});
+}catch(error){
+console.error("Restore inventory error:",error);
+}
+}
 
 /* =========================================================
-   PDF GENERATION & PWA SAVE
+   ⭐ ЗАГАЛЬНІ ЗАЛИШКИ ПО ВИДАХ
 ========================================================= */
 
-async function printInvoice() {
+function getStockGroup(name){
 
-    const type =
-        document.getElementById("opType").value;
+const n=String(name||"")
+.toLowerCase()
+.replace(/\s+/g," ")
+.trim();
 
-    if (type !== "sale") {
+/*
+ВАЖЛИВО:
+спочатку перевіряємо конкретні групи Chaser,
+а вже потім "поди", щоб "Chaser For Pods"
+не потрапив у групу "Поди".
+*/
 
-        showToast(
-            "Накладну можна видати лише на продаж!",
-            "var(--danger)"
-        );
-
-        return;
-    }
-
-    const activeId =
-        document.getElementById("activeTgOrderId").value;
-
-    const tgItems =
-        document
-            .getElementById("activeTgOrderId")
-            .getAttribute("data-items");
-
-    const customOrderNum =
-        document
-            .getElementById("activeTgOrderId")
-            .getAttribute("data-ordernum");
-
-    const clientName =
-        document.getElementById("debtorName").value ||
-        "Роздрібний клієнт";
-
-    const payMethod =
-        document.getElementById("pay").value;
-
-    const priceNum =
-        getNumericPrice(
-            document.getElementById("manualPrice").value
-        ) ||
-        getNumericPrice(
-            document.getElementById("total").innerText
-        );
-
-    let currency =
-        activeOrderCurrency;
-
-    if (!currency && activeOrderData) {
-
-        currency =
-            getOrderCurrency(activeOrderData);
-    }
-
-    if (!currency) {
-
-        currency =
-            payMethod === "Монобанк"
-                ? "UAH"
-                : "PLN";
-    }
-
-    const currencyText =
-        currencyLabel(currency);
-
-    const invoiceNum =
-        customOrderNum
-            ? "#" + customOrderNum
-            : activeId
-                ? "#" + activeId.substring(0, 6).toUpperCase()
-                : "#SH-" + Math.floor(
-                    1000 + Math.random() * 9000
-                );
-
-    document.getElementById("inv-num").innerText =
-        invoiceNum;
-
-    document.getElementById("inv-date").innerText =
-        formatDate(Date.now());
-
-    document.getElementById("inv-client").innerText =
-        clientName;
-
-    document.getElementById("inv-pay-method").innerText =
-        payMethod;
-
-    document.getElementById("inv-total").innerText =
-        priceNum;
-
-    document.getElementById("inv-currency").innerText =
-        currencyText;
-
-    const itemsList =
-        document.getElementById("inv-items-list");
-
-    itemsList.innerHTML = "";
-
-    if (tgItems && tgItems.trim()) {
-
-        const goods =
-            splitOrderItems(tgItems);
-
-        goods.forEach((good, index) => {
-
-            const row =
-                document.createElement("tr");
-
-            const nameCell =
-                document.createElement("td");
-
-            nameCell.innerText =
-                `${index + 1}. ${good}`;
-
-            const priceCell =
-                document.createElement("td");
-
-            priceCell.style.textAlign = "right";
-
-            priceCell.innerText =
-                index === 0
-                    ? `${priceNum} ${currencyText}`
-                    : "-";
-
-            row.appendChild(nameCell);
-            row.appendChild(priceCell);
-
-            itemsList.appendChild(row);
-        });
-
-    } else {
-
-        const flavor =
-            document.getElementById("flavor").value ||
-            "Товар з каталогу";
-
-        const row =
-            document.createElement("tr");
-
-        const nameCell =
-            document.createElement("td");
-
-        nameCell.innerText =
-            `1. ${flavor}`;
-
-        const priceCell =
-            document.createElement("td");
-
-        priceCell.style.textAlign = "right";
-
-        priceCell.innerText =
-            `${priceNum} ${currencyText}`;
-
-        row.appendChild(nameCell);
-        row.appendChild(priceCell);
-
-        itemsList.appendChild(row);
-    }
-
-    showToast("⏳ Генерація PDF...");
-
-    const element = document.getElementById('invoice-print-area');
-
-    try {
-        const canvas = await html2canvas(element, {
-            scale: 2,
-            useCORS: true,
-            allowTaint: true
-        });
-
-        const imgData = canvas.toDataURL('image/jpeg', 0.98);
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a5');
-
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-
-        const pdfBlob = pdf.output('blob');
-        const fileName = `Nakladna_${invoiceNum.replace('#', '')}.pdf`;
-
-        const blobUrl = URL.createObjectURL(pdfBlob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-
-        showToast("✅ PDF накладну збережено!");
-
-    } catch (err) {
-        console.error(err);
-        showToast("❌ Помилка створення PDF", "var(--danger)");
-    }
+if(
+n.includes("chaser lux")||
+n.includes("elfliq lux")
+){
+return"Elfliq Chaser Lux";
 }
 
+if(
+n.includes("chaser black")||
+n.includes("elfliq black")
+){
+return"Elfliq Chaser Black";
+}
+
+if(
+n.includes("chaser for pods")||
+n.includes("chaser for pod")||
+n.includes("for pods")
+){
+return"Elfliq Chaser For Pods";
+}
+
+if(
+n.includes("chaser special")||
+n.includes("elfliq special")
+){
+return"Elfliq Chaser Special";
+}
+
+if(
+n.includes("chaser you&me")||
+n.includes("chaser you & me")||
+n.includes("chaser you and me")||
+n.includes("you&me")||
+n.includes("you & me")
+){
+return"Elfliq Chaser You&Me";
+}
+
+if(
+n.includes("pod")||
+n.includes("под")||
+n.includes("поди")
+){
+return"Поди";
+}
+
+if(
+n.includes("картридж")||
+n.includes("cartridge")
+){
+return"Картриджі";
+}
+
+return"Інше";
+}
+
+function renderStockSummary(){
+
+const summary=document.getElementById("stockSummary");
+if(!summary)return;
+
+const groups={
+"Elfliq Chaser Lux":0,
+"Elfliq Chaser Black":0,
+"Elfliq Chaser For Pods":0,
+"Elfliq Chaser Special":0,
+"Elfliq Chaser You&Me":0,
+"Поди":0,
+"Картриджі":0,
+"Інше":0
+};
+
+inventory.forEach(item=>{
+const qty=parseInt(item.qty)||0;
+const group=getStockGroup(item.name);
+groups[group]+=qty;
+});
+
+const icons={
+"Elfliq Chaser Lux":"🧪",
+"Elfliq Chaser Black":"🧪",
+"Elfliq Chaser For Pods":"🧪",
+"Elfliq Chaser Special":"🧪",
+"Elfliq Chaser You&Me":"🧪",
+"Поди":"🔋",
+"Картриджі":"🔄",
+"Інше":"📦"
+};
+
+summary.innerHTML="";
+
+Object.entries(groups).forEach(([name,qty])=>{
+
+let quantityClass="stock-good";
+
+if(qty<=0){
+quantityClass="stock-empty";
+}else if(qty<=5){
+quantityClass="stock-low";
+}
+
+const card=document.createElement("div");
+card.className="stock-summary-card";
+
+card.innerHTML=`
+<div class="stock-summary-left">
+
+<div class="stock-summary-icon">
+${icons[name]}
+</div>
+
+<div>
+<div class="stock-summary-name">
+${escapeHtml(name)}
+</div>
+
+<div class="stock-summary-sub">
+Загальний залишок
+</div>
+</div>
+
+</div>
+
+<div class="stock-summary-qty ${quantityClass}">
+${qty}
+<span>шт</span>
+</div>
+`;
+
+summary.appendChild(card);
+});
+}
+
+/* =========================================================
+   PDF INVOICE
+========================================================= */
+
+async function printInvoice(){
+
+const type=document.getElementById("opType").value;
+
+if(type!=="sale"){
+showToast("Накладну можна видати лише на продаж!","var(--danger)");
+return;
+}
+
+const activeId=document.getElementById("activeTgOrderId").value;
+const activeElement=document.getElementById("activeTgOrderId");
+
+const tgItems=activeElement.getAttribute("data-items");
+const customOrderNum=activeElement.getAttribute("data-ordernum");
+
+const clientName=document.getElementById("debtorName").value||"Роздрібний клієнт";
+const payMethod=document.getElementById("pay").value;
+
+const priceNum=
+getNumericPrice(document.getElementById("manualPrice").value)||
+getNumericPrice(document.getElementById("total").innerText);
+
+let currency=activeOrderCurrency;
+
+if(!currency&&activeOrderData)currency=getOrderCurrency(activeOrderData);
+
+if(!currency)currency=payMethod==="Монобанк"?"UAH":"PLN";
+
+const currencyText=currencyLabel(currency);
+
+const invoiceNum=customOrderNum
+?"#"+customOrderNum
+:activeId
+?"#"+activeId.substring(0,6).toUpperCase()
+:"#SH-"+Math.floor(1000+Math.random()*9000);
+
+document.getElementById("inv-num").innerText=invoiceNum;
+document.getElementById("inv-date").innerText=formatDate(Date.now());
+document.getElementById("inv-client").innerText=clientName;
+document.getElementById("inv-pay-method").innerText=payMethod;
+document.getElementById("inv-total").innerText=priceNum;
+document.getElementById("inv-currency").innerText=currencyText;
+
+const itemsList=document.getElementById("inv-items-list");
+itemsList.innerHTML="";
+
+if(tgItems&&tgItems.trim()){
+
+splitOrderItems(tgItems).forEach((good,index)=>{
+
+const row=document.createElement("tr");
+const nameCell=document.createElement("td");
+const priceCell=document.createElement("td");
+
+nameCell.innerText=`${index+1}. ${good}`;
+priceCell.style.textAlign="right";
+priceCell.innerText=index===0?`${priceNum} ${currencyText}`:"-";
+
+row.appendChild(nameCell);
+row.appendChild(priceCell);
+itemsList.appendChild(row);
+
+});
+
+}else{
+
+const flavor=document.getElementById("flavor").value||"Товар з каталогу";
+
+const row=document.createElement("tr");
+const nameCell=document.createElement("td");
+const priceCell=document.createElement("td");
+
+nameCell.innerText=`1. ${flavor}`;
+priceCell.style.textAlign="right";
+priceCell.innerText=`${priceNum} ${currencyText}`;
+
+row.appendChild(nameCell);
+row.appendChild(priceCell);
+itemsList.appendChild(row);
+}
+
+showToast("⏳ Генерація PDF...");
+
+const element=document.getElementById("invoice-print-area");
+
+try{
+
+const canvas=await html2canvas(element,{
+scale:2,
+useCORS:true,
+allowTaint:true
+});
+
+const imgData=canvas.toDataURL("image/jpeg",.98);
+const{jsPDF}=window.jspdf;
+const pdf=new jsPDF("p","mm","a5");
+
+const pdfWidth=pdf.internal.pageSize.getWidth();
+const pdfHeight=canvas.height*pdfWidth/canvas.width;
+
+pdf.addImage(imgData,"JPEG",0,0,pdfWidth,pdfHeight);
+
+const pdfBlob=pdf.output("blob");
+const fileName=`Nakladna_${invoiceNum.replace("#","")}.pdf`;
+
+const blobUrl=URL.createObjectURL(pdfBlob);
+const link=document.createElement("a");
+
+link.href=blobUrl;
+link.download=fileName;
+
+document.body.appendChild(link);
+link.click();
+document.body.removeChild(link);
+
+setTimeout(()=>URL.revokeObjectURL(blobUrl),1000);
+
+showToast("✅ PDF накладну збережено!");
+
+}catch(err){
+console.error(err);
+showToast("❌ Помилка створення PDF","var(--danger)");
+}
+}
 
 /* =========================================================
    SAVE ORDER
 ========================================================= */
 
-async function saveOrder() {
+async function saveOrder(){
 
-    if (savingOrder) {
-        return;
-    }
+if(savingOrder)return;
 
-    savingOrder = true;
+savingOrder=true;
 
-    const button =
-        document.getElementById("saveOrderBtn");
+const button=document.getElementById("saveOrderBtn");
+button.disabled=true;
 
-    button.disabled = true;
+try{
 
-    try {
+const type=document.getElementById("opType").value;
+const tgId=document.getElementById("activeTgOrderId").value;
 
-        const type =
-            document.getElementById("opType").value;
+const activeElement=document.getElementById("activeTgOrderId");
+const tgItems=activeElement.getAttribute("data-items")||"";
 
-        const tgId =
-            document.getElementById("activeTgOrderId").value;
+const manualFlavor=document.getElementById("flavor").value;
 
-        const tgItems =
-            document
-                .getElementById("activeTgOrderId")
-                .getAttribute("data-items") || "";
+let priceStr=document.getElementById("total").innerText;
 
-        const manualFlavor =
-            document.getElementById("flavor").value;
+let pVal=getNumericPrice(document.getElementById("manualPrice").value);
 
-        let priceStr =
-            document.getElementById("total").innerText;
+if(!pVal)pVal=getNumericPrice(priceStr);
 
-        let pVal =
-            getNumericPrice(
-                document.getElementById("manualPrice").value
-            );
-
-        if (!pVal) {
-            pVal = getNumericPrice(priceStr);
-        }
-
-        if (!pVal) {
-
-            showToast(
-                "❌ Вкажіть суму",
-                "var(--danger)"
-            );
-
-            return;
-        }
-
-        if (type === "sale") {
-
-            const fName =
-                tgItems ||
-                manualFlavor;
-
-            if (!fName) {
-
-                showToast(
-                    "Оберіть товар!",
-                    "var(--danger)"
-                );
-
-                return;
-            }
-
-            let currency =
-                activeOrderCurrency;
-
-            if (!currency && activeOrderData) {
-
-                currency =
-                    getOrderCurrency(activeOrderData);
-            }
-
-            if (!currency) {
-
-                currency =
-                    document.getElementById("pay").value ===
-                    "Монобанк"
-                        ? "UAH"
-                        : "PLN";
-            }
-
-            const fullPrice =
-                formatMoney(
-                    pVal,
-                    currency
-                );
-
-            const deducted =
-                await deductInventoryForSale(
-                    tgItems,
-                    tgItems ? null : manualFlavor
-                );
-
-            const orderData = {
-
-                type: "sale",
-
-                catalog:
-                    document.getElementById("catalog").value,
-
-                flavor: fName,
-
-                pay:
-                    document.getElementById("pay").value,
-
-                priceVal: pVal,
-
-                currency: currency,
-
-                fullPrice: fullPrice,
-
-                status:
-                    document.getElementById("status").value,
-
-                debtor:
-                    document.getElementById("debtorName").value ||
-                    "",
-
-                date: Date.now(),
-
-                inventoryDeducted: deducted
-            };
-
-            await db
-                .collection("orders")
-                .add(orderData);
-
-            if (tgId) {
-
-                await db
-                    .collection("tg_orders")
-                    .doc(tgId)
-                    .update({
-                        status: "completed",
-                        completedAt: Date.now()
-                    });
-            }
-
-        } else {
-
-            const name =
-                document.getElementById("expName").value ||
-                "Витрата";
-
-            const pay =
-                document.getElementById("pay").value;
-
-            const currency =
-                pay === "Монобанк"
-                    ? "UAH"
-                    : "PLN";
-
-            const fullPrice =
-                "-" + formatMoney(
-                    pVal,
-                    currency
-                );
-
-            await db
-                .collection("orders")
-                .add({
-
-                    type: "expense",
-
-                    flavor:
-                        "🔻 " + name,
-
-                    pay: pay,
-
-                    priceVal: pVal,
-
-                    currency: currency,
-
-                    fullPrice: fullPrice,
-
-                    status: "paid",
-
-                    date: Date.now()
-                });
-        }
-
-        document.getElementById(
-            "manualPrice"
-        ).value = "";
-
-        document.getElementById(
-            "expName"
-        ).value = "";
-
-        document.getElementById(
-            "tgOrderSelect"
-        ).value = "";
-
-        document.getElementById(
-            "activeTgOrderId"
-        ).value = "";
-
-        document
-            .getElementById("activeTgOrderId")
-            .removeAttribute("data-items");
-
-        document
-            .getElementById("activeTgOrderId")
-            .removeAttribute("data-ordernum");
-
-        document
-            .querySelectorAll(".tg-order-card")
-            .forEach(card =>
-                card.classList.remove("selected")
-            );
-
-        activeOrderCurrency = null;
-        activeOrderData = null;
-
-        calc();
-
-        showToast(
-            "✅ Записано успішно!"
-        );
-
-    } catch (error) {
-
-        console.error(
-            "SAVE ORDER ERROR:",
-            error
-        );
-
-        showToast(
-            "❌ " + (
-                error.message ||
-                "Помилка збереження"
-            ),
-            "var(--danger)"
-        );
-
-    } finally {
-
-        savingOrder = false;
-
-        button.disabled = false;
-    }
+if(!pVal){
+showToast("❌ Вкажіть суму","var(--danger)");
+return;
 }
 
+if(type==="sale"){
+
+const fName=tgItems||manualFlavor;
+
+if(!fName){
+showToast("Оберіть товар!","var(--danger)");
+return;
+}
+
+let currency=activeOrderCurrency;
+
+if(!currency&&activeOrderData)currency=getOrderCurrency(activeOrderData);
+
+if(!currency)currency=document.getElementById("pay").value==="Монобанк"?"UAH":"PLN";
+
+const fullPrice=formatMoney(pVal,currency);
+
+const deducted=await deductInventoryForSale(
+tgItems,
+tgItems?null:manualFlavor
+);
+
+await db.collection("orders").add({
+
+type:"sale",
+
+catalog:document.getElementById("catalog").value,
+
+flavor:fName,
+
+pay:document.getElementById("pay").value,
+
+priceVal:pVal,
+
+currency:currency,
+
+fullPrice:fullPrice,
+
+status:document.getElementById("status").value,
+
+debtor:document.getElementById("debtorName").value||"",
+
+date:Date.now(),
+
+inventoryDeducted:deducted
+
+});
+
+if(tgId){
+
+await db.collection("tg_orders").doc(tgId).update({
+status:"completed",
+completedAt:Date.now()
+});
+
+}
+
+}else{
+
+const name=document.getElementById("expName").value||"Витрата";
+const pay=document.getElementById("pay").value;
+const currency=pay==="Монобанк"?"UAH":"PLN";
+
+await db.collection("orders").add({
+
+type:"expense",
+
+flavor:"🔻 "+name,
+
+pay:pay,
+
+priceVal:pVal,
+
+currency:currency,
+
+fullPrice:"-"+formatMoney(pVal,currency),
+
+status:"paid",
+
+date:Date.now()
+
+});
+}
+
+document.getElementById("manualPrice").value="";
+document.getElementById("expName").value="";
+document.getElementById("tgOrderSelect").value="";
+document.getElementById("activeTgOrderId").value="";
+
+activeElement.removeAttribute("data-items");
+activeElement.removeAttribute("data-ordernum");
+
+document.querySelectorAll(".tg-order-card").forEach(card=>card.classList.remove("selected"));
+
+activeOrderCurrency=null;
+activeOrderData=null;
+
+calc();
+
+showToast("✅ Записано успішно!");
+
+}catch(error){
+
+console.error("SAVE ORDER ERROR:",error);
+
+showToast("❌ "+(error.message||"Помилка збереження"),"var(--danger)");
+
+}finally{
+
+savingOrder=false;
+button.disabled=false;
+
+}
+}
 
 /* =========================================================
    DELETE ORDER
 ========================================================= */
 
-async function deleteOrder(id) {
+async function deleteOrder(id){
 
-    if (!confirm("Видалити транзакцію?")) {
-        return;
-    }
+if(!confirm("Видалити транзакцію?"))return;
 
-    try {
+try{
 
-        const ref =
-            db.collection("orders").doc(id);
+const ref=db.collection("orders").doc(id);
+const snap=await ref.get();
 
-        const snap =
-            await ref.get();
+if(!snap.exists)return;
 
-        if (!snap.exists) {
-            return;
-        }
+const data=snap.data();
 
-        const data =
-            snap.data();
-
-        if (
-            data.type === "sale" &&
-            Array.isArray(data.inventoryDeducted) &&
-            data.inventoryDeducted.length
-        ) {
-
-            await restoreInventory(
-                data.inventoryDeducted
-            );
-        }
-
-        await ref.delete();
-
-        showToast(
-            "🗑 Транзакцію видалено"
-        );
-
-    } catch (error) {
-
-        console.error(error);
-
-        showToast(
-            "❌ Не вдалося видалити транзакцію",
-            "var(--danger)"
-        );
-    }
+if(
+data.type==="sale"&&
+Array.isArray(data.inventoryDeducted)&&
+data.inventoryDeducted.length
+){
+await restoreInventory(data.inventoryDeducted);
 }
 
+await ref.delete();
+
+showToast("🗑 Транзакцію видалено");
+
+}catch(error){
+
+console.error(error);
+
+showToast("❌ Не вдалося видалити транзакцію","var(--danger)");
+}
+}
 
 /* =========================================================
-   PAY DEBT
+   DEBT
 ========================================================= */
 
-async function payDebt(id) {
+async function payDebt(id){
 
-    try {
+try{
 
-        await db
-            .collection("orders")
-            .doc(id)
-            .update({
-                status: "paid",
-                paidAt: Date.now()
-            });
+await db.collection("orders").doc(id).update({
+status:"paid",
+paidAt:Date.now()
+});
 
-        showToast(
-            "✅ Борг оплачено"
-        );
+showToast("✅ Борг оплачено");
 
-    } catch (error) {
+}catch(error){
 
-        console.error(error);
+console.error(error);
+showToast("❌ Помилка","var(--danger)");
 
-        showToast(
-            "❌ Помилка",
-            "var(--danger)"
-        );
-    }
 }
-
+}
 
 /* =========================================================
    FIREBASE SYNC
 ========================================================= */
 
-function sync() {
+function sync(){
 
-    db
-        .collection("tg_orders")
-        .where("status", "==", "new")
-        .onSnapshot(
-            snap => {
+/* TELEGRAM */
 
-                const list =
-                    document.getElementById(
-                        "tg-orders-list"
-                    );
+db.collection("tg_orders")
+.where("status","==","new")
+.onSnapshot(snap=>{
 
-                const dropdown =
-                    document.getElementById(
-                        "tgOrderSelect"
-                    );
+const list=document.getElementById("tg-orders-list");
+const dropdown=document.getElementById("tgOrderSelect");
+const section=document.getElementById("tg-orders-section");
 
-                const section =
-                    document.getElementById(
-                        "tg-orders-section"
-                    );
+list.innerHTML="";
 
-                list.innerHTML = "";
+dropdown.innerHTML=`
+<option value="" disabled selected>
+-- Виберіть замовлення або вкажіть вручну --
+</option>
+`;
 
-                dropdown.innerHTML =
-                    `
-                    <option value="" disabled selected>
-                        -- Виберіть замовлення або вкажіть вручну --
-                    </option>
-                    `;
+cachedTgOrders={};
 
-                cachedTgOrders = {};
-
-                if (snap.empty) {
-
-                    section.style.display =
-                        "none";
-
-                    return;
-                }
-
-                section.style.display =
-                    "block";
-
-                const docs =
-                    snap.docs.slice().sort(
-                        (a, b) => {
-
-                            const ad =
-                                a.data();
-
-                            const bd =
-                                b.data();
-
-                            const at =
-                                getTimestamp(
-                                    ad.date ??
-                                    ad.createdAt ??
-                                    ad.timestamp ??
-                                    0
-                                );
-
-                            const bt =
-                                getTimestamp(
-                                    bd.date ??
-                                    bd.createdAt ??
-                                    bd.timestamp ??
-                                    0
-                                );
-
-                            return bt - at;
-                        }
-                    );
-
-                docs.forEach(doc => {
-
-                    const tg =
-                        doc.data();
-
-                    cachedTgOrders[doc.id] =
-                        tg;
-
-                    const client =
-                        tg.client_name ||
-                        tg.client ||
-                        tg.name ||
-                        "Клієнт";
-
-                    const itemText =
-                        tg.items ||
-                        tg.products ||
-                        tg.product ||
-                        "Товар";
-
-                    const rawPrice =
-                        tg.total_price ??
-                        tg.price ??
-                        tg.amount ??
-                        0;
-
-                    const price =
-                        getNumericPrice(
-                            rawPrice
-                        );
-
-                    const currency =
-                        getOrderCurrency(tg);
-
-                    const currLabel =
-                        currencyLabel(currency);
-
-                    const orderNum =
-                        tg.order_number ||
-                        tg.number ||
-                        tg.orderId ||
-                        tg.id ||
-                        doc.id.substring(0, 5);
-
-                    const card =
-                        document.createElement("div");
-
-                    card.className =
-                        "tg-order-card";
-
-                    card.id =
-                        `tg-card-${doc.id}`;
-
-                    card.onclick = () =>
-                        selectTgOrderById(doc.id);
-
-                    card.innerHTML = `
-                        <div class="tg-order-title">
-                            👤 ${escapeHtml(client)}
-                            (#${escapeHtml(orderNum)})
-                        </div>
-
-                        <div class="tg-order-text">
-                            ${escapeHtml(itemText)}
-                        </div>
-
-                        <div class="tg-order-price">
-                            ${price} ${currLabel}
-                        </div>
-                    `;
-
-                    list.appendChild(card);
-
-                    const option =
-                        document.createElement("option");
-
-                    option.value =
-                        doc.id;
-
-                    option.textContent =
-                        `№${orderNum} | 👤 ${client} — ${price} ${currLabel}`;
-
-                    dropdown.appendChild(option);
-                });
-            },
-
-            error => {
-
-                console.error(
-                    "Telegram listener:",
-                    error
-                );
-
-                showToast(
-                    "❌ Помилка Telegram-замовлень",
-                    "var(--danger)"
-                );
-            }
-        );
-
-    db
-        .collection("inventory")
-        .orderBy("name")
-        .onSnapshot(
-            snap => {
-
-                inventory = [];
-
-                const list =
-                    document.getElementById(
-                        "inventoryList"
-                    );
-
-                list.innerHTML = "";
-
-                snap.forEach(doc => {
-
-                    const item =
-                        doc.data();
-
-                    const prepared = {
-                        id: doc.id,
-                        ...item
-                    };
-
-                    inventory.push(
-                        prepared
-                    );
-
-                    const isSale =
-                        item.type === "продаж";
-
-                    const qty =
-                        parseInt(item.qty) || 0;
-
-                    const stockColor =
-                        qty <= 0
-                            ? "var(--danger)"
-                            : "var(--success)";
-
-                    const wrapper =
-                        document.createElement("div");
-
-                    wrapper.className =
-                        "list-item";
-
-                    wrapper.style.cssText =
-                        `
-                        border-left-color:${
-                            isSale
-                                ? "var(--accent-primary)"
-                                : "var(--accent-secondary)"
-                        };
-                        flex-direction:column;
-                        align-items:stretch;
-                        `;
-
-                    wrapper.innerHTML = `
-
-                        <div style="
-                            display:flex;
-                            justify-content:space-between;
-                            align-items:flex-start;
-                            margin-bottom:12px;
-                        ">
-
-                            <div>
-
-                                <span class="type-badge">
-                                    ${escapeHtml(
-                                        item.type ||
-                                        "заливка"
-                                    )}
-                                </span>
-
-                                <b style="
-                                    display:block;
-                                    font-size:16px;
-                                    margin-top:6px;
-                                ">
-                                    ${escapeHtml(
-                                        item.name
-                                    )}
-                                </b>
-
-                            </div>
-
-                            <div style="
-                                display:flex;
-                                gap:8px;
-                            ">
-
-                                <button
-                                    class="icon-btn"
-                                    onclick="editInventoryById('${doc.id}')"
-                                >
-                                    ✏️
-                                </button>
-
-                                <button
-                                    class="icon-btn"
-                                    style="color:var(--danger)"
-                                    onclick="deleteInventoryItem('${doc.id}')"
-                                >
-                                    🗑
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                        <div style="
-                            display:flex;
-                            justify-content:space-between;
-                            align-items:center;
-                            background:rgba(0,0,0,.25);
-                            padding:10px 14px;
-                            border-radius:10px;
-                        ">
-
-                            <span style="
-                                font-size:12px;
-                                color:var(--text-p);
-                            ">
-                                📍 ${escapeHtml(
-                                    item.loc ||
-                                    "Немає"
-                                )}
-                            </span>
-
-                            <span style="
-                                font-size:15px;
-                                font-weight:800;
-                                color:${stockColor};
-                            ">
-                                📦 ${qty} шт
-                            </span>
-
-                        </div>
-                    `;
-
-                    list.appendChild(wrapper);
-                });
-
-                updateFlavorList();
-            },
-
-            error => {
-
-                console.error(
-                    "Inventory listener:",
-                    error
-                );
-
-                showToast(
-                    "❌ Помилка завантаження складу",
-                    "var(--danger)"
-                );
-            }
-        );
-
-    db
-        .collection("orders")
-        .orderBy("date", "desc")
-        .onSnapshot(
-            snap => {
-
-                const logs =
-                    document.getElementById(
-                        "logs"
-                    );
-
-                const debts =
-                    document.getElementById(
-                        "debtList"
-                    );
-
-                const dailyList =
-                    document.getElementById(
-                        "dailyStatsList"
-                    );
-
-                let pln = 0;
-                let uah = 0;
-
-                let sPln = 0;
-                let sUah = 0;
-
-                let ePln = 0;
-                let eUah = 0;
-
-                const weekAgo =
-                    Date.now() -
-                    7 * 24 * 60 * 60 * 1000;
-
-                const dayGroups = {};
-
-                logs.innerHTML = "";
-                debts.innerHTML = "";
-
-                const docs =
-                    snap.docs.slice().sort(
-                        (a, b) =>
-                            getTimestamp(
-                                b.data().date
-                            ) -
-                            getTimestamp(
-                                a.data().date
-                            )
-                    );
-
-                docs.forEach(doc => {
-
-                    const item =
-                        doc.data();
-
-                    const id =
-                        doc.id;
-
-                    const timestamp =
-                        getTimestamp(item.date);
-
-                    const isRecent =
-                        timestamp > weekAgo;
-
-                    const timeLabel =
-                        formatDate(timestamp);
-
-                    const dateOnly =
-                        formatDateOnly(timestamp);
-
-                    if (!dayGroups[dateOnly]) {
-
-                        dayGroups[dateOnly] = {
-                            pln: 0,
-                            uah: 0,
-                            timestamp
-                        };
-                    }
-
-                    const value =
-                        getNumericPrice(
-                            item.priceVal
-                        );
-
-                    if (item.status === "paid") {
-
-                        const isExpense =
-                            item.type === "expense";
-
-                        const sign =
-                            isExpense ? -1 : 1;
-
-                        const val =
-                            value * sign;
-
-                        if (item.currency === "PLN") {
-
-                            pln += val;
-
-                            dayGroups[
-                                dateOnly
-                            ].pln += val;
-
-                            if (isRecent) {
-
-                                if (isExpense) {
-                                    ePln += value;
-                                } else {
-                                    sPln += value;
-                                }
-                            }
-
-                        } else {
-
-                            uah += val;
-
-                            dayGroups[
-                                dateOnly
-                            ].uah += val;
-
-                            if (isRecent) {
-
-                                if (isExpense) {
-                                    eUah += value;
-                                } else {
-                                    sUah += value;
-                                }
-                            }
-                        }
-
-                        const itemDiv =
-                            document.createElement("div");
-
-                        itemDiv.className =
-                            "list-item";
-
-                        if (isExpense) {
-                            itemDiv.style.borderLeftColor =
-                                "var(--danger)";
-                        }
-
-                        itemDiv.innerHTML = `
-
-                            <div class="item-main">
-
-                                <span class="item-date">
-                                    ${timeLabel}
-                                </span>
-
-                                <b>
-                                    ${escapeHtml(
-                                        item.flavor ||
-                                        "Транзакція"
-                                    )}
-                                </b>
-
-                                <span>
-                                    💳 ${escapeHtml(
-                                        item.pay ||
-                                        ""
-                                    )}
-                                </span>
-
-                            </div>
-
-                            <div style="
-                                text-align:right;
-                                display:flex;
-                                flex-direction:column;
-                                align-items:flex-end;
-                                gap:6px;
-                            ">
-
-                                <b style="
-                                    font-size:16px;
-                                    color:${
-                                        isExpense
-                                            ? "var(--danger)"
-                                            : "var(--success)"
-                                    };
-                                ">
-                                    ${escapeHtml(
-                                        item.fullPrice ||
-                                        formatMoney(
-                                            value,
-                                            item.currency
-                                        )
-                                    )}
-                                </b>
-
-                                <button
-                                    class="icon-btn"
-                                    style="
-                                        width:28px;
-                                        height:28px;
-                                        font-size:12px;
-                                        border-color:transparent;
-                                    "
-                                    onclick="deleteOrder('${id}')"
-                                >
-                                    🗑
-                                </button>
-
-                            </div>
-                        `;
-
-                        logs.appendChild(
-                            itemDiv
-                        );
-
-                    } else {
-
-                        const debtDiv =
-                            document.createElement("div");
-
-                        debtDiv.className =
-                            "list-item";
-
-                        debtDiv.style.borderLeftColor =
-                            "var(--warning)";
-
-                        debtDiv.innerHTML = `
-
-                            <div class="item-main">
-
-                                <span class="item-date">
-                                    ${timeLabel}
-                                </span>
-
-                                <b>
-                                    👤 ${escapeHtml(
-                                        item.debtor ||
-                                        "Без імені"
-                                    )}
-                                </b>
-
-                                <span>
-                                    ${escapeHtml(
-                                        item.flavor ||
-                                        "Товар"
-                                    )}
-                                </span>
-
-                            </div>
-
-                            <div style="
-                                text-align:right;
-                                display:flex;
-                                flex-direction:column;
-                                align-items:flex-end;
-                                gap:6px;
-                            ">
-
-                                <b style="
-                                    font-size:16px;
-                                    color:var(--warning);
-                                ">
-                                    ${escapeHtml(
-                                        item.fullPrice ||
-                                        formatMoney(
-                                            value,
-                                            item.currency
-                                        )
-                                    )}
-                                </b>
-
-                                <button
-                                    class="btn-pay"
-                                    onclick="payDebt('${id}')"
-                                >
-                                    ОПЛАТИВ
-                                </button>
-
-                            </div>
-                        `;
-
-                        debts.appendChild(
-                            debtDiv
-                        );
-                    }
-                });
-
-                document.getElementById(
-                    "totalPLN"
-                ).innerText =
-                    `${pln} ZŁ`;
-
-                document.getElementById(
-                    "totalUAH"
-                ).innerText =
-                    `${uah} ₴`;
-
-                document.getElementById(
-                    "st-sales-pln"
-                ).innerText =
-                    `${sPln} ZŁ`;
-
-                document.getElementById(
-                    "st-sales-uah"
-                ).innerText =
-                    `${sUah} ₴`;
-
-                document.getElementById(
-                    "st-exp-pln"
-                ).innerText =
-                    `${ePln} ZŁ`;
-
-                document.getElementById(
-                    "st-exp-uah"
-                ).innerText =
-                    `${eUah} ₴`;
-
-                dailyList.innerHTML = "";
-
-                Object.keys(dayGroups)
-                    .sort((a, b) =>
-                        dayGroups[b].timestamp -
-                        dayGroups[a].timestamp
-                    )
-                    .forEach(day => {
-
-                        const data =
-                            dayGroups[day];
-
-                        const row =
-                            document.createElement("div");
-
-                        row.className =
-                            "day-row";
-
-                        row.innerHTML = `
-
-                            <div class="day-date">
-                                ${day}
-                            </div>
-
-                            <div class="day-totals">
-
-                                <div style="
-                                    color:${
-                                        data.pln >= 0
-                                            ? "var(--success)"
-                                            : "var(--danger)"
-                                    };
-                                ">
-                                    ${
-                                        data.pln > 0
-                                            ? "+"
-                                            : ""
-                                    }${data.pln} ZŁ
-                                </div>
-
-                                <div style="
-                                    color:${
-                                        data.uah >= 0
-                                            ? "var(--success)"
-                                            : "var(--danger)"
-                                    };
-                                ">
-                                    ${
-                                        data.uah > 0
-                                            ? "+"
-                                            : ""
-                                    }${data.uah} ₴
-                                </div>
-
-                            </div>
-                        `;
-
-                        dailyList.appendChild(
-                            row
-                        );
-                    });
-
-            },
-
-            error => {
-
-                console.error(
-                    "Orders listener:",
-                    error
-                );
-
-                showToast(
-                    "❌ Помилка завантаження архіву",
-                    "var(--danger)"
-                );
-            }
-        );
+if(snap.empty){
+section.style.display="none";
+return;
 }
 
+section.style.display="block";
+
+const docs=snap.docs.slice().sort((a,b)=>{
+
+const ad=a.data();
+const bd=b.data();
+
+const at=getTimestamp(ad.date??ad.createdAt??ad.timestamp??0);
+const bt=getTimestamp(bd.date??bd.createdAt??bd.timestamp??0);
+
+return bt-at;
+});
+
+docs.forEach(doc=>{
+
+const tg=doc.data();
+
+cachedTgOrders[doc.id]=tg;
+
+const client=tg.client_name||tg.client||tg.name||"Клієнт";
+const itemText=tg.items||tg.products||tg.product||"Товар";
+
+const rawPrice=tg.total_price??tg.price??tg.amount??0;
+const price=getNumericPrice(rawPrice);
+
+const currency=getOrderCurrency(tg);
+const currLabel=currencyLabel(currency);
+
+const orderNum=tg.order_number||tg.number||tg.orderId||tg.id||doc.id.substring(0,5);
+
+const card=document.createElement("div");
+
+card.className="tg-order-card";
+card.id=`tg-card-${doc.id}`;
+
+card.onclick=()=>selectTgOrderById(doc.id);
+
+card.innerHTML=`
+<div class="tg-order-title">
+👤 ${escapeHtml(client)}
+(#${escapeHtml(orderNum)})
+</div>
+
+<div class="tg-order-text">
+${escapeHtml(itemText)}
+</div>
+
+<div class="tg-order-price">
+${price} ${currLabel}
+</div>
+`;
+
+list.appendChild(card);
+
+const option=document.createElement("option");
+
+option.value=doc.id;
+option.textContent=`№${orderNum} | 👤 ${client} — ${price} ${currLabel}`;
+
+dropdown.appendChild(option);
+
+});
+
+},error=>{
+
+console.error("Telegram listener:",error);
+
+showToast("❌ Помилка Telegram-замовлень","var(--danger)");
+
+});
+
+/* INVENTORY */
+
+db.collection("inventory")
+.orderBy("name")
+.onSnapshot(snap=>{
+
+inventory=[];
+
+const list=document.getElementById("inventoryList");
+list.innerHTML="";
+
+snap.forEach(doc=>{
+
+const item=doc.data();
+
+const prepared={
+id:doc.id,
+...item
+};
+
+inventory.push(prepared);
+
+const isSale=item.type==="продаж";
+const qty=parseInt(item.qty)||0;
+
+const stockColor=qty<=0?"var(--danger)":qty<=5?"var(--warning)":"var(--success)";
+
+const wrapper=document.createElement("div");
+
+wrapper.className="list-item";
+
+wrapper.style.cssText=`
+border-left-color:${isSale?"var(--accent-primary)":"var(--accent-secondary)"};
+flex-direction:column;
+align-items:stretch;
+`;
+
+wrapper.innerHTML=`
+
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+margin-bottom:12px;
+">
+
+<div>
+
+<span class="type-badge">
+${escapeHtml(item.type||"заливка")}
+</span>
+
+<b style="
+display:block;
+font-size:16px;
+margin-top:6px;
+">
+${escapeHtml(item.name)}
+</b>
+
+</div>
+
+<div style="
+display:flex;
+gap:8px;
+">
+
+<button
+class="icon-btn"
+onclick="editInventoryById('${doc.id}')"
+>
+✏️
+</button>
+
+<button
+class="icon-btn"
+style="color:var(--danger)"
+onclick="deleteInventoryItem('${doc.id}')"
+>
+🗑
+</button>
+
+</div>
+
+</div>
+
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:rgba(0,0,0,.25);
+padding:10px 14px;
+border-radius:10px;
+">
+
+<span style="
+font-size:12px;
+color:var(--text-p);
+">
+📍 ${escapeHtml(item.loc||"Немає")}
+</span>
+
+<span style="
+font-size:15px;
+font-weight:800;
+color:${stockColor};
+">
+📦 ${qty} шт
+</span>
+
+</div>
+`;
+
+list.appendChild(wrapper);
+
+});
+
+/*
+ВАЖЛИВО:
+спочатку будуємо загальний підсумок,
+потім звичайний список.
+*/
+renderStockSummary();
+updateFlavorList();
+
+},error=>{
+
+console.error("Inventory listener:",error);
+
+showToast("❌ Помилка завантаження складу","var(--danger)");
+
+});
+
+/* ORDERS */
+
+db.collection("orders")
+.orderBy("date","desc")
+.onSnapshot(snap=>{
+
+const logs=document.getElementById("logs");
+const debts=document.getElementById("debtList");
+const dailyList=document.getElementById("dailyStatsList");
+
+let pln=0;
+let uah=0;
+
+let sPln=0;
+let sUah=0;
+
+let ePln=0;
+let eUah=0;
+
+const weekAgo=Date.now()-7*24*60*60*1000;
+const dayGroups={};
+
+logs.innerHTML="";
+debts.innerHTML="";
+
+const docs=snap.docs.slice().sort((a,b)=>
+getTimestamp(b.data().date)-getTimestamp(a.data().date)
+);
+
+docs.forEach(doc=>{
+
+const item=doc.data();
+const id=doc.id;
+
+const timestamp=getTimestamp(item.date);
+const isRecent=timestamp>weekAgo;
+
+const timeLabel=formatDate(timestamp);
+const dateOnly=formatDateOnly(timestamp);
+
+if(!dayGroups[dateOnly]){
+dayGroups[dateOnly]={
+pln:0,
+uah:0,
+timestamp
+};
+}
+
+const value=getNumericPrice(item.priceVal);
+
+if(item.status==="paid"){
+
+const isExpense=item.type==="expense";
+const sign=isExpense?-1:1;
+const val=value*sign;
+
+if(item.currency==="PLN"){
+
+pln+=val;
+dayGroups[dateOnly].pln+=val;
+
+if(isRecent){
+if(isExpense)ePln+=value;
+else sPln+=value;
+}
+
+}else{
+
+uah+=val;
+dayGroups[dateOnly].uah+=val;
+
+if(isRecent){
+if(isExpense)eUah+=value;
+else sUah+=value;
+}
+
+}
+
+const itemDiv=document.createElement("div");
+
+itemDiv.className="list-item";
+
+if(isExpense)itemDiv.style.borderLeftColor="var(--danger)";
+
+itemDiv.innerHTML=`
+
+<div class="item-main">
+
+<span class="item-date">
+${timeLabel}
+</span>
+
+<b>
+${escapeHtml(item.flavor||"Транзакція")}
+</b>
+
+<span>
+💳 ${escapeHtml(item.pay||"")}
+</span>
+
+</div>
+
+<div style="
+text-align:right;
+display:flex;
+flex-direction:column;
+align-items:flex-end;
+gap:6px;
+">
+
+<b style="
+font-size:16px;
+color:${isExpense?"var(--danger)":"var(--success)"};
+">
+${escapeHtml(item.fullPrice||formatMoney(value,item.currency))}
+</b>
+
+<button
+class="icon-btn"
+style="
+width:28px;
+height:28px;
+font-size:12px;
+border-color:transparent;
+"
+onclick="deleteOrder('${id}')"
+>
+🗑
+</button>
+
+</div>
+`;
+
+logs.appendChild(itemDiv);
+
+}else{
+
+const debtDiv=document.createElement("div");
+
+debtDiv.className="list-item";
+debtDiv.style.borderLeftColor="var(--warning)";
+
+debtDiv.innerHTML=`
+
+<div class="item-main">
+
+<span class="item-date">
+${timeLabel}
+</span>
+
+<b>
+👤 ${escapeHtml(item.debtor||"Без імені")}
+</b>
+
+<span>
+${escapeHtml(item.flavor||"Товар")}
+</span>
+
+</div>
+
+<div style="
+text-align:right;
+display:flex;
+flex-direction:column;
+align-items:flex-end;
+gap:6px;
+">
+
+<b style="
+font-size:16px;
+color:var(--warning);
+">
+${escapeHtml(item.fullPrice||formatMoney(value,item.currency))}
+</b>
+
+<button
+class="btn-pay"
+onclick="payDebt('${id}')"
+>
+ОПЛАТИВ
+</button>
+
+</div>
+`;
+
+debts.appendChild(debtDiv);
+}
+
+});
+
+document.getElementById("totalPLN").innerText=`${pln} ZŁ`;
+document.getElementById("totalUAH").innerText=`${uah} ₴`;
+
+document.getElementById("st-sales-pln").innerText=`${sPln} ZŁ`;
+document.getElementById("st-sales-uah").innerText=`${sUah} ₴`;
+document.getElementById("st-exp-pln").innerText=`${ePln} ZŁ`;
+document.getElementById("st-exp-uah").innerText=`${eUah} ₴`;
+
+dailyList.innerHTML="";
+
+Object.keys(dayGroups)
+.sort((a,b)=>dayGroups[b].timestamp-dayGroups[a].timestamp)
+.forEach(day=>{
+
+const data=dayGroups[day];
+
+const row=document.createElement("div");
+
+row.className="day-row";
+
+row.innerHTML=`
+
+<div class="day-date">
+${day}
+</div>
+
+<div class="day-totals">
+
+<div style="
+color:${data.pln>=0?"var(--success)":"var(--danger)"};
+">
+${data.pln>0?"+":""}${data.pln} ZŁ
+</div>
+
+<div style="
+color:${data.uah>=0?"var(--success)":"var(--danger)"};
+">
+${data.uah>0?"+":""}${data.uah} ₴
+</div>
+
+</div>
+`;
+
+dailyList.appendChild(row);
+
+});
+
+},error=>{
+
+console.error("Orders listener:",error);
+
+showToast("❌ Помилка завантаження архіву","var(--danger)");
+
+});
+
+}
 
 /* =========================================================
    START
 ========================================================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+document.addEventListener("DOMContentLoaded",()=>{
 
-        updateFlavorList();
-        toggleOpType();
-        toggleDebt();
+updateFlavorList();
+toggleOpType();
+toggleDebt();
+sync();
 
-        sync();
-    }
-);
+});
 
 </script>
 
