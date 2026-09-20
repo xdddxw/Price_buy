@@ -1718,56 +1718,63 @@ const n=String(name||"")
 .trim();
 
 /*
-ВАЖЛИВО:
-Спочатку конкретні Chaser,
-потім Поди,
-і тільки після цього ElfLiq.
+Логіка працює за ключовими словами.
+Не має значення, чи є перед ними Chaser.
 */
 
-if(
-n.includes("chaser black")
-){
+if(n.includes("black")){
 return"Chaser Black";
 }
 
-if(
-n.includes("chaser lux")
-){
+if(n.includes("lux")){
 return"Chaser Lux";
 }
 
 if(
-n.includes("chaser for pods")||
-n.includes("chaser for pod")||
-n.includes("for pods")
+n.includes("for pods")||
+n.includes("for pod")
 ){
 return"Chaser For pods";
 }
 
-if(
-n.includes("chaser special")
-){
+if(n.includes("special")){
 return"Chaser special";
 }
 
 if(
-n.includes("chaser you&me")||
-n.includes("chaser you & me")||
-n.includes("chaser you and me")||
 n.includes("you&me")||
-n.includes("you & me")
+n.includes("you & me")||
+n.includes("you and me")
 ){
 return"Chaser you&me";
 }
 
+/*
+СНЮС:
+Cuba
+Barron
+*/
+
 if(
-n.includes("pod")||
-n.includes("pods")||
-n.includes("под")||
-n.includes("поди")
+n.includes("cuba")||
+n.includes("barron")
 ){
+return"Снюс";
+}
+
+/*
+ПОДИ:
+Xros
+*/
+
+if(n.includes("xros")){
 return"Поди";
 }
+
+/*
+ELFLIQ
+Перевіряємо після Chaser-груп.
+*/
 
 if(
 n.includes("elfliq")||
@@ -1785,10 +1792,6 @@ const summary=document.getElementById("stockSummary");
 
 if(!summary)return;
 
-/*
-РІВНО 7 КАТЕГОРІЙ
-*/
-
 const groups={
 "ElfLiq":0,
 "Chaser Black":0,
@@ -1796,18 +1799,9 @@ const groups={
 "Chaser For pods":0,
 "Chaser special":0,
 "Chaser you&me":0,
-"Поди":0
+"Поди":0,
+"Снюс":0
 };
-
-/*
-Додаємо ВСІ SKU до відповідної категорії.
-Наприклад:
-Lux Blue 5
-Lux Strawberry 8
-Lux Ice 12
-=
-Chaser Lux 25
-*/
 
 inventory.forEach(item=>{
 
@@ -1827,7 +1821,8 @@ const icons={
 "Chaser For pods":"🧪",
 "Chaser special":"🧪",
 "Chaser you&me":"🧪",
-"Поди":"🔋"
+"Поди":"🔋",
+"Снюс":"🟫"
 };
 
 summary.innerHTML="";
