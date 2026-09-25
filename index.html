@@ -370,6 +370,7 @@
         <div class="sub-nav">
             <button class="sub-nav-btn active" data-target="aktsii">Картриджі</button>
             <button class="sub-nav-btn" data-target="aktsii-oxva">Oxva</button>
+            <button class="sub-nav-btn" data-target="aktsii-vaporesso">Vaporesso</button>
             <button class="sub-nav-btn" data-target="aktsii-pods">Подіки (Девайси)</button>
             <button class="sub-nav-btn" data-target="aktsii-xros6mini">Xros 6 Mini</button>
             <button class="sub-nav-btn" data-target="aktsii-xros6">Xros 6</button>
@@ -377,6 +378,7 @@
         </div>
         <div class="product-grid sub-grid active" id="grid-aktsii"></div>
         <div class="product-grid sub-grid" id="grid-aktsii-oxva"></div>
+        <div class="product-grid sub-grid" id="grid-aktsii-vaporesso"></div>
         <div class="product-grid sub-grid" id="grid-aktsii-pods"></div>
         <div class="product-grid sub-grid" id="grid-aktsii-xros6mini"></div>
         <div class="product-grid sub-grid" id="grid-aktsii-xros6"></div>
@@ -524,6 +526,7 @@
                 <optgroup label="⚡ Поди та Картриджі">
                     <option value="aktsii">Картриджі</option>
                     <option value="aktsii-oxva">Oxva</option>
+                    <option value="aktsii-vaporesso">Vaporesso</option>
                     <option value="aktsii-pods">Подіки</option>
                     <option value="aktsii-xros6mini">Xros 6 Mini</option>
                     <option value="aktsii-xros6">Xros 6</option>
@@ -834,7 +837,7 @@
         if (!globalCatalog) return "all";
         const liquids = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack', 'zalivka-chaserspecial', 'zalivka-chaseryoume'];
         const snus = ['prodazh-cuba', 'prodazh-barron'];
-        const cartridges = ['aktsii', 'aktsii-oxva', 'aktsii-pods', 'aktsii-xros6mini', 'aktsii-xros6', 'aktsii-xlimgo2'];
+        const cartridges = ['aktsii', 'aktsii-oxva', 'aktsii-vaporesso', 'aktsii-pods', 'aktsii-xros6mini', 'aktsii-xros6', 'aktsii-xlimgo2'];
         
         for (let cat of liquids) {
             if (globalCatalog[cat] && globalCatalog[cat].descs && globalCatalog[cat].descs.includes(itemName)) return "liquid";
@@ -1094,7 +1097,7 @@
 
     updateCartBadge(); renderCart();
 
-    const categoriesList = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack', 'zalivka-chaserspecial', 'zalivka-chaseryoume', 'prodazh-cuba', 'prodazh-barron', 'aktsii', 'aktsii-oxva', 'aktsii-pods', 'aktsii-xros6mini', 'aktsii-xros6', 'aktsii-xlimgo2'];
+    const categoriesList = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack', 'zalivka-chaserspecial', 'zalivka-chaseryoume', 'prodazh-cuba', 'prodazh-barron', 'aktsii', 'aktsii-oxva', 'aktsii-vaporesso', 'aktsii-pods', 'aktsii-xros6mini', 'aktsii-xros6', 'aktsii-xlimgo2'];
     
     onValue(ref(db, 'catalog'), (snap) => {
         globalCatalog = snap.val(); 
