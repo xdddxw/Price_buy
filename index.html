@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -369,20 +371,10 @@
     <div id="cat-aktsii" class="cat-section hidden">
         <div class="sub-nav">
             <button class="sub-nav-btn active" data-target="aktsii">Картриджі</button>
-            <button class="sub-nav-btn" data-target="aktsii-oxva">Oxva</button>
-            <button class="sub-nav-btn" data-target="aktsii-vaporesso">Vaporesso</button>
             <button class="sub-nav-btn" data-target="aktsii-pods">Подіки (Девайси)</button>
-            <button class="sub-nav-btn" data-target="aktsii-xros6mini">Xros 6 Mini</button>
-            <button class="sub-nav-btn" data-target="aktsii-xros6">Xros 6</button>
-            <button class="sub-nav-btn" data-target="aktsii-xlimgo2">Xlim Go 2</button>
         </div>
         <div class="product-grid sub-grid active" id="grid-aktsii"></div>
-        <div class="product-grid sub-grid" id="grid-aktsii-oxva"></div>
-        <div class="product-grid sub-grid" id="grid-aktsii-vaporesso"></div>
         <div class="product-grid sub-grid" id="grid-aktsii-pods"></div>
-        <div class="product-grid sub-grid" id="grid-aktsii-xros6mini"></div>
-        <div class="product-grid sub-grid" id="grid-aktsii-xros6"></div>
-        <div class="product-grid sub-grid" id="grid-aktsii-xlimgo2"></div>
     </div>
 
     <div id="cat-cart" class="cat-section hidden">
@@ -525,12 +517,7 @@
                 </optgroup>
                 <optgroup label="⚡ Поди та Картриджі">
                     <option value="aktsii">Картриджі</option>
-                    <option value="aktsii-oxva">Oxva</option>
-                    <option value="aktsii-vaporesso">Vaporesso</option>
                     <option value="aktsii-pods">Подіки</option>
-                    <option value="aktsii-xros6mini">Xros 6 Mini</option>
-                    <option value="aktsii-xros6">Xros 6</option>
-                    <option value="aktsii-xlimgo2">Xlim Go 2</option>
                 </optgroup>
             </select>
             <input type="text" id="new-prod-name" placeholder="Назва" class="admin-input">
@@ -837,7 +824,7 @@
         if (!globalCatalog) return "all";
         const liquids = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack', 'zalivka-chaserspecial', 'zalivka-chaseryoume'];
         const snus = ['prodazh-cuba', 'prodazh-barron'];
-        const cartridges = ['aktsii', 'aktsii-oxva', 'aktsii-vaporesso', 'aktsii-pods', 'aktsii-xros6mini', 'aktsii-xros6', 'aktsii-xlimgo2'];
+        const cartridges = ['aktsii', 'aktsii-pods'];
         
         for (let cat of liquids) {
             if (globalCatalog[cat] && globalCatalog[cat].descs && globalCatalog[cat].descs.includes(itemName)) return "liquid";
@@ -893,7 +880,7 @@
 
                 const isDiscounted = finalItemPrice !== getBasePrice(item.price, selectedCurrency);
                 const priceTagHtml = isDiscounted 
-                    ? `<span style="color:#888; text-decoration:line-through; font-size:11px; margin-right:5px;">${item.price}</span> <span style="color:#00ff99;">${finalItemPrice.toFixed(2)}${selectedCurrency} (Опт)</span>`
+                    ? `<span style="color:#888; text-decoration:line-through; font-size:11px; margin-right:5px;">${item.price}</span> <span style="color:#00ff99;">${finalItemPrice.toFixed(2)} ${selectedCurrency} (Опт)</span>`
                     : `<span>${item.price}</span>`;
 
                 const div = document.createElement('div'); div.className = 'cart-item';
@@ -919,7 +906,7 @@
                 if (activePromoCategory === 'snus') catName = "снюс";
                 if (activePromoCategory === 'cartridges') catName = "поди та картриджі";
 
-                discMsg.innerText = `🎁 Знижка -${activePromoDiscount}\% на ${catName} застосована!`;
+                discMsg.innerText = `🎁 Знижка -${activePromoDiscount}% на ${catName} застосована!`;
                 discMsg.style.color = 'var(--neon-pink)';
                 discMsg.style.display = 'block';
             } else if (activePromoDiscount > 0 && discountableSum === 0) {
@@ -930,7 +917,7 @@
                 discMsg.style.display = 'none';
             }
             
-            totalEl.innerText = `${totalSum.toFixed(2)}${selectedCurrency}`;
+            totalEl.innerText = `${totalSum.toFixed(2)} ${selectedCurrency}`;
             renderRecommended();
         }
     }
@@ -1097,7 +1084,7 @@
 
     updateCartBadge(); renderCart();
 
-    const categoriesList = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack', 'zalivka-chaserspecial', 'zalivka-chaseryoume', 'prodazh-cuba', 'prodazh-barron', 'aktsii', 'aktsii-oxva', 'aktsii-vaporesso', 'aktsii-pods', 'aktsii-xros6mini', 'aktsii-xros6', 'aktsii-xlimgo2'];
+    const categoriesList = ['zalivka-elfliq', 'zalivka-chaserlux', 'zalivka-chaserpods', 'zalivka-chaserblack', 'zalivka-chaserspecial', 'zalivka-chaseryoume', 'prodazh-cuba', 'prodazh-barron', 'aktsii', 'aktsii-pods'];
     
     onValue(ref(db, 'catalog'), (snap) => {
         globalCatalog = snap.val(); 
